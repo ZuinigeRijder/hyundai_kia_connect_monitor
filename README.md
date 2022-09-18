@@ -39,7 +39,7 @@ python monitor.py
 ```
 
 # Utilities
-##shrink_monitor_csv.py
+## shrink_monitor_csv.py
 Simple Python3 script to shrink monitor.csv.
 identical lines removed (first date/time column excluded)
 
@@ -51,7 +51,7 @@ Usage:
 python shrink_monitor_csv.py
 ```
 
-##monitor_csv_to_kml.py
+## monitor_csv_to_kml.py
 Simple Python3 script to convert monitor.csv to kml
 identical (longitude, latitude) lines to previous line are removed
 
