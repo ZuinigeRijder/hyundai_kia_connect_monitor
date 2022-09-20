@@ -1,12 +1,3 @@
-Automatic trip administration tools for Hyundai Bluelink or Kia UVO Connect users.
-Determining afterwards your private and/or business trips and information about those trips and usage of the car.
-
-**Table of Contents**
-
-[TOCM]
-
-[TOC]
-
 # hyundai_kia_connect_monitor
 Automatic trip administration tools for Hyundai Bluelink or Kia UVO Connect users.
 Determining afterwards your private and/or business trips and information about those trips and usage of the car.
@@ -55,7 +46,7 @@ Usage:
 ```
 python monitor.py
 ```
-- INPUTFILE: monitor.cfg (configuration of input to hyundai_kia_connect_api
+- INPUTFILE: monitor.cfg (configuration of input to hyundai_kia_connect_api)
 - OUTPUTFILE: monitor.csv (appended)
 
 Following information from hyundai_kia_connect_api is added to the monitor.csv file:
@@ -130,5 +121,5 @@ Usage:
 ```
 python debug.py
 ```
-- INPUTFILE: monitor.cfg (configuration of input to hyundai_kia_connect_api
+- INPUTFILE: monitor.cfg (configuration of input to hyundai_kia_connect_api)
 - standard output: debug output and pretty print of the data got from API calls

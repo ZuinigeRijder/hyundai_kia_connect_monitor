@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+<name>monitor 20220920 10:28</name>
+<Placemark><name>20220917 15:00</name><description>SOC: 54% 12V: 90% ODO: 17324.2</description><Point><coordinates>5.098617, 51.750744</coordinates></Point></Placemark>
+<Placemark><name>20220917 23:00 C</name><description>SOC: 55% 12V: 91% ODO: 17324.2 charging plugged:2</description><Point><coordinates>5.09873, 51.750783</coordinates></Point></Placemark>
+<Placemark><name>20220918 01:00</name><description>SOC: 60% 12V: 91% ODO: 17324.2 plugged:2</description><Point><coordinates>5.09873, 51.750783</coordinates></Point></Placemark>
+<Placemark><name>20220919 15:00  D</name><description>SOC: 61% 12V: 85% ODO: 17324.3 (+0.1 since 20220919 14:00) drive</description><Point><coordinates>5.075942, 51.769128</coordinates></Point></Placemark>
+<Placemark><name>20220919 16:00</name><description>SOC: 59% 12V: 86% ODO: 17330.7 (+6.4 since 20220919 15:00)</description><Point><coordinates>5.098636, 51.75075</coordinates></Point></Placemark>
+<Placemark><name>20220920 07:00  D</name><description>SOC: 59% 12V: 88% ODO: 17330.7 drive</description><Point><coordinates>5.091594, 51.754361</coordinates></Point></Placemark>
+<Placemark><name>20220920 08:00</name><description>SOC: 53% 12V: 91% ODO: 17358.9 (+28.2 since 20220920 07:00)</description><Point><coordinates>5.098597, 51.750739</coordinates></Point></Placemark>
+</Document>
+</kml>
