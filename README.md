@@ -60,6 +60,8 @@ Following information from hyundai_kia_connect_api is added to the monitor.csv f
 - charging
 - plugged
 
+Example output file monitor.csv: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/monitor.csv
+
 ## monitor_csv_to_kml.py
 transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations.
 Lines are not written, when the following info is the same as previous line: longitude, latitude, engineOn, charging
@@ -82,8 +84,14 @@ The following information is written in the kml file:
 Note:
 - the placemark lines are one-liners, so you can also search in monitor.kml
 
+Example standard output: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/monitor_csv_to_kml.py_output.txt
+Example output file monitor.kml: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/monitor.kml
+
 How to import kml in Google Maps:
 https://www.spotzi.com/en/about/help-center/how-to-import-a-kml-into-google-maps/
+
+Example screenshot (yes, I have adjusted the locations for privacy, so I park/drive in the meadows):
+- ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MonitorGoogleMyMaps.jpg)
 
 ## shrink_monitor_csv.py
 Simple Python3 script to shrink monitor.csv, identical lines removed (first date/time column excluded).  Handy for analyzing with other tools (e.g. Excel) with less data.
@@ -94,6 +102,8 @@ python shrink_monitor_csv.py
 ```
 - INPUTFILE: monitor.csv
 - OUTPUTFILE: shrinked_monitor.csv
+
+Example (based on earlier example monitor.csv) outputfile shrinked_monitor.csv: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/shrinked_monitor.csv
 
 ## Raspberry pi configuration
 Example script to run monitor.py once per hour on a linux based system.
