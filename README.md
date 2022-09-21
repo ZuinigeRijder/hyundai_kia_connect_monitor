@@ -2,7 +2,7 @@
 Automatic trip administration tools for Hyundai Bluelink or Kia UVO Connect users.
 Determining afterwards your private and/or business trips and information about those trips and usage of the car.
 
-Run monitor.py e.g. once per hour (I use it on a Raspberry Pi) and you can always check afterwards:
+Run monitor.py e.g. once per hour (I use it on a Raspberry Pi and on Windows 10 with pure Python) and you can always check afterwards:
 - captured locations
 - odometer at specific day/hour
 - how much driven at a specific day
@@ -28,7 +28,16 @@ Region Daily Limits    Per Action  Comments
 ```
 
 So maybe you can capture more than once per hour, but you might run into the problem that you use too much API calls, especially when you also regularly use the Hyndai Bluelink or Kia UVO Connect app. 
-You also can consider not to monitor between e.g. 22:00 and 6:00 (saves 1/3 of the calls).
+You also can consider only to monitor between e.g. 6:00 and 22:00 (saves 1/3 of the calls). Dependent on your regular driving habit, choose the best option for you. Examples:
+- each hour means 24 requests per day
+- each hour between 6:00 and 19:00 means 13 requests per day
+- each hour between 6:00 and 22:00 means 16 requests per day
+- each half hour means 48 requests per day
+- each half hour between 6:00 and 19:00 means 26 requests per day
+- each half hour between 6:00 and 22:00 means 32 requests per day
+- each quarter hour means 96 requests per day
+- each quarter hour between 6:00 and 19:00 means 52 requests per day
+- each quarter hour between 6:00 and 22:00 means 64 requests per day
 
 The following tools are available as pure Python3 scripts:
 - monitor.py: Simple Python3 script to monitor values using hyundai_kia_connect_api https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api

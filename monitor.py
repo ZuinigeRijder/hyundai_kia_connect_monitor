@@ -33,6 +33,7 @@ e.g. with Excel:
 import configparser
 import traceback
 import time
+from datetime import datetime
 from pathlib import Path
 from hyundai_kia_connect_api import VehicleManager
 
@@ -50,6 +51,12 @@ PASSWORD = monitor_settings['password']
 PIN = monitor_settings['pin']
 
 
+# == log =====================================================================
+def log(msg):
+    """log a message prefixed with a date/time format yyyymmdd hh:mm:ss"""
+    print(datetime.now().strftime("%Y%m%d %H:%M:%S") + ': ' + msg)
+
+
 def writeln(string):
     """ append line at monitor text file with end of line character """
     with MFILE.open("a", encoding="utf-8") as file:
@@ -59,7 +66,7 @@ def writeln(string):
 
 def get_append_data():
     """ get_append_data """
-    retries = 10
+    retries = 2
     while retries > 0:
         try:
             # get information and add to comma separated file
@@ -87,10 +94,11 @@ def get_append_data():
                     ', ' + str(vehicle.ev_battery_is_plugged_in)
                 )
             retries = 0  # successfully end while loop
-        except Exception:  # pylint: disable=broad-except
+        except Exception as ex:  # pylint: disable=broad-except
+            log('Exception: ' + str(ex))
             traceback.print_exc()
             retries -= 1
-            print("Sleeping a minute")
+            log("Sleeping a minute")
             time.sleep(60)
 
 
