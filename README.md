@@ -104,8 +104,7 @@ Example screenshot (yes, I have adjusted the locations for privacy, so I park/dr
 - ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MonitorGoogleMyMaps.jpg)
 
 ## summary.py
-transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations.
-Lines are not written, when the following info is the same as previous line: longitude, latitude, engineOn, charging
+make summary per DAY, WEEK, MONTH, YEAR with monitor.csv as input
 
 Usage: 
 ```
