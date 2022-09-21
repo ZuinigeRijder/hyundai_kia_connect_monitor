@@ -33,6 +33,17 @@ from pathlib import Path
 INPUT = Path("monitor.csv")
 OUTPUT = Path("monitor.kml")
 
+# indexes to splitted monitor.csv items
+DT = 0   # datetime
+LON = 1  # longitude
+LAT = 2  # latitude
+ENGINEON = 3  # engineOn
+V12 = 4  # 12V%
+ODO = 5  # odometer
+SOC = 6  # SOC%
+CHARGING = 7  # charging
+PLUGGED = 8  # plugged
+
 
 def write(outputfile, line):
     """ write """
@@ -66,15 +77,15 @@ def strip_datetime(string) -> str:
 
 def write_kml(outputfile, count, items, prev_items):
     """ write kml """
-    name = strip_datetime(items[0]) + ' '
-    lon = items[1].strip()
-    lat = items[2].strip()
-    driving = items[3].strip() == 'True'
-    voltage_12 = items[4].strip()
-    odometer = items[5].strip()
-    soc = items[6].strip()
-    charging = items[7].strip() == 'True'
-    plugged = items[8].strip()
+    name = strip_datetime(items[DT]) + ' '
+    lon = items[LON].strip()
+    lat = items[LAT].strip()
+    driving = items[ENGINEON].strip() == 'True'
+    voltage_12 = items[V12].strip()
+    odometer = items[ODO].strip()
+    soc = items[SOC].strip()
+    charging = items[CHARGING].strip() == 'True'
+    plugged = items[PLUGGED].strip()
 
     if charging:
         name += 'C'
@@ -91,13 +102,13 @@ def write_kml(outputfile, count, items, prev_items):
     delta_odometer = 0
     if len(prev_items) > 8:
         delta_odometer = round(
-            float(odometer) - float(prev_items[5].strip()), 1)
+            float(odometer) - float(prev_items[ODO].strip()), 1)
         if delta_odometer != 0.0:
             if delta_odometer > 0.0:
                 description += ' (+' + str(delta_odometer)
             else:
                 description += ' (' + str(delta_odometer)
-            description += ' since ' + strip_datetime(prev_items[0]) + ')'
+            description += ' since ' + strip_datetime(prev_items[DT]) + ')'
 
     if driving:
         description += ' drive'

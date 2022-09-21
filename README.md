@@ -41,8 +41,9 @@ You also can consider only to monitor between e.g. 6:00 and 22:00 (saves 1/3 of 
 
 The following tools are available as pure Python3 scripts:
 - monitor.py: Simple Python3 script to monitor values using hyundai_kia_connect_api https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api
-- monitor_csv_to_kml.py: transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations
-- shrink_monitor_csv.py: Simple Python3 script to shrink monitor.csv, identical lines removed (first date/time column excluded)
+- kml.py: transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations
+- summary.py: make summary per DAY, WEEK, MONTH, YEAR with monitor.csv as input
+- shrink.py: Simple Python3 script to shrink monitor.csv, identical lines removed (first date/time column excluded)
 - Raspberry pi configuration: example script to run monitor.py once per hour on a linux based system
 - debug.py: same sort of python script as monitor.py, but debug logging enabled and all the (internal) data is just printed to standard output in pretty print
 
@@ -71,13 +72,13 @@ Following information from hyundai_kia_connect_api is added to the monitor.csv f
 
 Example output file monitor.csv: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/monitor.csv
 
-## monitor_csv_to_kml.py
+## kml.py
 transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations.
 Lines are not written, when the following info is the same as previous line: longitude, latitude, engineOn, charging
 
 Usage: 
 ```
-python monitor_csv_to_kml.py
+python kml.py
 ```
 - INPUTFILE: monitor.csv
 - OUTPUTFILE: monitor.kml
@@ -102,12 +103,35 @@ https://www.spotzi.com/en/about/help-center/how-to-import-a-kml-into-google-maps
 Example screenshot (yes, I have adjusted the locations for privacy, so I park/drive in the meadows):
 - ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MonitorGoogleMyMaps.jpg)
 
-## shrink_monitor_csv.py
-Simple Python3 script to shrink monitor.csv, identical lines removed (first date/time column excluded).  Handy for analyzing with other tools (e.g. Excel) with less data.
+## summary.py
+transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations.
+Lines are not written, when the following info is the same as previous line: longitude, latitude, engineOn, charging
+
+Usage: 
+```
+python summary.py
+```
+- INPUTFILE: monitor.csv
+- standard output: summary per DAY, WEEK, MONTH, YEAR
+
+Example output:
+```
+C:\Users\Rick\git\monitor>python summary.py
+DAY   2022-09-17  driven:   0.0 delta SOC:  +4%
+WEEK  2022 W37    driven:   0.0 delta SOC:  +6%
+DAY   2022-09-19  driven:   6.5 delta SOC:  -1%
+DAY   2022-09-20  driven:  47.6 delta SOC: -14%
+WEEK  2022 W38    driven:  54.1 delta SOC: -15%
+MONTH 2022-09     driven:  54.1 delta SOC:  -9%
+YEAR  2022        driven:  54.1 delta SOC:  -9%
+```
+
+## shrink.py
+Simple Python3 script to shrink monitor.csv, identical lines removed (first date/time column excluded). Handy for analyzing with other tools (e.g. Excel) with less data.
 
 Usage:
 ```
-python shrink_monitor_csv.py
+python shrink.py
 ```
 - INPUTFILE: monitor.csv
 - OUTPUTFILE: shrinked_monitor.csv
