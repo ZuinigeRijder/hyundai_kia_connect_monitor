@@ -57,6 +57,9 @@ def same_day(d_1: datetime, d_2: datetime):
     return d_1.year == d_2.year
 
 
+print("Label, date      ,    driven, charged%, discharged%, charges, drives")  # noqa pylint:disable=line-too-long
+
+
 def compute_deltas(prefix, current, first):
     """ compute_deltas """
     debug("compute_deltas")
@@ -65,22 +68,55 @@ def compute_deltas(prefix, current, first):
     delta_odo = round(current[1] - first[1], 1)
     charged = first[2]
     discharged = first[3]
+    charges = first[4]
+    drives = first[5]
     if charged > 0 or discharged < 0 or delta_odo > 1.0:
-        print(f"{prefix:17} driven: {delta_odo:5.1f} charged: {charged:+4}% discharged: {discharged:4}%")  # noqa pylint:disable=line-too-long
+        print(f"{prefix:17}, {delta_odo:9.1f}, {charged:+7}%, {discharged:10}, {charges:8}, {drives:6}")  # noqa pylint:disable=line-too-long
 
 
 def init(current_day, odo):
     """ init tuple with initial charging and discharging """
-    return (current_day, odo, 0, 0)
+    return (current_day, odo, 0, 0, 0, 0)
 
 
-def add(values, delta_soc):
-    """ add delta_soc """
-    if delta_soc == 0:
-        return values
-    if delta_soc > 0:
-        return (values[0], values[1], values[2] + delta_soc, values[3])
-    return (values[0], values[1], values[2], values[3] + delta_soc)
+def keep_track_of_totals(values, split, split2):
+    """ add """
+    charged = values[2]
+    discharged = values[3]
+    charges = values[4]
+    drives = values[5]
+
+    odo = float(split[ODO].strip())
+    odo2 = float(split2[ODO].strip())
+
+    soc = int(split[SOC].strip())
+    soc2 = int(split2[SOC].strip())
+    delta_soc = soc - soc2
+
+    if delta_soc != 0:
+        debug("Delta SOC: " + str(delta_soc))
+        if delta_soc > 0:
+            charged += delta_soc
+        else:
+            discharged += delta_soc
+
+    charging = split[CHARGING].strip()
+    charging_2 = split2[CHARGING].strip()
+    debug(f"CHARGES: {charging} {charging_2}")
+    if charging == "True" and charging_2 == "False":
+        charges += 1
+        debug("CHARGES: " + str(charges))
+
+    engine_on = split[ENGINEON].strip()
+    engine_on_2 = split2[ENGINEON].strip()
+    if engine_on == "True" and engine_on_2 == "False":
+        drives += 1
+        debug("ENGINE_ON: " + str(drives))
+    if engine_on == "False" and engine_on_2 == "False" and odo != odo2:
+        drives += 1
+        debug("ODO: " + str(drives))
+
+    return (values[0], values[1], charged, discharged, charges, drives)
 
 
 def handle_line(  # pylint: disable=too-many-arguments
@@ -90,7 +126,6 @@ def handle_line(  # pylint: disable=too-many-arguments
     split = line.split(',')
     current_day = parser.parse(split[DT])
     odo = float(split[ODO].strip())
-    soc = int(split[SOC].strip())
 
     current_day_values = init(current_day, odo)
     if not first_d:
@@ -103,25 +138,21 @@ def handle_line(  # pylint: disable=too-many-arguments
 
     # take into account delta SOC per line
     split2 = prev_line.split(',')
-    soc2 = int(split2[SOC].strip())
-    delta_soc = soc - soc2
-    if delta_soc != 0:
-        debug("Delta SOC: " + str(delta_soc))
-        first_d = add(first_d, delta_soc)
-        first_w = add(first_w, delta_soc)
-        first_m = add(first_m, delta_soc)
-        first_y = add(first_y, delta_soc)
+    first_d = keep_track_of_totals(first_d, split, split2)
+    first_w = keep_track_of_totals(first_w, split, split2)
+    first_m = keep_track_of_totals(first_m, split, split2)
+    first_y = keep_track_of_totals(first_y, split, split2)
 
     if not same_day(current_day, first_d[0]):
         compute_deltas(
-            "DAY   " + first_d[0].strftime("%Y-%m-%d"),
+            "DAY  , " + first_d[0].strftime("%Y-%m-%d"),
             current_day_values,
             first_d
         )
         first_d = init(current_day, odo)
         if not same_week(current_day, first_w[0]):
             compute_deltas(
-                "WEEK  " + str(first_y[0].year) + " W" +
+                "WEEK , " + str(first_y[0].year) + " W" +
                 str(first_w[0].isocalendar().week),
                 current_day_values,
                 first_w
@@ -129,14 +160,14 @@ def handle_line(  # pylint: disable=too-many-arguments
             first_w = first_d
         if not same_month(current_day, first_m[0]):
             compute_deltas(
-                "MONTH " + first_m[0].strftime("%Y-%m"),
+                "MONTH, " + first_m[0].strftime("%Y-%m"),
                 current_day_values,
                 first_m
             )
             first_m = first_d
         if not same_year(current_day, first_y[0]):
             compute_deltas(
-                "YEAR  " + str(first_y[0].year),
+                "YEAR , " + str(first_y[0].year),
                 current_day_values,
                 first_y
             )

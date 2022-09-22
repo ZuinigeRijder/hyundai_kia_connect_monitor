@@ -12,8 +12,7 @@ Run monitor.py e.g. once per hour (I use it on a Raspberry Pi and on Windows 10 
 - see your 12 volt battery percentage fluctuation
 
 Idea is that you can analyze the information over time with other scripts or e.g. with Excel:
-- daily summary (I am thinking about adding a daily_summary.py script)
-- weekly/monthly summary
+- summaries (see summary.py script)
 - odometer trend over the lifetime
 - SOC trend and charging trend
 - 12V battery fluctuations
@@ -111,21 +110,27 @@ Usage:
 python summary.py
 ```
 - INPUTFILE: monitor.csv
-- standard output: summary per DAY, WEEK, MONTH, YEAR
+- standard output: summary per DAY, WEEK, MONTH, YEAR in csv format
 
 Example output:
 ```
 C:\Users\Rick\git\monitor>python summary.py
-DAY   2022-09-17  driven:   0.0 charged:   +4% discharged:    0%
-DAY   2022-09-18  driven:   0.0 charged:   +3% discharged:   -1%
-WEEK  2022 W37    driven:   0.0 charged:   +7% discharged:   -1%
-DAY   2022-09-19  driven:   6.5 charged:   +1% discharged:   -2%
-DAY   2022-09-20  driven:  47.6 charged:   +0% discharged:  -14%
-DAY   2022-09-21  driven:   5.2 charged:  +26% discharged:   -1%
-WEEK  2022 W38    driven:  59.3 charged:  +27% discharged:  -17%
-MONTH 2022-09     driven:  59.3 charged:  +34% discharged:  -18%
-YEAR  2022        driven:  59.3 charged:  +34% discharged:  -18%
+Label, date      ,    driven, charged%, discharged%, charges, drives
+DAY  , 2022-09-17,       0.0,      +4%,          0,        1,      0
+DAY  , 2022-09-18,       0.0,      +3%,         -1,        0,      0
+WEEK , 2022 W37  ,       0.0,      +7%,         -1,        1,      0
+DAY  , 2022-09-19,       6.5,      +1%,         -2,        0,      2
+DAY  , 2022-09-20,      47.6,      +0%,        -14,        0,      2
+DAY  , 2022-09-21,       5.2,     +26%,         -1,        2,      2
+WEEK , 2022 W38  ,      59.3,     +27%,        -17,        2,      6
+MONTH, 2022-09   ,      59.3,     +34%,        -18,        3,      6
+YEAR , 2022      ,      59.3,     +34%,        -18,        3,      6
 ```
+
+Notes:
+- the summary is done in one go, keeping track of DAY, WEEK, MONTH and YEAR totals
+- the summary is based on the captured data, so in fact there might be e.g. charges or drives missed
+- you can grep the output for DAY, WEEK, MONTH or YEAR to only have those lines shown
 
 ## shrink.py
 Simple Python3 script to shrink monitor.csv, identical lines removed (first date/time column excluded). Handy for analyzing with other tools (e.g. Excel) with less data.
