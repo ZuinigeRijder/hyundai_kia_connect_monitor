@@ -71,7 +71,7 @@ def compute_deltas(prefix, current, first):
     charges = first[4]
     drives = first[5]
     if charged > 0 or discharged < 0 or delta_odo > 1.0:
-        print(f"{prefix:17}, {delta_odo:9.1f}, {charged:+7}%, {discharged:10}, {charges:8}, {drives:6}")  # noqa pylint:disable=line-too-long
+        print(f"{prefix:17}, {delta_odo:9.1f}, {charged:+7}%, {discharged:11}, {charges:7}, {drives:6}")  # noqa pylint:disable=line-too-long
 
 
 def init(current_day, odo):
@@ -100,19 +100,22 @@ def keep_track_of_totals(values, split, split2):
         else:
             discharged += delta_soc
 
-    charging = split[CHARGING].strip()
-    charging_2 = split2[CHARGING].strip()
+    charging = split[CHARGING].strip() == "True"
+    charging_2 = split2[CHARGING].strip() == "True"
     debug(f"CHARGES: {charging} {charging_2}")
-    if charging == "True" and charging_2 == "False":
+    if charging and not charging_2:
         charges += 1
         debug("CHARGES: " + str(charges))
+    if delta_soc > 1 and not charging and not charging_2:
+        charges += 1
+        print("DELTA_SOC > 1: " + str(charges))
 
-    engine_on = split[ENGINEON].strip()
-    engine_on_2 = split2[ENGINEON].strip()
-    if engine_on == "True" and engine_on_2 == "False":
+    engine_on = split[ENGINEON].strip() == "True"
+    engine_on_2 = split2[ENGINEON].strip() == "True"
+    if engine_on and not engine_on_2:
         drives += 1
         debug("ENGINE_ON: " + str(drives))
-    if engine_on == "False" and engine_on_2 == "False" and odo != odo2:
+    if odo != odo2 and not engine_on and not engine_on_2:
         drives += 1
         debug("ODO: " + str(drives))
 
@@ -136,7 +139,7 @@ def handle_line(  # pylint: disable=too-many-arguments
             current_day_values
         )
 
-    # take into account delta SOC per line
+    # take into account totals per line
     split2 = prev_line.split(',')
     first_d = keep_track_of_totals(first_d, split, split2)
     first_w = keep_track_of_totals(first_w, split, split2)
