@@ -116,13 +116,15 @@ python summary.py
 Example output:
 ```
 C:\Users\Rick\git\monitor>python summary.py
-DAY   2022-09-17  driven:   0.0 delta SOC:  +4%
-WEEK  2022 W37    driven:   0.0 delta SOC:  +6%
-DAY   2022-09-19  driven:   6.5 delta SOC:  -1%
-DAY   2022-09-20  driven:  47.6 delta SOC: -14%
-WEEK  2022 W38    driven:  54.1 delta SOC: -15%
-MONTH 2022-09     driven:  54.1 delta SOC:  -9%
-YEAR  2022        driven:  54.1 delta SOC:  -9%
+DAY   2022-09-17  driven:   0.0 charged:   +4% discharged:    0%
+DAY   2022-09-18  driven:   0.0 charged:   +3% discharged:   -1%
+WEEK  2022 W37    driven:   0.0 charged:   +7% discharged:   -1%
+DAY   2022-09-19  driven:   6.5 charged:   +1% discharged:   -2%
+DAY   2022-09-20  driven:  47.6 charged:   +0% discharged:  -14%
+DAY   2022-09-21  driven:   5.2 charged:  +26% discharged:   -1%
+WEEK  2022 W38    driven:  59.3 charged:  +27% discharged:  -17%
+MONTH 2022-09     driven:  59.3 charged:  +34% discharged:  -18%
+YEAR  2022        driven:  59.3 charged:  +34% discharged:  -18%
 ```
 
 ## shrink.py
