@@ -108,7 +108,7 @@ def keep_track_of_totals(values, split, split2):
         debug("CHARGES: " + str(charges))
     if delta_soc > 1 and not charging and not charging_2:
         charges += 1
-        print("DELTA_SOC > 1: " + str(charges))
+        debug("DELTA_SOC > 1: " + str(charges))
 
     engine_on = split[ENGINEON].strip() == "True"
     engine_on_2 = split2[ENGINEON].strip() == "True"
