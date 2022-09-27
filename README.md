@@ -127,6 +127,9 @@ python shrink.py
 - INPUTFILE: monitor.csv
 - OUTPUTFILE: shrinked_monitor.csv
 
+Note: 
+- True and False for EngineOn and Driving are replaced into respectively 1 and 0, so it is shorter and easier usable in e.g. Excel.
+
 ## Raspberry pi configuration
 Example script to run monitor.py once per hour on a linux based system.
 

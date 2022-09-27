@@ -21,7 +21,8 @@ def shrink():
                 index = line.find(',')
                 if index < 0 or previndex < 0 or index != previndex or \
                         prevline[previndex:] != line[index:]:
-                    outputfile.write(line)
+                    tmp = line.replace("False", "0").replace("True", "1")
+                    outputfile.write(tmp)
 
                 prevline = line
                 previndex = index
