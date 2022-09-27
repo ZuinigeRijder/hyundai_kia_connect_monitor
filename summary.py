@@ -19,6 +19,8 @@ monitor_settings = dict(config_parser.items('summary'))
 
 ODO_METRIC = monitor_settings['odometer_metric']
 NET_BATTERY_SIZE_KWH = float(monitor_settings['net_battery_size_kwh'])
+AVERAGE_COST_PER_KWH = float(monitor_settings['average_cost_per_kwh'])
+COST_CURRENCY = monitor_settings['cost_currency']
 
 # indexes to splitted monitor.csv items
 DT = 0   # datetime
@@ -66,7 +68,7 @@ def same_day(d_1: datetime, d_2: datetime):
     return d_1.year == d_2.year
 
 
-print(f"Label, date      , driven {ODO_METRIC}, charged%, discharged%, charges, drives, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}")  # noqa pylint:disable=line-too-long
+print(f"Label, date      , driven {ODO_METRIC}, charged%, discharged%, charges, drives, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}")  # noqa pylint:disable=line-too-long
 
 
 def compute_deltas(prefix, current, values):
@@ -81,7 +83,9 @@ def compute_deltas(prefix, current, values):
     drives = values[5]
     km_mi_per_kwh = 0.0
     kwh_per_km_mi = 0.0
+    cost = 0.00
     if discharged < -2:
+        cost = NET_BATTERY_SIZE_KWH / 100 * -discharged * AVERAGE_COST_PER_KWH
         km_mi_per_kwh = delta_odo / (NET_BATTERY_SIZE_KWH / 100 * -discharged)
         if km_mi_per_kwh > 0.0:
             kwh_per_km_mi = 100 / km_mi_per_kwh
@@ -89,7 +93,7 @@ def compute_deltas(prefix, current, values):
         # do not show small discharges
         discharged = 0
     if charged > 0 or discharged < 0 or delta_odo > 1.0 or drives > 0:
-        print(f"{prefix:17}, {delta_odo:9.1f}, {charged:+7}%, {discharged:11}, {charges:7}, {drives:6}, {km_mi_per_kwh:6.1f}, {kwh_per_km_mi:9.1f}")  # noqa pylint:disable=line-too-long
+        print(f"{prefix:17}, {delta_odo:9.1f}, {charged:+7}%, {discharged:11}, {charges:7}, {drives:6}, {km_mi_per_kwh:6.1f}, {kwh_per_km_mi:9.1f}, {cost:9.2f}")  # noqa pylint:disable=line-too-long
 
 
 def init(current_day, odo):
