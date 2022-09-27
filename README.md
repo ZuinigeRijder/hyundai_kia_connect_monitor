@@ -252,3 +252,8 @@ I changed the style to "sequence numbering" so you see the order of locations in
 ## python shrink.py
 
 Example (based on earlier monitor.csv) outputfile shrinked_monitor.csv: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/shrinked_monitor.csv
+
+Excel example using shrinked_monitor.csv: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/blob/main/examples/shrinked_monitor.xlsx
+
+Screenshot of excel example with some graphs:
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/shrinked_monitor.jpg)
