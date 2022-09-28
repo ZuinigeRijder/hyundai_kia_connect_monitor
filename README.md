@@ -75,21 +75,31 @@ make summary per DAY, WEEK, MONTH, YEAR with monitor.csv as input
 Usage: 
 ```
 python summary.py
+or
+python summary.py day
+or
+python summary.py week
+or
+python summary.py month
+or
+python summary.py year
 ```
 - INPUTFILE: summary.cfg (configuration of kilometers or miles, net battery size in kWh, average cost per kWh and cost currency)
 - INPUTFILE: monitor.csv
-- standard output: summary per DAY, WEEK, MONTH, YEAR in csv format
+- standard output: summary per DAY, WEEK, MONTH, YEAR in csv format (default all summaries when no parameters given)
 
 Notes:
+- add day, week, month or year as parameter, which respectively only shows lines for DAY, WEEK, MONTH or YEAR
 - the summary is done in one go, keeping track of DAY, WEEK, MONTH and YEAR totals
 - the summary is based on the captured data, so in fact there might be e.g. charges or drives missed
-- you can grep the output for DAY, WEEK, MONTH or YEAR to only have those lines shown
 
 Example configuration of summary.cfg (I have an IONIQ 5 Project 45 with 72.6 kWh battery and 3.5% buffer, so net 70 kWh):
 ```
 [summary]
 odometer_metric = km
 net_battery_size_kwh = 70.0
+average_cost_per_kwh = 0.246
+cost_currency = Euro
 ```
 
 ## kml.py
@@ -172,28 +182,51 @@ Example output file monitor.csv: https://raw.githubusercontent.com/ZuinigeRijder
 
 ## python summary.py
 
-The summary of the previous monitor.csv file.
+The summary.py standard output of the previous monitor.csv file: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_output.txt
+
 
 output:
 ```
 C:\Users\Rick\git\monitor>python summary.py
 Label, date      , driven km, charged%, discharged%, charges, drives, km/kWh, kWh/100km, cost Euro
-DAY  , 2022-09-17,       0.0,      +3%,           0,       1,      0,    0.0,       0.0,      0.00
+DAY  , 2022-09-17,       0.0,      +4%,           0,       1,      0,    0.0,       0.0,      0.00
 DAY  , 2022-09-18,       0.0,      +2%,           0,       0,      0,    0.0,       0.0,      0.00
-WEEK , 2022 W37  ,       0.0,      +5%,           0,       1,      0,    0.0,       0.0,      0.00
+WEEK , 2022 W37  ,       0.0,      +6%,           0,       1,      0,    0.0,       0.0,      0.00
 DAY  , 2022-09-19,       6.5,      +0%,           0,       0,      2,    0.0,       0.0,      0.00
 DAY  , 2022-09-20,      47.6,      +0%,         -14,       0,      2,    4.9,      20.6,      2.41
-DAY  , 2022-09-21,       5.2,     +19%,           0,       2,      2,    0.0,       0.0,      0.00
+DAY  , 2022-09-21,       5.2,     +25%,           0,       2,      2,    0.0,       0.0,      0.00
 DAY  , 2022-09-22,       1.9,      +2%,           0,       1,      1,    0.0,       0.0,      0.00
-DAY  , 2022-09-23,       1.7,     +24%,           0,       2,      1,    0.0,       0.0,      0.00
+DAY  , 2022-09-23,       1.7,     +28%,           0,       2,      1,    0.0,       0.0,      0.00
 DAY  , 2022-09-24,     407.8,     +37%,         -95,       1,      6,    6.1,      16.3,     16.36
-DAY  , 2022-09-25,       0.0,      +6%,           0,       0,      0,    0.0,       0.0,      0.00
-WEEK , 2022 W38  ,     470.7,     +88%,         -98,       6,     14,    6.9,      14.6,     16.88
-MONTH, 2022-09   ,     470.7,     +93%,         -97,       7,     14,    6.9,      14.4,     16.70
-YEAR , 2022      ,     470.7,     +93%,         -97,       7,     14,    6.9,      14.4,     16.70
+DAY  , 2022-09-25,       0.0,      +8%,           0,       0,      0,    0.0,       0.0,      0.00
+WEEK , 2022 W38  ,     470.7,    +100%,        -110,       6,     14,    6.1,      16.4,     18.94
+MONTH, 2022-09   ,     470.7,    +106%,        -110,       7,     14,    6.1,      16.4,     18.94
+YEAR , 2022      ,     470.7,    +106%,        -110,       7,     14,    6.1,      16.4,     18.94
 ```
 
 2022-09-24 I did a trip from 100% SOC to 5% SOC, have driven 407.8 km and started charging when back at home.
+
+Example output when filtering on DAY:
+```
+C:\Users\Rick\git\monitor>python summary.py day
+Label, date      , driven km, charged%, discharged%, charges, drives, km/kWh, kWh/100km, cost Euro
+DAY  , 2022-09-17,       0.0,      +4%,           0,       1,      0,    0.0,       0.0,      0.00
+DAY  , 2022-09-18,       0.0,      +2%,           0,       0,      0,    0.0,       0.0,      0.00
+DAY  , 2022-09-19,       6.5,      +0%,           0,       0,      2,    0.0,       0.0,      0.00
+DAY  , 2022-09-20,      47.6,      +0%,         -14,       0,      2,    4.9,      20.6,      2.41
+DAY  , 2022-09-21,       5.2,     +25%,           0,       2,      2,    0.0,       0.0,      0.00
+DAY  , 2022-09-22,       1.9,      +2%,           0,       1,      1,    0.0,       0.0,      0.00
+DAY  , 2022-09-23,       1.7,     +28%,           0,       2,      1,    0.0,       0.0,      0.00
+DAY  , 2022-09-24,     407.8,     +37%,         -95,       1,      6,    6.1,      16.3,     16.36
+DAY  , 2022-09-25,       0.0,      +8%,           0,       0,      0,    0.0,       0.0,      0.00
+```
+
+You can redirect this standard output to a file, e.g. summary.day.csv: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.csv
+
+Excel example using summary.day.csv: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/blob/main/examples/summary.day.xlsx
+
+Screenshot of excel example with some graphs:
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.jpg)
 
 ## python kml.py
 
