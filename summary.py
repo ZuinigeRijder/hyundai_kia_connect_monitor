@@ -72,7 +72,7 @@ def same_day(d_1: datetime, d_2: datetime):
     return d_1.year == d_2.year
 
 
-print(f"Label, date      , driven {ODO_METRIC}, charged%, discharged%, charges, drives, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}")  # noqa pylint:disable=line-too-long
+print(f"Period, date      , driven {ODO_METRIC}, charged%, charged kWh, discharged%, discharged kWh, #charges, #drives, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}")  # noqa pylint:disable=line-too-long
 
 
 def print_summary(prefix, current, values):
@@ -85,19 +85,23 @@ def print_summary(prefix, current, values):
     discharged = values[3]
     charges = values[4]
     drives = values[5]
+
+    charged_kwh = NET_BATTERY_SIZE_KWH / 100 * charged
+    discharged_kwh = NET_BATTERY_SIZE_KWH / 100 * discharged
     km_mi_per_kwh = 0.0
     kwh_per_km_mi = 0.0
     cost = 0.00
-    if discharged < -2:
-        cost = NET_BATTERY_SIZE_KWH / 100 * -discharged * AVERAGE_COST_PER_KWH
-        km_mi_per_kwh = delta_odo / (NET_BATTERY_SIZE_KWH / 100 * -discharged)
-        if km_mi_per_kwh > 0.0:
-            kwh_per_km_mi = 100 / km_mi_per_kwh
+    if discharged < 0:
+        if discharged != -1:  # small discharge means inaccurate calculation
+            cost = discharged_kwh * -AVERAGE_COST_PER_KWH
+            km_mi_per_kwh = delta_odo / -discharged_kwh
+            if km_mi_per_kwh > 0.0:
+                kwh_per_km_mi = 100 / km_mi_per_kwh
     else:
-        # do not show small discharges
+        # do not show positive discharges
         discharged = 0
-    if charged > 2 or discharged < 2 or delta_odo > 1.0 or drives > 0:
-        print(f"{prefix:17}, {delta_odo:9.1f}, {charged:+7}%, {discharged:11}, {charges:7}, {drives:6}, {km_mi_per_kwh:6.1f}, {kwh_per_km_mi:9.1f}, {cost:9.2f}")  # noqa pylint:disable=line-too-long
+    if charged > 0 or discharged < 0 or delta_odo > 1.0 or drives > 0:
+        print(f"{prefix:18}, {delta_odo:9.1f}, {charged:+7}%, {charged_kwh:11.1f}, {discharged:10}%, {discharged_kwh:14.1f}, {charges:8}, {drives:7}, {km_mi_per_kwh:6.1f}, {kwh_per_km_mi:9.1f}, {cost:9.2f}")  # noqa pylint:disable=line-too-long
 
 
 def init(current_day, odo):
@@ -106,21 +110,27 @@ def init(current_day, odo):
 
 
 def keep_track_of_totals(values, split, prev_split):
-    """ add """
+    """ keep_track_of_totals """
+
+    debug("prev_split: " + str(prev_split))
+    debug("     split: " + str(split))
+
     charged = values[2]
     discharged = values[3]
     charges = values[4]
     drives = values[5]
 
-    odo = float(split[ODO].strip())
-    prev_odo = float(prev_split[ODO].strip())
+    moved = (
+        float(split[ODO].strip()) != float(prev_split[ODO].strip()) or
+        float(split[LAT].strip()) != float(prev_split[LAT].strip()) or
+        float(split[LON].strip()) != float(prev_split[LON].strip())
+    )
 
-    soc = int(split[SOC].strip())
-    prev_soc = int(prev_split[SOC].strip())
-    delta_soc = soc - prev_soc
+    delta_soc = int(split[SOC].strip()) - int(prev_split[SOC].strip())
 
     charging = split[CHARGING].strip() == "True"
     prev_charging = prev_split[CHARGING].strip() == "True"
+    no_charging = not charging and not prev_charging
 
     engine_on = split[ENGINEON].strip() == "True"
     engine_on_2 = prev_split[ENGINEON].strip() == "True"
@@ -128,7 +138,7 @@ def keep_track_of_totals(values, split, prev_split):
     if delta_soc != 0:
         debug("Delta SOC: " + str(delta_soc))
         if delta_soc > 0:
-            if not charging and delta_soc == 1:
+            if delta_soc == 1 and no_charging and not moved:
                 # small SOC difference can occur due to
                 # temperature difference (morning/evening),
                 # so correct discharged for delta_soc of 1
@@ -138,18 +148,17 @@ def keep_track_of_totals(values, split, prev_split):
         else:
             discharged += delta_soc
 
-    debug(f"CHARGES: {charging} {prev_charging}")
     if charging and not prev_charging:
         charges += 1
         debug("CHARGES: " + str(charges))
-    if delta_soc > 1 and not charging and not prev_charging:
+    if delta_soc > 1 and no_charging:
         charges += 1
         debug("charges: DELTA_SOC > 1: " + str(charges))
 
     if engine_on and not engine_on_2:
         drives += 1
         debug("ENGINE_ON: " + str(drives))
-    if odo != prev_odo and not engine_on and not engine_on_2:
+    if moved and not engine_on and not engine_on_2:
         drives += 1
         debug("ODO: " + str(drives))
 
@@ -187,7 +196,7 @@ def handle_line(  # pylint: disable=too-many-arguments
     if not same_day(current_day, first_d[0]):
         if DAY:
             print_summary(
-                "DAY  , " + first_d[0].strftime("%Y-%m-%d"),
+                "DAY   , " + first_d[0].strftime("%Y-%m-%d"),
                 current_day_values,
                 first_d
             )
@@ -195,7 +204,7 @@ def handle_line(  # pylint: disable=too-many-arguments
         if not same_week(current_day, first_w[0]):
             if WEEK:
                 print_summary(
-                    "WEEK , " + str(first_y[0].year) + " W" +
+                    "WEEK  , " + str(first_y[0].year) + " W" +
                     str(first_w[0].isocalendar().week),
                     current_day_values,
                     first_w
@@ -204,7 +213,7 @@ def handle_line(  # pylint: disable=too-many-arguments
         if not same_month(current_day, first_m[0]):
             if MONTH:
                 print_summary(
-                    "MONTH, " + first_m[0].strftime("%Y-%m"),
+                    "MONTH , " + first_m[0].strftime("%Y-%m"),
                     current_day_values,
                     first_m
                 )
@@ -212,7 +221,7 @@ def handle_line(  # pylint: disable=too-many-arguments
         if not same_year(current_day, first_y[0]):
             if YEAR:
                 print_summary(
-                    "YEAR , " + str(first_y[0].year),
+                    "YEAR  , " + str(first_y[0].year),
                     current_day_values,
                     first_y
                 )

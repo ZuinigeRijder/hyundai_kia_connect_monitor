@@ -188,20 +188,20 @@ The summary.py standard output of the previous monitor.csv file: https://raw.git
 output:
 ```
 C:\Users\Rick\git\monitor>python summary.py
-Label, date      , driven km, charged%, discharged%, charges, drives, km/kWh, kWh/100km, cost Euro
-DAY  , 2022-09-17,       0.0,      +4%,           0,       1,      0,    0.0,       0.0,      0.00
-DAY  , 2022-09-18,       0.0,      +2%,           0,       0,      0,    0.0,       0.0,      0.00
-WEEK , 2022 W37  ,       0.0,      +6%,           0,       1,      0,    0.0,       0.0,      0.00
-DAY  , 2022-09-19,       6.5,      +0%,           0,       0,      2,    0.0,       0.0,      0.00
-DAY  , 2022-09-20,      47.6,      +0%,         -14,       0,      2,    4.9,      20.6,      2.41
-DAY  , 2022-09-21,       5.2,     +25%,           0,       2,      2,    0.0,       0.0,      0.00
-DAY  , 2022-09-22,       1.9,      +2%,           0,       1,      1,    0.0,       0.0,      0.00
-DAY  , 2022-09-23,       1.7,     +28%,           0,       2,      1,    0.0,       0.0,      0.00
-DAY  , 2022-09-24,     407.8,     +37%,         -95,       1,      6,    6.1,      16.3,     16.36
-DAY  , 2022-09-25,       0.0,      +8%,           0,       0,      0,    0.0,       0.0,      0.00
-WEEK , 2022 W38  ,     470.7,    +100%,        -110,       6,     14,    6.1,      16.4,     18.94
-MONTH, 2022-09   ,     470.7,    +106%,        -110,       7,     14,    6.1,      16.4,     18.94
-YEAR , 2022      ,     470.7,    +106%,        -110,       7,     14,    6.1,      16.4,     18.94
+Period, date      , driven km, charged%, charged kWh, discharged%, discharged kWh, #charges, #drives, km/kWh, kWh/100km, cost Euro
+DAY   , 2022-09-17,       0.0,      +4%,         2.8,          0%,            0.0,        1,       0,    0.0,       0.0,      0.00
+DAY   , 2022-09-18,       0.0,      +2%,         1.4,          0%,            0.0,        0,       0,    0.0,       0.0,      0.00
+WEEK  , 2022 W37  ,       0.0,      +6%,         4.2,          0%,            0.0,        1,       0,    0.0,       0.0,      0.00
+DAY   , 2022-09-19,       6.5,      +0%,         0.0,         -1%,           -0.7,        0,       2,    0.0,       0.0,      0.00
+DAY   , 2022-09-20,      47.6,      +0%,         0.0,        -14%,           -9.8,        0,       2,    4.9,      20.6,      2.41
+DAY   , 2022-09-21,       5.2,     +26%,        18.2,         -1%,           -0.7,        2,       2,    0.0,       0.0,      0.00
+DAY   , 2022-09-22,       1.9,      +2%,         1.4,         -1%,           -0.7,        1,       1,    0.0,       0.0,      0.00
+DAY   , 2022-09-23,       1.7,     +29%,        20.3,          0%,            0.0,        2,       1,    0.0,       0.0,      0.00
+DAY   , 2022-09-24,     407.8,     +37%,        25.9,        -95%,          -66.5,        1,       6,    6.1,      16.3,     16.36
+DAY   , 2022-09-25,       0.0,      +8%,         5.6,          0%,            0.0,        0,       0,    0.0,       0.0,      0.00
+WEEK  , 2022 W38  ,     470.7,    +102%,        71.4,       -112%,          -78.4,        6,      14,    6.0,      16.7,     19.29
+MONTH , 2022-09   ,     470.7,    +108%,        75.6,       -112%,          -78.4,        7,      14,    6.0,      16.7,     19.29
+YEAR  , 2022      ,     470.7,    +108%,        75.6,       -112%,          -78.4,        7,      14,    6.0,      16.7,     19.29
 ```
 
 2022-09-24 I did a trip from 100% SOC to 5% SOC, have driven 407.8 km and started charging when back at home.
@@ -209,16 +209,16 @@ YEAR , 2022      ,     470.7,    +106%,        -110,       7,     14,    6.1,   
 Example output when filtering on DAY:
 ```
 C:\Users\Rick\git\monitor>python summary.py day
-Label, date      , driven km, charged%, discharged%, charges, drives, km/kWh, kWh/100km, cost Euro
-DAY  , 2022-09-17,       0.0,      +4%,           0,       1,      0,    0.0,       0.0,      0.00
-DAY  , 2022-09-18,       0.0,      +2%,           0,       0,      0,    0.0,       0.0,      0.00
-DAY  , 2022-09-19,       6.5,      +0%,           0,       0,      2,    0.0,       0.0,      0.00
-DAY  , 2022-09-20,      47.6,      +0%,         -14,       0,      2,    4.9,      20.6,      2.41
-DAY  , 2022-09-21,       5.2,     +25%,           0,       2,      2,    0.0,       0.0,      0.00
-DAY  , 2022-09-22,       1.9,      +2%,           0,       1,      1,    0.0,       0.0,      0.00
-DAY  , 2022-09-23,       1.7,     +28%,           0,       2,      1,    0.0,       0.0,      0.00
-DAY  , 2022-09-24,     407.8,     +37%,         -95,       1,      6,    6.1,      16.3,     16.36
-DAY  , 2022-09-25,       0.0,      +8%,           0,       0,      0,    0.0,       0.0,      0.00
+Period, date      , driven km, charged%, charged kWh, discharged%, discharged kWh, #charges, #drives, km/kWh, kWh/100km, cost Euro
+DAY   , 2022-09-17,       0.0,      +4%,         2.8,          0%,            0.0,        1,       0,    0.0,       0.0,      0.00
+DAY   , 2022-09-18,       0.0,      +2%,         1.4,          0%,            0.0,        0,       0,    0.0,       0.0,      0.00
+DAY   , 2022-09-19,       6.5,      +0%,         0.0,         -1%,           -0.7,        0,       2,    0.0,       0.0,      0.00
+DAY   , 2022-09-20,      47.6,      +0%,         0.0,        -14%,           -9.8,        0,       2,    4.9,      20.6,      2.41
+DAY   , 2022-09-21,       5.2,     +26%,        18.2,         -1%,           -0.7,        2,       2,    0.0,       0.0,      0.00
+DAY   , 2022-09-22,       1.9,      +2%,         1.4,         -1%,           -0.7,        1,       1,    0.0,       0.0,      0.00
+DAY   , 2022-09-23,       1.7,     +29%,        20.3,          0%,            0.0,        2,       1,    0.0,       0.0,      0.00
+DAY   , 2022-09-24,     407.8,     +37%,        25.9,        -95%,          -66.5,        1,       6,    6.1,      16.3,     16.36
+DAY   , 2022-09-25,       0.0,      +8%,         5.6,          0%,            0.0,        0,       0,    0.0,       0.0,      0.00
 ```
 
 You can redirect this standard output to a file, e.g. summary.day.csv: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.csv
@@ -226,7 +226,7 @@ You can redirect this standard output to a file, e.g. summary.day.csv: https://r
 Excel example using summary.day.csv: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/blob/main/examples/summary.day.xlsx
 
 Screenshot of excel example with some graphs:
-![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.jpg)
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.png)
 
 ## python kml.py
 
