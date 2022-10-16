@@ -70,13 +70,19 @@ Following information from hyundai_kia_connect_api is added to the monitor.csv f
 - plugged
 
 ## summary.py
-make summary per DAY, WEEK, MONTH, YEAR with monitor.csv as input
+make summary per TRIP, DAY, WEEK, MONTH, YEAR or a combination with monitor.csv as input
 
 Usage: 
 ```
 python summary.py
 or
+python summary.py -trip
+or
 python summary.py day
+or
+python summary.py trip
+or
+python summary.py trip day
 or
 python summary.py week
 or
@@ -86,12 +92,12 @@ python summary.py year
 ```
 - INPUTFILE: summary.cfg (configuration of kilometers or miles, net battery size in kWh, average cost per kWh and cost currency)
 - INPUTFILE: monitor.csv
-- standard output: summary per DAY, WEEK, MONTH, YEAR in csv format (default all summaries when no parameters given)
+- standard output: summary per TRIP, DAY, WEEK, MONTH, YEAR in csv format (default all summaries when no parameters given)
 
 Notes:
-- add day, week, month or year as parameter, which respectively only shows lines for DAY, WEEK, MONTH or YEAR
-- the summary is done in one go, keeping track of DAY, WEEK, MONTH and YEAR totals
-- the summary is based on the captured data, so in fact there might be e.g. charges or drives missed
+- add trip, day, week, month, year or -trip or a combination as parameter, which respectively only shows lines for TRIP, DAY, WEEK, MONTH, YEAR or all without TRIP or a combination
+- the summary is done in one go, keeping track of TRIP, DAY, WEEK, MONTH and YEAR totals
+- the summary is based on the captured data, so in fact there might be e.g. charges or drives missed or consumption for trips is inaccurate
 
 Example configuration of summary.cfg (I have an IONIQ 5 Project 45 with 72.6 kWh battery and 3.5% buffer, so net 70 kWh):
 ```
@@ -100,7 +106,19 @@ odometer_metric = km
 net_battery_size_kwh = 70.0
 average_cost_per_kwh = 0.246
 cost_currency = Euro
+min_consumption_discharge_kwh = 1.5
+ignore_small_positive_delta_soc = 2
+ignore_small_negative_delta_soc = -2
+show_zero_values = False
 ```
+
+Explanation of configuration items:
+- odometer_metric, e.g. km or mi
+- cost_currency, e.g. Euro or Dollar
+- min_consumption_discharge_kwh, do not show consumption figures when the discharge in kWh is below this number
+- ignore_small_positive_delta_soc, do not see this as charge%, because with temperature changes the percentage can increase
+- ignore_small_negative_delta_soc, do not see this as discharge%, because with temperature changes the percentage can decrease
+- show_zero_values = True shows also zero values in the standard output, can be easier for spreadsheets, but more diffivult to read
 
 ## kml.py
 transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations.
@@ -188,42 +206,166 @@ The summary.py standard output of the previous monitor.csv file: https://raw.git
 output:
 ```
 C:\Users\Rick\git\monitor>python summary.py
-Period, date      , driven km, charged%, charged kWh, discharged%, discharged kWh, #charges, #drives, km/kWh, kWh/100km, cost Euro
-DAY   , 2022-09-17,       0.0,      +4%,         2.8,          0%,            0.0,        1,       0,    0.0,       0.0,      0.00
-DAY   , 2022-09-18,       0.0,      +2%,         1.4,          0%,            0.0,        0,       0,    0.0,       0.0,      0.00
-WEEK  , 2022 W37  ,       0.0,      +6%,         4.2,          0%,            0.0,        1,       0,    0.0,       0.0,      0.00
-DAY   , 2022-09-19,       6.5,      +0%,         0.0,         -1%,           -0.7,        0,       2,    0.0,       0.0,      0.00
-DAY   , 2022-09-20,      47.6,      +0%,         0.0,        -14%,           -9.8,        0,       2,    4.9,      20.6,      2.41
-DAY   , 2022-09-21,       5.2,     +26%,        18.2,         -1%,           -0.7,        2,       2,    0.0,       0.0,      0.00
-DAY   , 2022-09-22,       1.9,      +2%,         1.4,         -1%,           -0.7,        1,       1,    0.0,       0.0,      0.00
-DAY   , 2022-09-23,       1.7,     +29%,        20.3,          0%,            0.0,        2,       1,    0.0,       0.0,      0.00
-DAY   , 2022-09-24,     407.8,     +37%,        25.9,        -95%,          -66.5,        1,       6,    6.1,      16.3,     16.36
-DAY   , 2022-09-25,       0.0,      +8%,         5.6,          0%,            0.0,        0,       0,    0.0,       0.0,      0.00
-WEEK  , 2022 W38  ,     470.7,    +102%,        71.4,       -112%,          -78.4,        6,      14,    6.0,      16.7,     19.29
-MONTH , 2022-09   ,     470.7,    +108%,        75.6,       -112%,          -78.4,        7,      14,    6.0,      16.7,     19.29
-YEAR  , 2022      ,     470.7,    +108%,        75.6,       -112%,          -78.4,        7,      14,    6.0,      16.7,     19.29
+Period, date      , info , delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives
+DAY   , 2022-09-17, Sat  ,         ,     0.7,         ,       ,          ,          ,      54, 55, 55,      90, 91, 91,        1,
+DAY   , 2022-09-18, Sun  ,         ,     2.8,         ,       ,          ,          ,      59, 58, 60,      91, 91, 91,         ,
+WEEK  , 2022-09-18, WK 37,         ,     3.5,         ,       ,          ,          ,      59, 55, 60,      91, 91, 91,        1,
+TRIP  , 2022-09-19, 15:00,      0.1,        ,         ,       ,          ,          ,      60, 59, 61,      90, 85, 91,         ,       1
+TRIP  , 2022-09-19, 16:00,      6.4,        ,     -1.4,       ,          ,          ,      60, 59, 59,      86, 86, 86,         ,       1
+DAY   , 2022-09-19, Mon  ,      6.5,        ,         ,       ,          ,          ,      60, 59, 61,      89, 85, 91,         ,       2
+TRIP  , 2022-09-20, 08:00,     28.2,        ,     -4.2,    6.7,      14.9,      1.03,      58, 53, 59,      88, 86, 91,         ,       1
+TRIP  , 2022-09-20, 15:30,     12.6,        ,     -2.1,    6.0,      16.7,      0.52,      50, 48, 51,      90, 87, 92,         ,       1
+TRIP  , 2022-09-20, 15:58,      6.8,        ,     -0.7,       ,          ,          ,      48, 47, 47,      92, 91, 91,         ,       1
+DAY   , 2022-09-20, Tue  ,     47.6,        ,     -7.0,    6.8,      14.7,      1.72,      54, 47, 59,      89, 86, 92,         ,       3
+TRIP  , 2022-09-21, 12:30,      2.5,     3.5,         ,       ,          ,          ,      46, 45, 52,      91, 91, 92,        1,       1
+TRIP  , 2022-09-21, 13:00,      2.7,        ,     -0.7,       ,          ,          ,      52, 51, 51,      92, 91, 91,         ,       1
+DAY   , 2022-09-21, Wed  ,      5.2,    15.4,     -0.7,       ,          ,          ,      50, 45, 68,      91, 91, 92,        2,       2
+DAY   , 2022-09-22, Thu  ,         ,     1.4,         ,       ,          ,          ,      69, 70, 72,      91, 91, 91,        1,
+TRIP  , 2022-09-23, 11:21,      1.9,        ,     -0.7,       ,          ,          ,      72, 71, 72,      91, 88, 91,         ,       1
+TRIP  , 2022-09-23, 12:00,      1.7,     0.7,         ,       ,          ,          ,      72, 72, 72,      88, 87, 87,        1,       1
+DAY   , 2022-09-23, Fri  ,      3.6,     6.3,     -0.7,       ,          ,          ,      73, 71, 80,      90, 87, 91,        1,       2
+TRIP  , 2022-09-24, 09:57,      3.7,    14.0,     -0.7,       ,          ,          ,      91, 99,100,      88, 87, 95,        1,       1
+TRIP  , 2022-09-24, 13:21,    198.4,        ,    -32.9,    6.0,      16.6,      8.09,      80, 52, 98,      96, 92, 98,         ,       1
+TRIP  , 2022-09-24, 14:31,      3.3,        ,     -0.7,       ,          ,          ,      52, 51, 51,      95, 94, 94,         ,       1
+TRIP  , 2022-09-24, 15:23,      4.8,        ,     -0.7,       ,          ,          ,      51, 50, 51,      94, 93, 96,         ,       1
+TRIP  , 2022-09-24, 19:00,    197.6,        ,    -31.5,    6.3,      15.9,      7.75,      30,  5, 50,      95, 94, 97,        1,       1
+DAY   , 2022-09-24, Sat  ,    407.8,    15.4,    -66.5,    6.1,      16.3,     16.36,      75,  5,100,      91, 87, 98,        2,       5
+DAY   , 2022-09-25, Sun  ,         ,    30.1,         ,       ,          ,          ,      29, 42, 50,      97, 97, 97,         ,
+WEEK  , 2022-09-25, WK 38,    470.7,    67.2,    -73.5,    6.4,      15.6,     18.08,      60,  5,100,      91, 85, 98,        6,      14
+MONTH , 2022-09-25, Sep  ,    470.7,    70.7,    -73.5,    6.4,      15.6,     18.08,      59,  5,100,      91, 85, 98,        7,      14
+YEAR  , 2022-09-25, 2022 ,    470.7,    70.7,    -73.5,    6.4,      15.6,     18.08,      59,  5,100,      91, 85, 98,        7,      14
 ```
 
-2022-09-24 I did a trip from 100% SOC to 5% SOC, have driven 407.8 km and started charging when back at home.
+- 2022-09-24 I did a trip from 100% SOC to 5% SOC (-66.5 kWh)
+- have driven 407.8 km and started charging when back at home. 
+- 198.4 km one way with 6.0 km/kWh and 16.6 kWh/100km, 197.6 km back with 6.3 km/kWh and 15.9 km/kWh.
+- also shown is the average, minimum and maximum State Of Charge percentage and average, minimum and maximum of 12 Volt percentage. 
+- for better readability zero values are left out, because of configuration show_zero_values = False
+
+The SOC% can be used to see your habits about charging. Because wrongly someone posted for the IONIQ 5:
+> My dealer told me that Hyundai has no restrictions on battery charging. So that it is not an issue to just load up to 100% (and leave it). Have you heard any stories other than this?
+
+Depends on how long you want to drive it :-) The car is guaranteed up to 70% capacity (8 years or 160,000 km). 
+- You can charge a battery maybe about 1000x (from 0% to 100% or 2x from 50% to 100%, etc) with the dealers advice (do not look at it). With a 72 kWh battery and 5 km/kWh you can drive 360,000 km until it is 70%. 
+- Only if you do care about your battery and, for example, do not leave it at 100% for a long time and only charge to 100% when necessary, do not drive completely empty before you start charging again, drive economically, you can charge up to maybe 4000x. With a 72 kWh battery and 6 km/kWh you can drive almost 2 million km until it is 70%. The advantage is that you hardly lose any range over the years. 
+
+There is also a buffer in the batteries so opponents will say that 100% is maybe only 95% and the manufacturer has already taken this into account. Yes, to claim under the warranty yes, but it is simply better not to always fully charge the batteries and almost completely empty. That is true even with a phone. 
+A lease driver may not care, I bought the car privately and want to use it as long as possible. And of course it is also better for the climate not to wear out batteries unnecessarily. 
+
+My previous Kia EV Soul with 27 kWh battery has driven 145,000 km in 7 years and the State Of Health (SOH) was still 91% and I was able to make someone else happy (I hope). There are plenty of people who have had to replace the battery because it was already below 70% SOH under warranty (7 years or 150,000 km). So being sensible with the battery certainly helps. 
+
+But in the summary above, you see that my average SOC is 59%, which is pretty good.
+
+Also the 12 Volt battery is shown and it has not become beneath 85%, with an average of 91%.
 
 Example output when filtering on DAY:
 ```
 C:\Users\Rick\git\monitor>python summary.py day
-Period, date      , driven km, charged%, charged kWh, discharged%, discharged kWh, #charges, #drives, km/kWh, kWh/100km, cost Euro
-DAY   , 2022-09-17,       0.0,      +4%,         2.8,          0%,            0.0,        1,       0,    0.0,       0.0,      0.00
-DAY   , 2022-09-18,       0.0,      +2%,         1.4,          0%,            0.0,        0,       0,    0.0,       0.0,      0.00
-DAY   , 2022-09-19,       6.5,      +0%,         0.0,         -1%,           -0.7,        0,       2,    0.0,       0.0,      0.00
-DAY   , 2022-09-20,      47.6,      +0%,         0.0,        -14%,           -9.8,        0,       2,    4.9,      20.6,      2.41
-DAY   , 2022-09-21,       5.2,     +26%,        18.2,         -1%,           -0.7,        2,       2,    0.0,       0.0,      0.00
-DAY   , 2022-09-22,       1.9,      +2%,         1.4,         -1%,           -0.7,        1,       1,    0.0,       0.0,      0.00
-DAY   , 2022-09-23,       1.7,     +29%,        20.3,          0%,            0.0,        2,       1,    0.0,       0.0,      0.00
-DAY   , 2022-09-24,     407.8,     +37%,        25.9,        -95%,          -66.5,        1,       6,    6.1,      16.3,     16.36
-DAY   , 2022-09-25,       0.0,      +8%,         5.6,          0%,            0.0,        0,       0,    0.0,       0.0,      0.00
+Period, date      , info , delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives
+DAY   , 2022-09-17, Sat  ,         ,     0.7,         ,       ,          ,          ,      54, 55, 55,      90, 91, 91,        1,
+DAY   , 2022-09-18, Sun  ,         ,     2.8,         ,       ,          ,          ,      59, 58, 60,      91, 91, 91,         ,
+DAY   , 2022-09-19, Mon  ,      6.5,        ,         ,       ,          ,          ,      60, 59, 61,      89, 85, 91,         ,       2
+DAY   , 2022-09-20, Tue  ,     47.6,        ,     -7.0,    6.8,      14.7,      1.72,      54, 47, 59,      89, 86, 92,         ,       3
+DAY   , 2022-09-21, Wed  ,      5.2,    15.4,     -0.7,       ,          ,          ,      50, 45, 68,      91, 91, 92,        2,       2
+DAY   , 2022-09-22, Thu  ,         ,     1.4,         ,       ,          ,          ,      69, 70, 72,      91, 91, 91,        1,
+DAY   , 2022-09-23, Fri  ,      3.6,     6.3,     -0.7,       ,          ,          ,      73, 71, 80,      90, 87, 91,        1,       2
+DAY   , 2022-09-24, Sat  ,    407.8,    15.4,    -66.5,    6.1,      16.3,     16.36,      75,  5,100,      91, 87, 98,        2,       5
+DAY   , 2022-09-25, Sun  ,         ,    30.1,         ,       ,          ,          ,      29, 42, 50,      97, 97, 97,         ,
+```
+
+Example output when filtering on TRIP:
+```
+C:\Users\Rick\git\monitor>python summary.py trip
+Period, date      , info , delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives
+TRIP  , 2022-09-19, 15:00,      0.1,        ,         ,       ,          ,          ,      60, 59, 61,      90, 85, 91,         ,       1
+TRIP  , 2022-09-19, 16:00,      6.4,        ,     -1.4,       ,          ,          ,      60, 59, 59,      86, 86, 86,         ,       1
+TRIP  , 2022-09-20, 08:00,     28.2,        ,     -4.2,    6.7,      14.9,      1.03,      58, 53, 59,      88, 86, 91,         ,       1
+TRIP  , 2022-09-20, 15:30,     12.6,        ,     -2.1,    6.0,      16.7,      0.52,      50, 48, 51,      90, 87, 92,         ,       1
+TRIP  , 2022-09-20, 15:58,      6.8,        ,     -0.7,       ,          ,          ,      48, 47, 47,      92, 91, 91,         ,       1
+TRIP  , 2022-09-21, 12:30,      2.5,     3.5,         ,       ,          ,          ,      46, 45, 52,      91, 91, 92,        1,       1
+TRIP  , 2022-09-21, 13:00,      2.7,        ,     -0.7,       ,          ,          ,      52, 51, 51,      92, 91, 91,         ,       1
+TRIP  , 2022-09-23, 11:21,      1.9,        ,     -0.7,       ,          ,          ,      72, 71, 72,      91, 88, 91,         ,       1
+TRIP  , 2022-09-23, 12:00,      1.7,     0.7,         ,       ,          ,          ,      72, 72, 72,      88, 87, 87,        1,       1
+TRIP  , 2022-09-24, 09:57,      3.7,    14.0,     -0.7,       ,          ,          ,      91, 99,100,      88, 87, 95,        1,       1
+TRIP  , 2022-09-24, 13:21,    198.4,        ,    -32.9,    6.0,      16.6,      8.09,      80, 52, 98,      96, 92, 98,         ,       1
+TRIP  , 2022-09-24, 14:31,      3.3,        ,     -0.7,       ,          ,          ,      52, 51, 51,      95, 94, 94,         ,       1
+TRIP  , 2022-09-24, 15:23,      4.8,        ,     -0.7,       ,          ,          ,      51, 50, 51,      94, 93, 96,         ,       1
+TRIP  , 2022-09-24, 19:00,    197.6,        ,    -31.5,    6.3,      15.9,      7.75,      30,  5, 50,      95, 94, 97,        1,       1
+```
+
+Example output when filtering on DAY and TRIP:
+```
+C:\Users\Rick\git\monitor>python summary.py day trip
+Period, date      , info , delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives
+DAY   , 2022-09-17, Sat  ,         ,     0.7,         ,       ,          ,          ,      54, 55, 55,      90, 91, 91,        1,
+DAY   , 2022-09-18, Sun  ,         ,     2.8,         ,       ,          ,          ,      59, 58, 60,      91, 91, 91,         ,
+TRIP  , 2022-09-19, 15:00,      0.1,        ,         ,       ,          ,          ,      60, 59, 61,      90, 85, 91,         ,       1
+TRIP  , 2022-09-19, 16:00,      6.4,        ,     -1.4,       ,          ,          ,      60, 59, 59,      86, 86, 86,         ,       1
+DAY   , 2022-09-19, Mon  ,      6.5,        ,         ,       ,          ,          ,      60, 59, 61,      89, 85, 91,         ,       2
+TRIP  , 2022-09-20, 08:00,     28.2,        ,     -4.2,    6.7,      14.9,      1.03,      58, 53, 59,      88, 86, 91,         ,       1
+TRIP  , 2022-09-20, 15:30,     12.6,        ,     -2.1,    6.0,      16.7,      0.52,      50, 48, 51,      90, 87, 92,         ,       1
+TRIP  , 2022-09-20, 15:58,      6.8,        ,     -0.7,       ,          ,          ,      48, 47, 47,      92, 91, 91,         ,       1
+DAY   , 2022-09-20, Tue  ,     47.6,        ,     -7.0,    6.8,      14.7,      1.72,      54, 47, 59,      89, 86, 92,         ,       3
+TRIP  , 2022-09-21, 12:30,      2.5,     3.5,         ,       ,          ,          ,      46, 45, 52,      91, 91, 92,        1,       1
+TRIP  , 2022-09-21, 13:00,      2.7,        ,     -0.7,       ,          ,          ,      52, 51, 51,      92, 91, 91,         ,       1
+DAY   , 2022-09-21, Wed  ,      5.2,    15.4,     -0.7,       ,          ,          ,      50, 45, 68,      91, 91, 92,        2,       2
+DAY   , 2022-09-22, Thu  ,         ,     1.4,         ,       ,          ,          ,      69, 70, 72,      91, 91, 91,        1,
+TRIP  , 2022-09-23, 11:21,      1.9,        ,     -0.7,       ,          ,          ,      72, 71, 72,      91, 88, 91,         ,       1
+TRIP  , 2022-09-23, 12:00,      1.7,     0.7,         ,       ,          ,          ,      72, 72, 72,      88, 87, 87,        1,       1
+DAY   , 2022-09-23, Fri  ,      3.6,     6.3,     -0.7,       ,          ,          ,      73, 71, 80,      90, 87, 91,        1,       2
+TRIP  , 2022-09-24, 09:57,      3.7,    14.0,     -0.7,       ,          ,          ,      91, 99,100,      88, 87, 95,        1,       1
+TRIP  , 2022-09-24, 13:21,    198.4,        ,    -32.9,    6.0,      16.6,      8.09,      80, 52, 98,      96, 92, 98,         ,       1
+TRIP  , 2022-09-24, 14:31,      3.3,        ,     -0.7,       ,          ,          ,      52, 51, 51,      95, 94, 94,         ,       1
+TRIP  , 2022-09-24, 15:23,      4.8,        ,     -0.7,       ,          ,          ,      51, 50, 51,      94, 93, 96,         ,       1
+TRIP  , 2022-09-24, 19:00,    197.6,        ,    -31.5,    6.3,      15.9,      7.75,      30,  5, 50,      95, 94, 97,        1,       1
+DAY   , 2022-09-24, Sat  ,    407.8,    15.4,    -66.5,    6.1,      16.3,     16.36,      75,  5,100,      91, 87, 98,        2,       5
+DAY   , 2022-09-25, Sun  ,         ,    30.1,         ,       ,          ,          ,      29, 42, 50,      97, 97, 97,         ,
+```
+
+Example output when filtering on WEEK:
+```
+C:\Users\Rick\git\monitor>python summary.py week
+PPeriod, date      , info , delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives
+WEEK  , 2022-09-18, WK 37,         ,     3.5,         ,       ,          ,          ,      59, 55, 60,      91, 91, 91,        1,
+WEEK  , 2022-09-25, WK 38,    470.7,    67.2,    -73.5,    6.4,      15.6,     18.08,      60,  5,100,      91, 85, 98,        6,      14
+```
+
+Example output when filtering on MONTH:
+```
+C:\Users\Rick\git\monitor>python summary.py month
+Period, date      , info , delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives
+MONTH , 2022-09-25, Sep  ,    470.7,    70.7,    -73.5,    6.4,      15.6,     18.08,      59,  5,100,      91, 85, 98,        7,      14
+```
+
+Example output when filtering on YEAR:
+```
+C:\Users\Rick\git\monitor>python summary.py year
+Period, date      , info , delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives
+YEAR  , 2022-09-25, 2022 ,    470.7,    70.7,    -73.5,    6.4,      15.6,     18.08,      59,  5,100,      91, 85, 98,        7,      14
+```
+
+Example output when showing everything except TRIP:
+```
+C:\Users\Rick\git\monitor>python summary.py -trip
+Period, date      , info , delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives
+DAY   , 2022-09-17, Sat  ,         ,     0.7,         ,       ,          ,          ,      54, 55, 55,      90, 91, 91,        1,
+DAY   , 2022-09-18, Sun  ,         ,     2.8,         ,       ,          ,          ,      59, 58, 60,      91, 91, 91,         ,
+WEEK  , 2022-09-18, WK 37,         ,     3.5,         ,       ,          ,          ,      59, 55, 60,      91, 91, 91,        1,
+DAY   , 2022-09-19, Mon  ,      6.5,        ,         ,       ,          ,          ,      60, 59, 61,      89, 85, 91,         ,       2
+DAY   , 2022-09-20, Tue  ,     47.6,        ,     -7.0,    6.8,      14.7,      1.72,      54, 47, 59,      89, 86, 92,         ,       3
+DAY   , 2022-09-21, Wed  ,      5.2,    15.4,     -0.7,       ,          ,          ,      50, 45, 68,      91, 91, 92,        2,       2
+DAY   , 2022-09-22, Thu  ,         ,     1.4,         ,       ,          ,          ,      69, 70, 72,      91, 91, 91,        1,
+DAY   , 2022-09-23, Fri  ,      3.6,     6.3,     -0.7,       ,          ,          ,      73, 71, 80,      90, 87, 91,        1,       2
+DAY   , 2022-09-24, Sat  ,    407.8,    15.4,    -66.5,    6.1,      16.3,     16.36,      75,  5,100,      91, 87, 98,        2,       5
+DAY   , 2022-09-25, Sun  ,         ,    30.1,         ,       ,          ,          ,      29, 42, 50,      97, 97, 97,         ,
+WEEK  , 2022-09-25, WK 38,    470.7,    67.2,    -73.5,    6.4,      15.6,     18.08,      60,  5,100,      91, 85, 98,        6,      14
+MONTH , 2022-09-25, Sep  ,    470.7,    70.7,    -73.5,    6.4,      15.6,     18.08,      59,  5,100,      91, 85, 98,        7,      14
+YEAR  , 2022-09-25, 2022 ,    470.7,    70.7,    -73.5,    6.4,      15.6,     18.08,      59,  5,100,      91, 85, 98,        7,      14
 ```
 
 You can redirect this standard output to a file, e.g. summary.day.csv: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.csv
 
-Excel example using summary.day.csv: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/blob/main/examples/summary.day.xlsx
+Excel example using python summary.py day > summary.day.csv: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/blob/main/examples/summary.day.xlsx
 
 Screenshot of excel example with some graphs:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.png)
