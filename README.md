@@ -116,9 +116,9 @@ Explanation of configuration items:
 - odometer_metric, e.g. km or mi
 - cost_currency, e.g. Euro or Dollar
 - min_consumption_discharge_kwh, do not show consumption figures when the discharge in kWh is below this number
-- ignore_small_positive_delta_soc, do not see this as charge%, because with temperature changes the percentage can increase
-- ignore_small_negative_delta_soc, do not see this as discharge%, because with temperature changes the percentage can decrease
-- show_zero_values = True shows also zero values in the standard output, can be easier for spreadsheets, but more diffivult to read
+- ignore_small_positive_delta_soc, do not see this as charge% when not charging/moved, because with temperature changes the percentage can increase
+- ignore_small_negative_delta_soc, do not see this as discharge% when not moved, because with temperature changes the percentage can decrease
+- show_zero_values = True shows also zero values in the standard output, can be easier for spreadsheets, but more difficult to read
 
 ## kml.py
 transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations.
@@ -370,6 +370,152 @@ Excel example using python summary.py day > summary.day.csv: https://github.com/
 Screenshot of excel example with some graphs:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.png)
 
+Below a larger example of using monitor for a month:
+```
+C:\Users\Rick\git\monitor>python summary.py
+Period, date      , info , delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives
+DAY   , 2022-09-17, Sat  ,         ,     0.7,         ,       ,          ,          ,      54, 55, 55,      90, 91, 91,        1,
+DAY   , 2022-09-18, Sun  ,         ,     2.8,         ,       ,          ,          ,      59, 58, 60,      91, 91, 91,         ,
+WEEK  , 2022-09-18, WK 37,         ,     3.5,         ,       ,          ,          ,      59, 55, 60,      91, 91, 91,        1,
+TRIP  , 2022-09-19, 15:00,      0.1,        ,         ,       ,          ,          ,      60, 59, 61,      90, 85, 91,         ,       1
+TRIP  , 2022-09-19, 16:00,      6.4,        ,     -1.4,       ,          ,          ,      60, 59, 59,      86, 86, 86,         ,       1
+DAY   , 2022-09-19, Mon  ,      6.5,        ,         ,       ,          ,          ,      60, 59, 61,      89, 85, 91,         ,       2
+TRIP  , 2022-09-20, 08:00,     28.2,        ,     -4.2,    6.7,      14.9,      1.03,      58, 53, 59,      88, 86, 91,         ,       1
+TRIP  , 2022-09-20, 15:30,     12.6,        ,     -2.1,    6.0,      16.7,      0.52,      51, 48, 53,      91, 87, 92,         ,       1
+TRIP  , 2022-09-20, 15:58,      6.8,        ,     -0.7,       ,          ,          ,      48, 47, 47,      92, 91, 91,         ,       1
+DAY   , 2022-09-20, Tue  ,     47.6,        ,     -7.0,    6.8,      14.7,      1.72,      54, 47, 59,      89, 86, 92,         ,       3
+TRIP  , 2022-09-21, 12:30,      2.5,     3.5,         ,       ,          ,          ,      46, 45, 52,      91, 91, 92,        1,       1
+TRIP  , 2022-09-21, 13:00,      2.7,        ,     -0.7,       ,          ,          ,      52, 51, 51,      92, 91, 91,         ,       1
+DAY   , 2022-09-21, Wed  ,      5.2,    15.4,     -0.7,       ,          ,          ,      50, 45, 68,      91, 91, 92,        2,       2
+DAY   , 2022-09-22, Thu  ,         ,     1.4,         ,       ,          ,          ,      69, 70, 72,      91, 91, 91,        1,
+TRIP  , 2022-09-23, 11:21,      1.9,        ,     -0.7,       ,          ,          ,      72, 71, 72,      91, 88, 91,         ,       1
+TRIP  , 2022-09-23, 12:00,      1.7,     0.7,         ,       ,          ,          ,      72, 72, 72,      88, 87, 87,        1,       1
+DAY   , 2022-09-23, Fri  ,      3.6,     6.3,     -0.7,       ,          ,          ,      73, 71, 80,      90, 87, 91,        1,       2
+TRIP  , 2022-09-24, 09:57,      3.7,    14.0,     -0.7,       ,          ,          ,      91, 99,100,      88, 87, 95,        1,       1
+TRIP  , 2022-09-24, 13:21,    198.4,        ,    -32.9,    6.0,      16.6,      8.09,      83, 52, 99,      96, 92, 98,         ,       1
+TRIP  , 2022-09-24, 14:31,      3.3,        ,     -0.7,       ,          ,          ,      52, 51, 51,      95, 94, 94,         ,       1
+TRIP  , 2022-09-24, 15:23,      4.8,        ,     -0.7,       ,          ,          ,      51, 50, 51,      94, 93, 96,         ,       1
+TRIP  , 2022-09-24, 19:00,    197.6,        ,    -31.5,    6.3,      15.9,      7.75,      30,  5, 50,      95, 94, 97,        1,       1
+DAY   , 2022-09-24, Sat  ,    407.8,    15.4,    -66.5,    6.1,      16.3,     16.36,      76,  5,100,      91, 87, 98,        2,       5
+TRIP  , 2022-09-25, 15:00,      7.9,    37.1,     -0.7,       ,          ,          ,      35, 42, 60,      97, 94, 97,         ,       1
+TRIP  , 2022-09-25, 18:00,      8.1,        ,     -0.7,       ,          ,          ,      58, 58, 59,      93, 91, 94,         ,       1
+DAY   , 2022-09-25, Sun  ,     16.0,    37.1,     -1.4,       ,          ,          ,      37, 42, 60,      97, 91, 97,         ,       2
+WEEK  , 2022-09-25, WK 38,    486.7,    74.2,    -74.9,    6.5,      15.4,     18.43,      59,  5,100,      92, 85, 98,        6,      16
+DAY   , 2022-09-26, Mon  ,         ,        ,         ,       ,          ,          ,      58, 58, 59,      92, 92, 92,         ,
+TRIP  , 2022-09-27, 07:30,      7.0,        ,     -3.5,    2.0,      50.0,      0.86,      58, 53, 58,      92, 92, 95,         ,       1
+TRIP  , 2022-09-27, 08:00,     21.2,        ,     -0.7,       ,          ,          ,      52, 52, 52,      96, 96, 96,         ,       1
+TRIP  , 2022-09-27, 09:30,      2.7,        ,     -0.7,       ,          ,          ,      51, 51, 51,      94, 94, 94,         ,       1
+TRIP  , 2022-09-27, 10:00,      2.7,        ,     -0.7,       ,          ,          ,      50, 50, 50,      94, 93, 93,         ,       1
+TRIP  , 2022-09-27, 11:00,      0.1,        ,         ,       ,          ,          ,      50, 50, 50,      92, 91, 91,         ,       1
+TRIP  , 2022-09-27, 11:30,      2.3,        ,         ,       ,          ,          ,      50, 50, 50,      92, 92, 92,         ,       1
+TRIP  , 2022-09-27, 16:00,      6.5,        ,     -1.4,       ,          ,          ,      49, 48, 49,      92, 88, 95,         ,       1
+DAY   , 2022-09-27, Tue  ,     42.5,        ,     -7.0,    6.1,      16.5,      1.72,      55, 48, 58,      92, 88, 96,         ,       7
+TRIP  , 2022-09-28, 09:30,      5.1,        ,     -3.5,    1.5,      68.6,      0.86,      46, 43, 44,      95, 89, 95,         ,       1
+TRIP  , 2022-09-28, 12:30,      5.1,        ,     -0.7,       ,          ,          ,      42, 42, 42,      88, 88, 88,         ,       1
+DAY   , 2022-09-28, Wed  ,     10.2,        ,     -4.2,    2.4,      41.2,      1.03,      46, 42, 44,      95, 88, 95,         ,       2
+DAY   , 2022-09-29, Thu  ,         ,        ,         ,       ,          ,          ,      42, 42, 42,      88, 88, 88,         ,
+TRIP  , 2022-09-30, 11:00,      1.8,        ,         ,       ,          ,          ,      41, 41, 41,      88, 88, 89,         ,       1
+TRIP  , 2022-09-30, 11:00,      1.8,        ,         ,       ,          ,          ,       0, 41, 41,       0, 89, 89,         ,       1
+DAY   , 2022-09-30, Fri  ,      3.6,    12.6,         ,       ,          ,          ,      45, 41, 60,      88, 88, 89,        1,       2
+MONTH , 2022-09-30, Sep  ,    543.0,    89.6,    -85.4,    6.4,      15.7,     21.01,      55,  5,100,      91, 85, 98,        8,      27
+TRIP  , 2022-10-01, 10:00,      4.0,        ,     -0.7,       ,          ,          ,      60, 59, 60,      88, 88, 90,         ,       1
+DAY   , 2022-10-01, Sat  ,      4.0,        ,     -0.7,       ,          ,          ,      60, 59, 60,      88, 88, 90,         ,       1
+TRIP  , 2022-10-02, 11:30,     77.4,        ,    -11.2,    6.9,      14.5,      2.76,      59, 43, 61,      90, 90, 92,        1,       1
+TRIP  , 2022-10-02, 17:00,     77.6,        ,    -12.6,    6.2,      16.2,      3.10,      32, 25, 35,      95, 94, 96,         ,       1
+DAY   , 2022-10-02, Sun  ,    155.0,        ,    -23.8,    6.5,      15.4,      5.85,      56, 25, 61,      91, 90, 96,        1,       2
+WEEK  , 2022-10-02, WK 39,    215.3,    11.9,    -35.0,    6.2,      16.3,      8.61,      52, 25, 61,      90, 88, 96,        2,      14
+DAY   , 2022-10-03, Mon  ,         ,    23.8,         ,       ,          ,          ,      42, 50, 60,      96, 96, 96,        1,
+TRIP  , 2022-10-04, 12:00,     10.1,        ,     -1.4,       ,          ,          ,      59, 57, 59,      96, 92, 96,         ,       1
+TRIP  , 2022-10-04, 12:30,      9.5,        ,     -0.7,       ,          ,          ,      56, 56, 56,      93, 94, 94,         ,       1
+TRIP  , 2022-10-04, 15:00,      4.0,        ,     -2.1,    1.9,      52.5,      0.52,      55, 53, 56,      94, 92, 95,         ,       1
+TRIP  , 2022-10-04, 15:30,     15.8,        ,     -0.7,       ,          ,          ,      52, 52, 52,      96, 96, 96,         ,       1
+DAY   , 2022-10-04, Tue  ,     39.4,        ,     -4.9,    8.0,      12.4,      1.21,      58, 52, 59,      95, 92, 96,         ,       4
+TRIP  , 2022-10-05, 15:30,      5.0,        ,     -0.7,       ,          ,          ,      51, 49, 51,      96, 87, 96,         ,       1
+TRIP  , 2022-10-05, 16:30,      4.8,        ,     -0.7,       ,          ,          ,      48, 48, 48,      86, 86, 86,         ,       1
+TRIP  , 2022-10-05, 18:30,      1.2,        ,     -0.7,       ,          ,          ,      48, 47, 47,      86, 85, 85,         ,       1
+TRIP  , 2022-10-05, 19:01,      6.1,        ,         ,       ,          ,          ,      47, 47, 47,      86, 86, 86,         ,       1
+DAY   , 2022-10-05, Wed  ,     23.1,        ,     -2.1,   11.0,       9.1,      0.52,      51, 47, 51,      94, 84, 96,         ,       4
+TRIP  , 2022-10-06, 06:00,         ,        ,     -1.4,       ,          ,          ,      46, 45, 45,      85, 86, 86,         ,       1
+DAY   , 2022-10-06, Thu  ,         ,        ,     -1.4,       ,          ,          ,      46, 44, 45,      85, 86, 86,         ,       1
+TRIP  , 2022-10-07, 09:30,      0.1,        ,     -0.7,       ,          ,          ,      44, 43, 44,      86, 86, 90,         ,       1
+TRIP  , 2022-10-07, 10:00,      5.3,        ,         ,       ,          ,          ,      43, 43, 43,      90, 91, 91,         ,       1
+TRIP  , 2022-10-07, 10:30,      4.7,        ,     -0.7,       ,          ,          ,      42, 42, 42,      90, 90, 90,         ,       1
+DAY   , 2022-10-07, Fri  ,     10.1,        ,     -1.4,       ,          ,          ,      44, 42, 44,      86, 86, 91,         ,       3
+TRIP  , 2022-10-08, 10:00,      3.0,        ,     -0.7,       ,          ,          ,      42, 41, 42,      90, 86, 90,         ,       1
+TRIP  , 2022-10-08, 11:00,      3.4,        ,     -0.7,       ,          ,          ,      40, 40, 40,      86, 87, 87,         ,       1
+TRIP  , 2022-10-08, 15:00,      5.1,        ,     -0.7,       ,          ,          ,      40, 39, 40,      87, 86, 87,         ,       1
+TRIP  , 2022-10-08, 17:00,      5.1,        ,     -0.7,       ,          ,          ,      38, 38, 38,      86, 87, 87,         ,       1
+DAY   , 2022-10-08, Sat  ,     16.6,        ,     -2.8,    5.9,      16.9,      0.69,      42, 38, 42,      89, 86, 90,         ,       4
+DAY   , 2022-10-09, Sun  ,         ,    14.0,         ,       ,          ,          ,      42, 37, 58,      85, 81, 87,        1,
+WEEK  , 2022-10-09, WK 40,     89.2,    35.7,    -12.6,    7.1,      14.1,      3.10,      46, 37, 60,      90, 81, 96,        2,      16
+TRIP  , 2022-10-10, 10:30,      4.1,        ,     -2.8,    1.5,      68.3,      0.69,      58, 54, 58,      81, 81, 87,         ,       1
+TRIP  , 2022-10-10, 11:00,     19.0,        ,         ,       ,          ,          ,      54, 54, 54,      88, 88, 88,         ,       1
+TRIP  , 2022-10-10, 17:31,     23.1,        ,     -2.8,    8.3,      12.1,      0.69,      52, 49, 53,      90, 88, 91,         ,       1
+DAY   , 2022-10-10, Mon  ,     46.2,        ,     -5.6,    8.3,      12.1,      1.38,      57, 49, 58,      82, 81, 91,         ,       3
+TRIP  , 2022-10-11, 14:31,      2.6,        ,     -0.7,       ,          ,          ,      48, 47, 48,      91, 87, 91,         ,       1
+TRIP  , 2022-10-11, 14:45,      1.3,        ,         ,       ,          ,          ,      47, 47, 47,      87, 87, 87,         ,       1
+TRIP  , 2022-10-11, 15:30,      8.5,        ,     -1.4,       ,          ,          ,      46, 45, 45,      88, 88, 88,         ,       1
+TRIP  , 2022-10-11, 16:30,      7.3,        ,     -0.7,       ,          ,          ,      45, 44, 45,      88, 87, 88,         ,       1
+DAY   , 2022-10-11, Tue  ,     19.7,        ,     -2.8,    7.0,      14.2,      0.69,      48, 44, 48,      90, 87, 91,         ,       4
+TRIP  , 2022-10-12, 13:30,      5.5,        ,     -0.7,       ,          ,          ,      43, 42, 43,      88, 86, 88,         ,       1
+TRIP  , 2022-10-12, 15:30,      6.0,        ,     -0.7,       ,          ,          ,      42, 41, 41,      86, 85, 85,         ,       1
+DAY   , 2022-10-12, Wed  ,     11.5,        ,     -1.4,       ,          ,          ,      43, 41, 43,      88, 85, 88,         ,       2
+TRIP  , 2022-10-13, 07:30,      6.9,        ,     -4.2,    1.6,      60.9,      1.03,      41, 35, 41,      86, 85, 95,         ,       1
+TRIP  , 2022-10-13, 08:00,     21.3,        ,         ,       ,          ,          ,      35, 35, 35,      95, 95, 95,         ,       1
+DAY   , 2022-10-13, Thu  ,     28.2,    13.3,     -4.2,    6.7,      14.9,      1.03,      42, 35, 54,      89, 85, 95,        1,       2
+TRIP  , 2022-10-14, 10:30,      1.8,     4.2,     -0.7,       ,          ,          ,      57, 59, 60,      95, 95, 97,        1,       1
+TRIP  , 2022-10-14, 11:00,      1.7,        ,         ,       ,          ,          ,      59, 59, 59,      98, 98, 98,         ,       1
+TRIP  , 2022-10-14, 13:30,      3.7,        ,     -0.7,       ,          ,          ,      59, 58, 59,      98, 97, 98,         ,       1
+TRIP  , 2022-10-14, 14:30,      3.3,        ,     -0.7,       ,          ,          ,      58, 57, 58,      97, 96, 98,         ,       1
+TRIP  , 2022-10-14, 15:30,      8.3,        ,     -0.7,       ,          ,          ,      56, 56, 56,      98, 99, 99,         ,       1
+TRIP  , 2022-10-14, 16:00,      8.5,        ,     -1.4,       ,          ,          ,      55, 54, 54,      99, 99, 99,         ,       1
+DAY   , 2022-10-14, Fri  ,     27.3,     4.2,     -4.2,    6.5,      15.4,      1.03,      57, 54, 60,      96, 95, 99,        1,       6
+TRIP  , 2022-10-15, 10:00,      1.9,        ,         ,       ,          ,          ,      54, 54, 54,      98, 85, 99,         ,       1
+TRIP  , 2022-10-15, 11:00,      1.9,        ,     -0.7,       ,          ,          ,      54, 53, 54,      85, 85, 85,         ,       1
+DAY   , 2022-10-15, Sat  ,      3.8,     4.2,         ,       ,          ,          ,      55, 53, 61,      94, 85, 99,        2,       2
+TRIP  , 2022-10-16, 11:30,     77.4,        ,    -12.6,    6.1,      16.3,      3.10,      60, 43, 61,      86, 85, 92,         ,       1
+TRIP  , 2022-10-16, 17:30,     77.2,        ,    -10.5,    7.4,      13.6,      2.58,      38, 28, 41,      90, 89, 91,         ,       1
+DAY   , 2022-10-16, Sun  ,    154.6,        ,    -23.1,    6.7,      14.9,      5.68,      57, 28, 61,      86, 85, 92,         ,       2
+WEEK  , 2022-10-16, WK 41,    291.3,    19.6,    -40.6,    7.2,      13.9,      9.99,      51, 28, 61,      90, 81, 99,        4,      21
+DAY   , 2022-10-17, Mon  ,         ,    21.7,         ,       ,          ,          ,      43, 51, 59,      91, 91, 91,        1,
+WEEK  , 2022-10-17, WK 42,         ,    21.7,         ,       ,          ,          ,      43, 51, 59,      91, 91, 91,        1,
+MONTH , 2022-10-17, Oct  ,    539.5,    77.0,    -77.7,    6.9,      14.4,     19.11,      49, 25, 61,      90, 81, 99,        8,      40
+YEAR  , 2022-10-17, 2022 ,   1082.5,   166.6,   -163.1,    6.6,      15.1,     40.12,      52,  5,100,      91, 81, 99,       16,      67
+```
+
+Notes:
+- when the -kWh is below the configured threshold, no consumption data is shown
+- sometimes with TRIP the used kWh is counted by the previous trip, this is because of the moment of capturing data and then consumption is off for both trips AND the odometer is only updated after the car is switched off (apparently the behavior of bluelink)
+
+Example of wrong consumption shown for trip:
+
+```
+TRIP  , 2022-10-13, 07:30,      6.9,        ,     -4.2,    1.6,      60.9,      1.03,      41, 35, 41,      86, 85, 95,         ,       1
+TRIP  , 2022-10-13, 08:00,     21.3,        ,         ,       ,          ,          ,      35, 35, 35,      95, 95, 95,         ,       1
+DAY   , 2022-10-13, Thu  ,     28.2,    13.3,     -4.2,    6.7,      14.9,      1.03,      42, 35, 54,      89, 85, 95,        1,       2
+```
+
+If you look at the corresonding entries of monitor.csv:
+```
+2022-10-12 19:30:42+02:00, 5.118697, 51.680767, False, 85, 18192.8, 41, False, 0
+2022-10-13 06:00:42+02:00, 5.118697, 51.680767, False, 85, 18192.8, 41, False, 0
+2022-10-13 06:30:44+02:00, 5.118697, 51.680767, False, 85, 18192.8, 41, False, 0
+2022-10-13 07:00:34+02:00, 5.066594, 51.692425, True, 94, 18192.8, 39, False, 0
+2022-10-13 07:30:32+02:00, 5.156569, 51.697092, True, 95, 18199.7, 35, False, 0
+2022-10-13 08:00:50+02:00, 5.118764, 51.6808, False, 95, 18221, 35, False, 0
+2022-10-13 08:30:43+02:00, 5.118764, 51.6808, False, 95, 18221, 35, False, 0
+```
+
+What has happended on those TRIPs:
+- till 07:30 I have driven 6.9 km till 07:05, put the car off (odometer is updated) and started a new trip around 7:10, which trip ended around 7:25, but did NOT put the car off (odometer is NOT updated).
+- these intermediate trips are not captured
+- At 7:25 I drove home again, only a few km, got home after 7:30, which has been captured at 8:00
+- because I have not switched off the car at 7:25, the odometer is not updated and seen at 7:30 is the short trip end of 7:05, but already 6% SOC change has been recorded
+- the way back home is only a few km, so the consumption has not decreased
+- the consumption of 6% is given to the first trip (there was a odometer change), but actually the consumption should have been divided between the 2 trips
+- I cannot detect these situations and also do not know how to divide these, because of the moment of capturing AND odometer is not constantly updated
+- you can compute a better consumption by combining those 2 trips, in this case the DAY gives the real consumption
+
 ## python kml.py
 
 Input is previous monitor.csv file.
@@ -432,3 +578,18 @@ Excel example using shrinked_monitor.csv: https://github.com/ZuinigeRijder/hyund
 
 Screenshot of excel example with some graphs:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/shrinked_monitor.jpg)
+
+## Remarks of using the tools for a month
+- The hyundai_kia_connect_api gives regularly exceptions, see this issue: https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/issues/62#issuecomment-1280045102
+- the retry mechanism (wait one minute and retry twice) seems a good workaround
+- I do not know what happens if the car cannot be reached by bluelink or when the number of calls allowed per day have been exceeded
+- I have seen small drops and increases of SOC% (on my IONIQ 5 around 1% to 2%), because of temperature changes between e.g. evening and morning, I made this configurable via summary.cfg
+- Small trips will give inaccurate consumption figures, on the IONIQ 5 1% SOC difference is 0.7 kWh difference, so I made the minimum kWh consumption configurable via summary.cfg. A Smaller battery will have better accurracy, because 1% of e.g. 27 kWh makes 0.27 kWh delta's instead of 0.7 kWh in my case
+- I have seen once that SOC was reported wrongly in monitor.csv as zero, in summary.py I corrected this when the previous SOC% was not zero and delta is greather than 5
+
+Occurrence of SOC% of 0: 
+```
+2022-10-11 11:30:47+02:00, 5.118592, 51.680736, False, 91, 18161.6, 48, False, 0
+2022-10-11 12:00:54+02:00, 5.118592, 51.680736, False, 91, 18161.6, 0, False, 0
+2022-10-11 12:30:48+02:00, 5.118592, 51.680736, False, 91, 18161.6, 48, False, 0
+```
