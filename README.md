@@ -593,3 +593,35 @@ Occurrence of SOC% of 0:
 2022-10-11 12:00:54+02:00, 5.118592, 51.680736, False, 91, 18161.6, 0, False, 0
 2022-10-11 12:30:48+02:00, 5.118592, 51.680736, False, 91, 18161.6, 48, False, 0
 ```
+
+## How to install python, packages and hyundai_connect_monitor
+Explanation for someone with no knowledge of python. I don't know what computer you have. Part of the tools is the regular retrieval of the data with the Python script monitor.py.   For this you need to install Python. I have installed Python 3.9.13.
+Here's more information about installing Python: https://realpython.com/installing-python/
+
+Then download  the source code of hyundai_kia_connect_api V1.34.2 here: https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases/tag/v1.34.2
+And of course  also download the hyundai_kia_connect_monitor R1.5.0 here: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R1.5.0
+
+Extract both and move the hyundai_kia_connect_api subfolder of hyundai_kia_connect_api-1.34.2 under hyundai_kia_connect_monitor.
+
+Then edit hyundai_kia_connect_api/HyundaiBlueLinkAPIUSA.py and comment the first line with # like this:
+```
+# from locale import D_T_FMT
+```
+This is a workaround for this issue: https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/issues/80
+
+Then configure the monitor.cfg.
+
+Then run: python monitor.py
+
+Probably some packages needed for Hyundai Connect API are not installed (error messages). Learn more about installing Python packages: https://packaging.python.org/en/latest/tutorials/installing-packages/
+I have installed the following packages (e.g. use python -m pip install "package_name")
+
+    python-dateutil    2.8.2
+    beautifulsoup4     4.11.1
+    pytz               2022.2.1
+    requests           2.28.1
+
+If everything works, it's a matter of regularly collecting the information, for example by running the "python monitor.py" command once an hour. A server is of course best, I use a Raspberry Pi, but it can also regularly be done on a Windows 10 or Mac computer, provided the computer is on.
+
+
+By then, if you want to show the summary information in monitor.csv, configure the summary.cfg once and run the command: python summary.py
