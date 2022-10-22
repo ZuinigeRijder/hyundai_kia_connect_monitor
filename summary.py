@@ -84,6 +84,21 @@ def debug(line):
         print(line)
 
 
+def init(current_day, odo):
+    """ init tuple with initial values """
+    # current_day, odo, charged_perc, discharged_perc, charges, drives,
+    # elapsed_minutes, soc_avg, soc_min, soc_max
+    debug(f"init({current_day})")
+    return (current_day, odo, 0, 0, 0, 0, 0, -1.0, 999, -1, -1.0, 999, -1)
+
+
+def to_int(string):
+    """ convert to int """
+    if string == "None":
+        return -1
+    return int(string)
+
+
 def same_year(d_1: datetime, d_2: datetime):
     """ return if same year """
     return d_1.year == d_2.year
@@ -241,14 +256,6 @@ def print_summaries(current_day_values, totals):
     return totals
 
 
-def init(current_day, odo):
-    """ init tuple with initial values """
-    # current_day, odo, charged_perc, discharged_perc, charges, drives,
-    # elapsed_minutes, soc_avg, soc_min, soc_max
-    debug(f"init({current_day})")
-    return (current_day, odo, 0, 0, 0, 0, 0, 0.0, 999, 0, 0.0, 999, 0)
-
-
 def keep_track_of_totals(values, split, prev_split):
     """ keep_track_of_totals """
     debug("keep track of totals")
@@ -274,8 +281,8 @@ def keep_track_of_totals(values, split, prev_split):
         float(split[LON].strip()) != float(prev_split[LON].strip())
     )
 
-    soc = int(split[SOC].strip())
-    prev_soc = int(prev_split[SOC].strip())
+    soc = to_int(split[SOC].strip())
+    prev_soc = to_int(prev_split[SOC].strip())
     delta_soc = soc - prev_soc
     if (soc == 0 or prev_soc == 0) and abs(delta_soc) > 5:
         # possibly wrong readout, take largest
@@ -296,8 +303,8 @@ def keep_track_of_totals(values, split, prev_split):
     t_soc_max = max(soc, t_soc_max)
 
     # keep track of average 12V over time
-    volt12 = int(split[V12].strip())
-    prev_volt12 = int(prev_split[V12].strip())
+    volt12 = to_int(split[V12].strip())
+    prev_volt12 = to_int(prev_split[V12].strip())
     average_volt12 = (volt12 + prev_volt12) / 2
     t_volt12_avg += (average_volt12 * elapsed_minutes)
     t_volt12_min = min(volt12, t_volt12_min)
