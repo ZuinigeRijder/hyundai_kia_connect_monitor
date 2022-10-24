@@ -5,8 +5,11 @@ Simple Python3 script to make a summary of monitor.csv
 import sys
 import configparser
 from datetime import datetime
+from time import sleep
 from pathlib import Path
 from dateutil import parser
+from geopy.distance import geodesic
+from geopy.geocoders import Nominatim
 
 
 def arg_has(string):
@@ -24,6 +27,10 @@ DAY = len(sys.argv) == 1 or arg_has('day') or arg_has('-trip')
 WEEK = len(sys.argv) == 1 or arg_has('week') or arg_has('-trip')
 MONTH = len(sys.argv) == 1 or arg_has('month') or arg_has('-trip')
 YEAR = len(sys.argv) == 1 or arg_has('year') or arg_has('-trip')
+MOVES = arg_has('move')
+ADDRESS = arg_has('address')
+if ADDRESS and not TRIP and not MOVES:
+    TRIP = True
 
 INPUT = Path("monitor.csv")
 
@@ -32,7 +39,7 @@ config_parser = configparser.ConfigParser()
 config_parser.read('summary.cfg')
 monitor_settings = dict(config_parser.items('summary'))
 
-ODO_METRIC = monitor_settings['odometer_metric']
+ODO_METRIC = monitor_settings['odometer_metric'].lower()
 NET_BATTERY_SIZE_KWH = float(monitor_settings['net_battery_size_kwh'])
 AVERAGE_COST_PER_KWH = float(monitor_settings['average_cost_per_kwh'])
 COST_CURRENCY = monitor_settings['cost_currency']
@@ -69,6 +76,7 @@ T_SOC_MAX = 9
 T_VOLT12_AVG = 10
 T_VOLT12_MIN = 11
 T_VOLT12_MAX = 12
+T_MOVES = 13
 
 # indexes to totals tuples
 T_DAY = 0
@@ -87,9 +95,9 @@ def debug(line):
 def init(current_day, odo):
     """ init tuple with initial values """
     # current_day, odo, charged_perc, discharged_perc, charges, drives,
-    # elapsed_minutes, soc_avg, soc_min, soc_max
+    # elapsed_minutes, soc_avg, soc_min, soc_max, moves
     debug(f"init({current_day})")
-    return (current_day, odo, 0, 0, 0, 0, 0, -1.0, 999, -1, -1.0, 999, -1)
+    return (current_day, odo, 0, 0, 0, 0, 0, -1.0, 999, -1, -1.0, 999, -1, 0)
 
 
 def to_int(string):
@@ -127,16 +135,19 @@ def same_day(d_1: datetime, d_2: datetime):
     return d_1.year == d_2.year
 
 
-print(f"Period, date      , info , delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives")  # noqa pylint:disable=line-too-long
+if ADDRESS:
+    print(f"Period, date      , info , delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives, #moves, Address")  # noqa pylint:disable=line-too-long
+else:
+    print(f"Period, date      , info , delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives, #moves")  # noqa pylint:disable=line-too-long
 
 
-def print_summary(prefix, current, values):
+def print_summary(prefix, current, values, location_str):
     """ print_summary """
     debug("print_summary")
     debug("PREV  : " + str(values))
     debug("CURR  : " + str(current))
     debug("VALUES: " + str(values))
-    delta_odo = round(current[T_ODO] - values[T_ODO], 1)
+    delta_odo = abs(round(current[T_ODO] - values[T_ODO], 1))
 
     t_charged_perc = values[T_CHARGED_PERC]
     if t_charged_perc < 0:
@@ -146,6 +157,7 @@ def print_summary(prefix, current, values):
         t_discharged_perc = 0
     t_charges = values[T_CHARGES]
     t_drives = values[T_DRIVES]
+    t_moves = values[T_MOVES]
 
     t_elapsed_minutes = values[T_ELAPSED_MINUTES]
     t_soc_avg = values[T_SOC_AVG]
@@ -200,7 +212,13 @@ def print_summary(prefix, current, values):
     t_drives_str = ""
     if SHOW_ZERO_VALUES or t_drives != 0:
         t_drives_str = f"{t_drives:8}"
-    print(f"{prefix:18},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{soc_average:8},{t_soc_min:3},{t_soc_max:3},{volt12_average:8},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_drives_str:8}")  # noqa pylint:disable=line-too-long
+    t_moves_str = ""
+    if SHOW_ZERO_VALUES or t_moves != 0:
+        t_moves_str = f"{t_moves:7}"
+    if ADDRESS:
+        print(f"{prefix:18},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{soc_average:8},{t_soc_min:3},{t_soc_max:3},{volt12_average:8},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_drives_str:8},{t_moves_str:7},{location_str}")  # noqa pylint:disable=line-too-long
+    else:
+        print(f"{prefix:18},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{soc_average:8},{t_soc_min:3},{t_soc_max:3},{volt12_average:8},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_drives_str:8},{t_moves_str:7}")  # noqa pylint:disable=line-too-long
 
 
 def print_summaries(current_day_values, totals):
@@ -221,7 +239,8 @@ def print_summaries(current_day_values, totals):
             print_summary(
                 f"DAY   , {day_str}, {day_info:5}",
                 current_day_values,
-                t_day
+                t_day,
+                ""
             )
         t_day = current_day_values
         t_trip = current_day_values
@@ -231,7 +250,8 @@ def print_summaries(current_day_values, totals):
         print_summary(
             f"WEEK  , {day_str:10}, WK {weeknr:2}",
             current_day_values,
-            t_week
+            t_week,
+            ""
         )
         t_week = current_day_values
 
@@ -240,7 +260,8 @@ def print_summaries(current_day_values, totals):
         print_summary(
             f"MONTH , {day_str:10}, {month_info:5}",
             current_day_values,
-            t_month
+            t_month,
+            ""
         )
         t_month = current_day_values
     if YEAR and not same_year(current_day, t_year[T_CURRENT_DAY]):
@@ -248,7 +269,8 @@ def print_summaries(current_day_values, totals):
         print_summary(
             f"YEAR  , {day_str:10}, {year:5}",
             current_day_values,
-            t_year
+            t_year,
+            ""
         )
         t_year = current_day_values
 
@@ -256,12 +278,13 @@ def print_summaries(current_day_values, totals):
     return totals
 
 
-def keep_track_of_totals(values, split, prev_split):
+def keep_track_of_totals(values, split, prev_split, handle_moved):
     """ keep_track_of_totals """
     debug("keep track of totals")
     debug("prev_split: " + str(prev_split))
     debug("     split: " + str(split))
 
+    t_odo = values[T_ODO]
     t_charged_perc = values[T_CHARGED_PERC]
     t_discharged_perc = values[T_DISCHARGED_PERC]
     t_charges = values[T_CHARGES]
@@ -273,13 +296,26 @@ def keep_track_of_totals(values, split, prev_split):
     t_volt12_avg = values[T_VOLT12_AVG]
     t_volt12_min = values[T_VOLT12_MIN]
     t_volt12_max = values[T_VOLT12_MAX]
+    t_moves = values[T_MOVES]
 
     delta_odo = float(split[ODO].strip()) - float(prev_split[ODO].strip())
-    moved = (
-        delta_odo != 0.0 or
+    coord_changed = (
         float(split[LAT].strip()) != float(prev_split[LAT].strip()) or
         float(split[LON].strip()) != float(prev_split[LON].strip())
     )
+    moved = coord_changed or delta_odo
+    if coord_changed:
+        t_moves += 1
+        if MOVES and handle_moved:
+            debug("Coordinate changed")
+            loc = (float(split[LAT].strip()), float(split[LON].strip()))
+            prev_loc = (
+                float(prev_split[LAT].strip()), float(prev_split[LON].strip()))
+            t_odo = 0.0
+            if ODO_METRIC == "km":
+                t_odo = geodesic(loc, prev_loc).kilometers
+            elif ODO_METRIC == "mi":
+                t_odo = geodesic(loc, prev_loc).miles
 
     soc = to_int(split[SOC].strip())
     prev_soc = to_int(prev_split[SOC].strip())
@@ -349,7 +385,7 @@ def keep_track_of_totals(values, split, prev_split):
     debug("    before: " + str(values))
     values = (
         values[T_CURRENT_DAY],
-        values[T_ODO],
+        t_odo,
         t_charged_perc,
         t_discharged_perc,
         t_charges,
@@ -360,7 +396,8 @@ def keep_track_of_totals(values, split, prev_split):
         t_soc_max,
         t_volt12_avg,
         t_volt12_min,
-        t_volt12_max
+        t_volt12_max,
+        t_moves
     )
     debug("     after: " + str(values))
     return values
@@ -377,9 +414,10 @@ def handle_line(split, prev_split, totals):
     t_year = totals[T_YEAR]
     t_trip = totals[T_TRIP]
 
+    current_day_values = init(current_day, float(split[ODO].strip()))
+
     if not t_day:  # first time, fill in with initial values
         debug(f"not TDAY: {t_day}")
-        current_day_values = init(current_day, float(split[ODO].strip()))
         totals = (
             current_day_values,
             current_day_values,
@@ -389,38 +427,66 @@ def handle_line(split, prev_split, totals):
         )
         return totals
 
+    t_trip = totals[T_TRIP]  # do not update due to day change!
     day_change = not same_day(current_day, t_day[T_CURRENT_DAY])
     if day_change:
         debug(f"DAY change: {t_day}")
-        current_day_values = init(current_day, float(split[ODO].strip()))
         totals = print_summaries(current_day_values, totals)
 
     t_day = totals[T_DAY]
     t_week = totals[T_WEEK]
     t_month = totals[T_MONTH]
     t_year = totals[T_YEAR]
-    t_trip = totals[T_TRIP]
 
     # take into account totals per line
     if DAY:
-        t_day = keep_track_of_totals(t_day, split, prev_split)
+        t_day = keep_track_of_totals(t_day, split, prev_split, False)
     if WEEK:
-        t_week = keep_track_of_totals(t_week, split, prev_split)
+        t_week = keep_track_of_totals(t_week, split, prev_split, False)
     if MONTH:
-        t_month = keep_track_of_totals(t_month, split, prev_split)
+        t_month = keep_track_of_totals(t_month, split, prev_split, False)
     if YEAR:
-        t_year = keep_track_of_totals(t_year, split, prev_split)
+        t_year = keep_track_of_totals(t_year, split, prev_split, False)
+
+    if MOVES:
+        t_moves_init = init(current_day, 0.0)
+        t_moves = keep_track_of_totals(t_moves_init, split, prev_split, True)
+        if t_moves[T_MOVES] > 0:
+            day_move_str = current_day.strftime("%Y-%m-%d")
+            day_move_info = current_day.strftime("%H:%M")
+            location_str = ""
+            if ADDRESS:
+                sleep(1)  # do not abuse Nominatim, 1 request per second
+                geolocator = \
+                    Nominatim(user_agent="hyundai_kia_connect_monitor")
+                location = geolocator.reverse(
+                    split[LAT].strip() + ", " + split[LON].strip())
+                location_str = ' "' + location.address + '"'
+            print_summary(
+                f"MOVE  , {day_move_str:10}, {day_move_info:5}",
+                t_moves_init,
+                t_moves,
+                location_str
+            )
 
     if TRIP:
-        t_trip = keep_track_of_totals(t_trip, split, prev_split)
+        t_trip = keep_track_of_totals(t_trip, split, prev_split, False)
         if t_trip[T_DRIVES] > 0:
-            current_day_values = init(current_day, float(split[ODO].strip()))
             day_trip_str = current_day.strftime("%Y-%m-%d")
             day_info = current_day.strftime("%H:%M")
+            location_str = ""
+            if ADDRESS:
+                sleep(1)  # do not abuse Nominatim, 1 request per second
+                geolocator = \
+                    Nominatim(user_agent="hyundai_kia_connect_monitor")
+                location = geolocator.reverse(
+                    split[LAT].strip() + ", " + split[LON].strip())
+                location_str = ' "' + location.address + '"'
             print_summary(
                 f"TRIP  , {day_trip_str:10}, {day_info:5}",
                 current_day_values,
-                t_trip
+                t_trip,
+                location_str
             )
             t_trip = current_day_values
 

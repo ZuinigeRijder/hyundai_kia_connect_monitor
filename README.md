@@ -70,7 +70,7 @@ Following information from hyundai_kia_connect_api is added to the monitor.csv f
 - plugged
 
 ## summary.py
-make summary per TRIP, DAY, WEEK, MONTH, YEAR or a combination with monitor.csv as input
+make summary per TRIP, DAY, WEEK, MONTH, YEAR, MOVE, ADDRESS or a combination with monitor.csv as input
 
 Usage: 
 ```
@@ -89,13 +89,25 @@ or
 python summary.py month
 or
 python summary.py year
+or 
+python summary.py move
+or 
+python summary.py address
+or 
+python summary.py move address
+or
+python summary.py day trip address
+or
+python summary.py day trip move address
 ```
 - INPUTFILE: summary.cfg (configuration of kilometers or miles, net battery size in kWh, average cost per kWh and cost currency)
 - INPUTFILE: monitor.csv
-- standard output: summary per TRIP, DAY, WEEK, MONTH, YEAR in csv format (default all summaries when no parameters given)
+- standard output: summary per TRIP, DAY, WEEK, MONTH, YEAR, MOVE, ADDRESS in csv format, default all summaries (except move and address) when no parameters given
 
 Notes:
 - add trip, day, week, month, year or -trip or a combination as parameter, which respectively only shows lines for TRIP, DAY, WEEK, MONTH, YEAR or all without TRIP or a combination
+- "move" argument computes the distance between two changed coordinates with geopy, actually driven distance can be of course (much) longer
+- "address" shows the address of a coordinate for "move" or "trip" with geopy, because Nominatim has a 1000 query limit per day and bulk queries are not appreciated, one second sleep is added per address lookup.  
 - the summary is done in one go, keeping track of TRIP, DAY, WEEK, MONTH and YEAR totals
 - the summary is based on the captured data, so in fact there might be e.g. charges or drives missed or consumption for trips is inaccurate
 
@@ -363,7 +375,63 @@ MONTH , 2022-09-25, Sep  ,    470.7,    70.7,    -73.5,    6.4,      15.6,     1
 YEAR  , 2022-09-25, 2022 ,    470.7,    70.7,    -73.5,    6.4,      15.6,     18.08,      59,  5,100,      91, 85, 98,        7,      14
 ```
 
-You can redirect this standard output to a file, e.g. summary.day.csv: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.csv
+Example output when showing day, trip, move and address:
+```
+C:\Users\Rick\git\monitor>python summary.py day trip move address
+Period, date      , info , delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives, #moves, Address
+DAY   , 2022-09-17, Sat  ,         ,     0.7,         ,       ,          ,          ,      54, 55, 55,      90, 91, 91,        1,        ,       ,
+DAY   , 2022-09-18, Sun  ,         ,     2.8,         ,       ,          ,          ,      59, 58, 60,      91, 91, 91,         ,        ,       ,
+MOVE  , 2022-09-19, 15:00,      0.4,        ,         ,       ,          ,          ,      61, 61, 61,      88, 85, 85,         ,       1,      1, "Statenlaan, Drunen, Heusden, Noord-Brabant, Nederland, 5152 SG, Nederland"
+TRIP  , 2022-09-19, 15:00,      0.1,     3.5,         ,       ,          ,          ,      59, 55, 61,      91, 85, 91,        1,       1,      1, "Statenlaan, Drunen, Heusden, Noord-Brabant, Nederland, 5152 SG, Nederland"
+MOVE  , 2022-09-19, 16:00,      0.4,        ,     -1.4,       ,          ,          ,      60, 59, 59,      85, 86, 86,         ,       1,      1, "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+TRIP  , 2022-09-19, 16:00,      6.4,        ,     -1.4,       ,          ,          ,      60, 59, 59,      85, 86, 86,         ,       1,      1, "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+DAY   , 2022-09-19, Mon  ,      6.5,        ,         ,       ,          ,          ,      60, 59, 61,      89, 85, 91,         ,       2,      2,
+MOVE  , 2022-09-20, 07:00,      2.3,        ,         ,       ,          ,          ,      59, 59, 59,      87, 88, 88,         ,        ,      1, "Akkerlaan, Bloemenoord, Waalwijk, Noord-Brabant, Nederland, 5143 ND, Nederland"
+MOVE  , 2022-09-20, 08:00,      2.3,        ,     -4.2,    0.5,     182.6,      1.03,      56, 53, 53,      89, 91, 91,         ,       1,      1, "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+TRIP  , 2022-09-20, 08:00,     28.2,        ,     -4.2,    6.7,      14.9,      1.03,      58, 53, 59,      87, 86, 91,         ,       1,      2, "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+MOVE  , 2022-09-20, 14:30,      1.3,        ,     -0.7,       ,          ,          ,      50, 50, 50,      89, 87, 87,         ,        ,      1, "18, Leliestraat, Drunen, Heusden, Noord-Brabant, Nederland, 5151 TP, Nederland"
+MOVE  , 2022-09-20, 15:00,      4.0,        ,     -0.7,       ,          ,          ,      49, 49, 49,      89, 91, 91,         ,        ,      1, "Desso Tarkett, 15, Taxandriaweg, Laageinde, Waalwijk, Noord-Brabant, Nederland, 5142 PA, Nederland"
+MOVE  , 2022-09-20, 15:30,      2.2,        ,     -0.7,       ,          ,          ,      48, 48, 48,      91, 92, 92,         ,       1,      1, "29b, Westeinde, Besoijen, Waalwijk, Noord-Brabant, Nederland, 5141 AA, Nederland"
+TRIP  , 2022-09-20, 15:30,     12.6,        ,     -2.1,    6.0,      16.7,      0.52,      50, 48, 51,      90, 87, 92,         ,       1,      3, "29b, Westeinde, Besoijen, Waalwijk, Noord-Brabant, Nederland, 5141 AA, Nederland"
+MOVE  , 2022-09-20, 15:58,      5.4,        ,     -0.7,       ,          ,          ,      47, 47, 47,      91, 91, 91,         ,       1,      1, "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+TRIP  , 2022-09-20, 15:58,      6.8,        ,     -0.7,       ,          ,          ,      47, 47, 47,      91, 91, 91,         ,       1,      1, "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+DAY   , 2022-09-20, Tue  ,     47.6,        ,     -7.0,    6.8,      14.7,      1.72,      54, 47, 59,      89, 86, 92,         ,       3,      6,
+MOVE  , 2022-09-21, 12:30,      1.3,     0.7,         ,       ,          ,          ,      51, 52, 52,      91, 92, 92,         ,       1,      1, "18, Leliestraat, Drunen, Heusden, Noord-Brabant, Nederland, 5151 TP, Nederland"
+TRIP  , 2022-09-21, 12:30,      2.5,     3.5,         ,       ,          ,          ,      46, 45, 52,      91, 91, 92,        1,       1,      1, "18, Leliestraat, Drunen, Heusden, Noord-Brabant, Nederland, 5151 TP, Nederland"
+MOVE  , 2022-09-21, 13:00,      1.3,        ,     -0.7,       ,          ,          ,      51, 51, 51,      91, 91, 91,         ,       1,      1, "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+TRIP  , 2022-09-21, 13:00,      2.7,        ,     -0.7,       ,          ,          ,      51, 51, 51,      91, 91, 91,         ,       1,      1, "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+DAY   , 2022-09-21, Wed  ,      5.2,    15.4,     -0.7,       ,          ,          ,      50, 45, 68,      91, 91, 92,        2,       2,      2,
+DAY   , 2022-09-22, Thu  ,         ,     1.4,         ,       ,          ,          ,      69, 70, 72,      91, 91, 91,        1,        ,       ,
+MOVE  , 2022-09-23, 11:21,      0.6,        ,     -0.7,       ,          ,          ,      71, 71, 71,      89, 88, 88,         ,       1,      1, "Jumbo Aalbersestraat, 5, Aalbersestraat, Drunen, Heusden, Noord-Brabant, Nederland, 5151 EE, Nederland"
+TRIP  , 2022-09-23, 11:21,      1.9,    13.3,         ,       ,          ,          ,      68, 52, 72,      91, 88, 91,        2,       1,      1, "Jumbo Aalbersestraat, 5, Aalbersestraat, Drunen, Heusden, Noord-Brabant, Nederland, 5151 EE, Nederland"
+MOVE  , 2022-09-23, 12:00,      0.6,     0.7,         ,       ,          ,          ,      71, 72, 72,      87, 87, 87,        1,       1,      1, "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+TRIP  , 2022-09-23, 12:00,      1.7,     0.7,         ,       ,          ,          ,      71, 72, 72,      87, 87, 87,        1,       1,      1, "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+DAY   , 2022-09-23, Fri  ,      3.6,     6.3,     -0.7,       ,          ,          ,      73, 71, 80,      90, 87, 91,        1,       2,      2,
+TRIP  , 2022-09-24, 09:57,      3.7,    19.6,     -0.7,       ,          ,          ,      88, 73,100,      88, 87, 95,        1,       1,       , "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+MOVE  , 2022-09-24, 11:00,      0.9,        ,     -0.7,       ,          ,          ,      98, 98, 98,      93, 92, 92,         ,        ,      1, "140, Torenstraat, Drunen, Heusden, Noord-Brabant, Nederland, 5151 JN, Nederland"
+MOVE  , 2022-09-24, 11:30,     23.8,        ,     -4.9,    4.9,      20.6,      1.21,      94, 91, 91,      94, 97, 97,         ,        ,      1, "Rijksweg A2, Enspijk, West Betuwe, Gelderland, Nederland, 4153 RN, Nederland"
+MOVE  , 2022-09-24, 12:00,     41.6,        ,     -7.0,    5.9,      16.8,      1.72,      86, 81, 81,      97, 98, 98,         ,        ,      1, "Rijksweg A27, Eemnes, Utrecht, Nederland, 3755 AS, Nederland"
+MOVE  , 2022-09-24, 12:30,     40.7,        ,     -8.4,    4.8,      20.6,      2.07,      75, 69, 69,      98, 98, 98,         ,        ,      1, "Rijksweg A6, Lelystad, Flevoland, Nederland, 8221 RD, Nederland"
+MOVE  , 2022-09-24, 13:00,     39.1,        ,     -8.4,    4.7,      21.5,      2.07,      63, 57, 57,      98, 98, 98,         ,        ,      1, "A6, Oldeouwer, De Fryske Marren, Fryslân, Nederland, 8516 DD, Nederland"
+MOVE  , 2022-09-24, 13:21,     16.4,        ,     -3.5,    4.7,      21.3,      0.86,      54, 52, 52,      97, 96, 96,         ,       1,      1, "17-101, Dekamalaan, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 ZG, Nederland"
+TRIP  , 2022-09-24, 13:21,    198.4,        ,    -32.9,    6.0,      16.6,      8.09,      80, 52, 98,      96, 92, 98,         ,       1,      6, "17-101, Dekamalaan, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 ZG, Nederland"
+MOVE  , 2022-09-24, 14:31,      2.2,        ,     -0.7,       ,          ,          ,      51, 51, 51,      95, 94, 94,         ,       1,      1, "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8606 KZ, Nederland"
+TRIP  , 2022-09-24, 14:31,      3.3,        ,     -0.7,       ,          ,          ,      51, 51, 51,      95, 94, 94,         ,       1,      1, "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8606 KZ, Nederland"
+MOVE  , 2022-09-24, 15:00,      1.6,        ,         ,       ,          ,          ,      51, 51, 51,      93, 93, 93,         ,        ,      1, "Stadsrondweg-Oost, Houkesloot, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 GC, Nederland"
+MOVE  , 2022-09-24, 15:23,      0.7,        ,     -0.7,       ,          ,          ,      50, 50, 50,      94, 96, 96,         ,       1,      1, "17-101, Dekamalaan, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 ZG, Nederland"
+TRIP  , 2022-09-24, 15:23,      4.8,        ,     -0.7,       ,          ,          ,      51, 50, 51,      94, 93, 96,         ,       1,      2, "17-101, Dekamalaan, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 ZG, Nederland"
+MOVE  , 2022-09-24, 16:30,      0.2,        ,         ,       ,          ,          ,      50, 50, 50,      95, 94, 94,         ,        ,      1, "10, Groenedijk, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 AB, Nederland"
+MOVE  , 2022-09-24, 17:00,     36.9,        ,     -7.0,    5.3,      19.0,      1.72,      45, 40, 40,      94, 94, 94,         ,        ,      1, "A6, De Zuidert, Emmeloord, Noordoostpolder, Flevoland, Nederland, 8305 AC, Nederland"
+MOVE  , 2022-09-24, 17:30,     42.7,        ,     -7.0,    6.1,      16.4,      1.72,      35, 30, 30,      94, 95, 95,         ,        ,      1, "Rijksweg A6, Lelystad, Flevoland, Nederland, 3897 MA, Nederland"
+MOVE  , 2022-09-24, 18:00,     38.1,        ,     -6.3,    6.0,      16.5,      1.55,      25, 21, 21,      94, 94, 94,         ,        ,      1, "A27, Rijnsweerd, Utrecht, Nederland, 3731 GC, Nederland"
+MOVE  , 2022-09-24, 18:30,     39.7,        ,     -7.7,    5.2,      19.4,      1.89,      15, 10, 10,      95, 96, 96,         ,        ,      1, "A2, Hoenzadriel, Maasdriel, Gelderland, Nederland, 5334 NV, Nederland"
+MOVE  , 2022-09-24, 19:00,     13.8,        ,     -3.5,    3.9,      25.4,      0.86,       7,  5,  5,      96, 97, 97,        1,       1,      1, "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+TRIP  , 2022-09-24, 19:00,    197.6,        ,    -31.5,    6.3,      15.9,      7.75,      30,  5, 50,      95, 94, 97,        1,       1,      6, "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+DAY   , 2022-09-24, Sat  ,    407.8,    15.4,    -66.5,    6.1,      16.3,     16.36,      75,  5,100,      91, 87, 98,        2,       5,     15,
+DAY   , 2022-09-25, Sun  ,         ,    30.1,         ,       ,          ,          ,      29, 42, 50,      97, 97, 97,         ,        ,       ,
+```
+
+You can redirect the standard output to a file, e.g. summary.day.csv: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.csv
 
 Excel example using python summary.py day > summary.day.csv: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/blob/main/examples/summary.day.xlsx
 
@@ -497,13 +565,13 @@ DAY   , 2022-10-13, Thu  ,     28.2,    13.3,     -4.2,    6.7,      14.9,      
 
 If you look at the corresonding entries of monitor.csv:
 ```
-2022-10-12 19:30:42+02:00, 5.118697, 51.680767, False, 85, 18192.8, 41, False, 0
-2022-10-13 06:00:42+02:00, 5.118697, 51.680767, False, 85, 18192.8, 41, False, 0
-2022-10-13 06:30:44+02:00, 5.118697, 51.680767, False, 85, 18192.8, 41, False, 0
+2022-10-12 19:30:42+02:00, 5.124957, 51.68260, False, 85, 18192.8, 41, False, 0
+2022-10-13 06:00:42+02:00, 5.124957, 51.68260, False, 85, 18192.8, 41, False, 0
+2022-10-13 06:30:44+02:00, 5.124957, 51.68260, False, 85, 18192.8, 41, False, 0
 2022-10-13 07:00:34+02:00, 5.066594, 51.692425, True, 94, 18192.8, 39, False, 0
 2022-10-13 07:30:32+02:00, 5.156569, 51.697092, True, 95, 18199.7, 35, False, 0
-2022-10-13 08:00:50+02:00, 5.118764, 51.6808, False, 95, 18221, 35, False, 0
-2022-10-13 08:30:43+02:00, 5.118764, 51.6808, False, 95, 18221, 35, False, 0
+2022-10-13 08:00:50+02:00, 5.124957, 51.68260, False, 95, 18221, 35, False, 0
+2022-10-13 08:30:43+02:00, 5.124957, 51.68260, False, 95, 18221, 35, False, 0
 ```
 
 What has happended on those TRIPs:
@@ -581,8 +649,9 @@ Screenshot of excel example with some graphs:
 
 ## Remarks of using the tools for a month
 - The hyundai_kia_connect_api gives regularly exceptions, see this issue: https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/issues/62#issuecomment-1280045102
-- the retry mechanism (wait one minute and retry twice) seems a good workaround
-- I do not know what happens if the car cannot be reached by bluelink or when the number of calls allowed per day have been exceeded
+- The retry mechanism (wait one minute and retry twice) seems a good workaround
+- If the car cannot be reached by bluelink then an exception will be thrown and no entry will appear in monitor.csv
+- I do not know what happens if the the number of calls allowed per day have been exceeded, probably an exception will be thrown and no entry will appear in monitor.csv
 - I have seen small drops and increases of SOC% (on my IONIQ 5 around 1% to 2%), because of temperature changes between e.g. evening and morning, I made this configurable via summary.cfg
 - Small trips will give inaccurate consumption figures, on the IONIQ 5 1% SOC difference is 0.7 kWh difference, so I made the minimum kWh consumption configurable via summary.cfg. A Smaller battery will have better accurracy, because 1% of e.g. 27 kWh makes 0.27 kWh delta's instead of 0.7 kWh in my case
 - I have seen once that SOC was reported wrongly in monitor.csv as zero, in summary.py I corrected this when the previous SOC% was not zero and delta is greather than 5
@@ -620,6 +689,9 @@ I have installed the following packages (e.g. use python -m pip install "package
     beautifulsoup4     4.11.1
     pytz               2022.2.1
     requests           2.28.1
+    
+In hyundai_kia_connect_monitor also geopy packages is used, so also install this package:
+    geopy  2.2.0
 
 If everything works, it's a matter of regularly collecting the information, for example by running the "python monitor.py" command once an hour. A server is of course best, I use a Raspberry Pi, but it can also regularly be done on a Windows 10 or Mac computer, provided the computer is on.
 
