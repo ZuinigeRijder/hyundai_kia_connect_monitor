@@ -638,6 +638,49 @@ Screenshot after imported into Google My Maps (yes, I have adjusted the location
 
 I changed the style to "sequence numbering" so you see the order of locations in the map. You can also adjust the base map, so less information is shown, but your locations are better visible. You can also view the Google My Map in Google Earth (via the Google My Maps menu) and zoom in interactively to the different locations.  
 
+It is also possible to add addresses to kml.
+```
+C:\Users\Rick\git\monitor>python kml.py address
+  1: 20220917 15:00    (5.124957,51.68260 ) SOC: 54% 12V: 90% ODO: 17324.2 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+  2: 20220917 23:00 C  (5.124957,51.68260 ) SOC: 55% 12V: 91% ODO: 17324.2 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"       charging plugged:2
+  3: 20220918 01:00    (5.124957,51.68260 ) SOC: 60% 12V: 91% ODO: 17324.2 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"       plugged:2
+  4: 20220919 15:00  D (5.125942,51.679128) SOC: 61% 12V: 85% ODO: 17324.3 Address: "Statenlaan, Drunen, Heusden, Noord-Brabant, Nederland, 5152 SG, Nederland"       (+0.1 since 20220919 14:00) drive
+  5: 20220919 16:00    (5.124957,51.68260 ) SOC: 59% 12V: 86% ODO: 17330.7 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"       (+6.4 since 20220919 15:00)
+  6: 20220920 07:00  D (5.091594,51.684361) SOC: 59% 12V: 88% ODO: 17330.7 Address: "Akkerlaan, Bloemenoord, Waalwijk, Noord-Brabant, Nederland, 5143 ND, Nederland"       drive
+  7: 20220920 08:00    (5.124957,51.68260 ) SOC: 53% 12V: 91% ODO: 17358.9 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"       (+28.2 since 20220920 07:00)
+  8: 20220920 14:30  D (5.135242,51.692605) SOC: 50% 12V: 87% ODO: 17358.9 Address: "18, Leliestraat, Drunen, Heusden, Noord-Brabant, Nederland, 5151 TP, Nederland"       drive
+  9: 20220920 15:00  D (5.078042,51.693758) SOC: 49% 12V: 91% ODO: 17358.9 Address: "Desso Tarkett, 15, Taxandriaweg, Laageinde, Waalwijk, Noord-Brabant, Nederland, 5142 PA, Nederland"       drive
+ 10: 20220920 15:30    (5.04708 ,51.688192) SOC: 48% 12V: 92% ODO: 17371.5 Address: "29b, Westeinde, Besoijen, Waalwijk, Noord-Brabant, Nederland, 5141 AA, Nederland"       (+12.6 since 20220920 15:00)
+ 11: 20220920 15:58    (5.124957,51.68260 ) SOC: 47% 12V: 91% ODO: 17378.3 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"       (+6.8 since 20220920 15:30)
+ 12: 20220921 10:30 C  (5.124957,51.68260 ) SOC: 46% 12V: 91% ODO: 17378.3 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"       charging plugged:2
+ 13: 20220921 12:30    (5.135183,51.692608) SOC: 52% 12V: 92% ODO: 17380.8 Address: "18, Leliestraat, Drunen, Heusden, Noord-Brabant, Nederland, 5151 TP, Nederland"       (+2.5 since 20220921 12:00)
+ 14: 20220921 13:00    (5.124957,51.68260 ) SOC: 51% 12V: 91% ODO: 17383.5 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"       (+2.7 since 20220921 12:30)
+ 15: 20220921 14:31 C  (5.124957,51.68260 ) SOC: 52% 12V: 91% ODO: 17383.5 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"       charging plugged:2
+ 16: 20220922 06:00    (5.124957,51.68260 ) SOC: 70% 12V: 91% ODO: 17383.5 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"       plugged:2
+ 17: 20220923 11:21    (5.132119,51.685055) SOC: 71% 12V: 88% ODO: 17385.4 Address: "Jumbo Aalbersestraat, 5, Aalbersestraat, Drunen, Heusden, Noord-Brabant, Nederland, 5151 EE, Nederland"       (+1.9 since 20220923 11:00)
+ 18: 20220923 12:00 C  (5.124957,51.68260 ) SOC: 72% 12V: 87% ODO: 17387.1 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"       (+1.7 since 20220923 11:21) charging plugged:2
+ 19: 20220923 15:00    (5.124957,51.68260 ) SOC: 80% 12V: 87% ODO: 17387.1 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"       plugged:2
+ 20: 20220924 08:00  D (5.124957,51.68260 ) SOC:100% 12V: 95% ODO: 17387.1 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"       drive
+ 21: 20220924 08:30    (5.124957,51.68260 ) SOC:100% 12V: 95% ODO: 17387.1 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"
+ 22: 20220924 11:00  D (5.129967,51.674819) SOC: 98% 12V: 92% ODO: 17390.8 Address: "140, Torenstraat, Drunen, Heusden, Noord-Brabant, Nederland, 5151 JN, Nederland"       drive
+ 23: 20220924 11:30  D (5.204728,51.883719) SOC: 91% 12V: 97% ODO: 17390.8 Address: "Rijksweg A2, Enspijk, West Betuwe, Gelderland, Nederland, 4153 RN, Nederland"       drive
+ 24: 20220924 12:00  D (5.250064,52.256122) SOC: 81% 12V: 98% ODO: 17390.8 Address: "Rijksweg A27, Eemnes, Utrecht, Nederland, 3755 AS, Nederland"       drive
+ 25: 20220924 12:30  D (5.540714,52.575733) SOC: 69% 12V: 98% ODO: 17390.8 Address: "Rijksweg A6, Lelystad, Flevoland, Nederland, 8221 RD, Nederland"       drive
+ 26: 20220924 13:00  D (5.768325,52.898894) SOC: 57% 12V: 98% ODO: 17390.8 Address: "A6, Oldeouwer, De Fryske Marren, Fryslân, Nederland, 8516 DD, Nederland"       drive
+ 27: 20220924 13:21    (5.683261,53.036686) SOC: 52% 12V: 96% ODO: 17589.2 Address: "17-101, Dekamalaan, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 ZG, Nederland"       (+198.4 since 20220924 13:00)
+ 28: 20220924 14:31    (5.681147,53.016858) SOC: 51% 12V: 94% ODO: 17592.5 Address: "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8606 KZ, Nederland"       (+3.3 since 20220924 14:00)
+ 29: 20220924 15:00  D (5.686422,53.030697) SOC: 51% 12V: 93% ODO: 17592.5 Address: "Stadsrondweg-Oost, Houkesloot, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 GC, Nederland"       drive
+ 30: 20220924 15:23    (5.68325 ,53.036683) SOC: 50% 12V: 96% ODO: 17597.3 Address: "17-101, Dekamalaan, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 ZG, Nederland"       (+4.8 since 20220924 15:00)
+ 31: 20220924 16:30  D (5.6802  ,53.035853) SOC: 50% 12V: 94% ODO: 17597.3 Address: "10, Groenedijk, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 AB, Nederland"       drive
+ 32: 20220924 17:00  D (5.771994,52.709039) SOC: 40% 12V: 94% ODO: 17597.3 Address: "A6, De Zuidert, Emmeloord, Noordoostpolder, Flevoland, Nederland, 8305 AC, Nederland"       drive
+ 33: 20220924 17:30  D (5.375436,52.411236) SOC: 30% 12V: 95% ODO: 17597.3 Address: "Rijksweg A6, Lelystad, Flevoland, Nederland, 3897 MA, Nederland"       drive
+ 34: 20220924 18:00  D (5.158522,52.095317) SOC: 21% 12V: 94% ODO: 17597.3 Address: "A27, Rijnsweerd, Utrecht, Nederland, 3731 GC, Nederland"       drive
+ 35: 20220924 18:30  D (5.293333,51.748758) SOC: 10% 12V: 96% ODO: 17597.3 Address: "A2, Hoenzadriel, Maasdriel, Gelderland, Nederland, 5334 NV, Nederland"       drive
+ 36: 20220924 19:00 C  (5.124957,51.68260 ) SOC:  5% 12V: 97% ODO: 17794.9 Address: "26, Keniaring, Drunen, Heusden, Noord-Brabant, Nederland, 5152 MX, Nederland"       (+197.6 since 20220924 18:30) charging plugged:2
+```
+
+Note: "address" shows the address of a coordinate with geopy, because Nominatim has a 1000 query limit per day and bulk queries are not appreciated, one second sleep is added per address lookup.
+
 ## python shrink.py
 
 Example (based on earlier monitor.csv) outputfile shrinked_monitor.csv: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/shrinked_monitor.csv
@@ -658,32 +701,24 @@ Screenshot of excel example with some graphs:
 
 Occurrence of SOC% of 0: 
 ```
-2022-10-11 11:30:47+02:00, 5.118592, 51.680736, False, 91, 18161.6, 48, False, 0
-2022-10-11 12:00:54+02:00, 5.118592, 51.680736, False, 91, 18161.6, 0, False, 0
-2022-10-11 12:30:48+02:00, 5.118592, 51.680736, False, 91, 18161.6, 48, False, 0
+2022-10-11 11:30:47+02:00, 5.124957, 51.68260, False, 91, 18161.6, 48, False, 0
+2022-10-11 12:00:54+02:00, 5.124957, 51.68260, False, 91, 18161.6, 0, False, 0
+2022-10-11 12:30:48+02:00, 5.124957, 51.68260, False, 91, 18161.6, 48, False, 0
 ```
 
 ## How to install python, packages and hyundai_connect_monitor
 Explanation for someone with no knowledge of python. I don't know what computer you have. Part of the tools is the regular retrieval of the data with the Python script monitor.py.   For this you need to install Python. I have installed Python 3.9.13.
 Here's more information about installing Python: https://realpython.com/installing-python/
 
-Then download  the source code of hyundai_kia_connect_api V1.34.2 here: https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases/tag/v1.34.2
-And of course  also download the hyundai_kia_connect_monitor R1.5.0 here: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R1.5.0
-
-Extract both and move the hyundai_kia_connect_api subfolder of hyundai_kia_connect_api-1.34.2 under hyundai_kia_connect_monitor.
-
-Then edit hyundai_kia_connect_api/HyundaiBlueLinkAPIUSA.py and comment the first line with # like this:
-```
-# from locale import D_T_FMT
-```
-This is a workaround for this issue: https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/issues/80
-
-Then configure the monitor.cfg.
-
-Then run: python monitor.py
+Steps:
+- Download the source code of hyundai_kia_connect_api v1.34.4 here: https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases/tag/v1.34.4
+- Download the latest hyundai_kia_connect_monitor release here: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases
+- Extract both and move the hyundai_kia_connect_api subfolder of hyundai_kia_connect_api-1.34.4 under hyundai_kia_connect_monitor.
+- Then configure monitor.cfg
+- Then run: python monitor.py
 
 Probably some packages needed for Hyundai Connect API are not installed (error messages). Learn more about installing Python packages: https://packaging.python.org/en/latest/tutorials/installing-packages/
-I have installed the following packages (e.g. use python -m pip install "package_name")
+I have installed the following packages (e.g. use python -m pip install "package_name"), see https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements.txt
 
     python-dateutil    2.8.2
     beautifulsoup4     4.11.1
@@ -694,6 +729,5 @@ In hyundai_kia_connect_monitor also geopy packages is used, so also install this
     geopy  2.2.0
 
 If everything works, it's a matter of regularly collecting the information, for example by running the "python monitor.py" command once an hour. A server is of course best, I use a Raspberry Pi, but it can also regularly be done on a Windows 10 or Mac computer, provided the computer is on.
-
 
 By then, if you want to show the summary information in monitor.csv, configure the summary.cfg once and run the command: python summary.py
