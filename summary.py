@@ -4,7 +4,7 @@ Simple Python3 script to make a summary of monitor.csv
 """
 import sys
 import configparser
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import sleep
 from pathlib import Path
 from dateutil import parser
@@ -403,19 +403,25 @@ def keep_track_of_totals(values, split, prev_split, handle_moved):
     return values
 
 
+def get_address(split):
+    """ get address """
+    location_str = ""
+    if ADDRESS:
+        sleep(1)  # do not abuse Nominatim, 1 request per second
+        geolocator = \
+            Nominatim(user_agent="hyundai_kia_connect_monitor")
+        location = geolocator.reverse(
+            split[LAT].strip() + ", " + split[LON].strip())
+        location_str = ' "' + location.address + '"'
+    return location_str
+
+
 def handle_line(split, prev_split, totals):
     """ handle_line """
     debug(f"handle_line: {split}, {prev_split}")
     current_day = parser.parse(split[DT])
-
-    t_day = totals[T_DAY]
-    t_week = totals[T_WEEK]
-    t_month = totals[T_MONTH]
-    t_year = totals[T_YEAR]
-    t_trip = totals[T_TRIP]
-
     current_day_values = init(current_day, float(split[ODO].strip()))
-
+    t_day = totals[T_DAY]
     if not t_day:  # first time, fill in with initial values
         debug(f"not TDAY: {t_day}")
         totals = (
@@ -427,16 +433,15 @@ def handle_line(split, prev_split, totals):
         )
         return totals
 
-    t_trip = totals[T_TRIP]  # do not update due to day change!
-    day_change = not same_day(current_day, t_day[T_CURRENT_DAY])
-    if day_change:
-        debug(f"DAY change: {t_day}")
-        totals = print_summaries(current_day_values, totals)
-
-    t_day = totals[T_DAY]
+    t_trip = totals[T_TRIP]
     t_week = totals[T_WEEK]
     t_month = totals[T_MONTH]
     t_year = totals[T_YEAR]
+
+    day_change = not same_day(current_day, t_day[T_CURRENT_DAY])
+    if day_change:  # assume just before 24 hour
+        current_day = \
+            current_day.replace(hour=23, minute=59) - timedelta(days=1)
 
     # take into account totals per line
     if DAY:
@@ -454,19 +459,11 @@ def handle_line(split, prev_split, totals):
         if t_moves[T_MOVES] > 0:
             day_move_str = current_day.strftime("%Y-%m-%d")
             day_move_info = current_day.strftime("%H:%M")
-            location_str = ""
-            if ADDRESS:
-                sleep(1)  # do not abuse Nominatim, 1 request per second
-                geolocator = \
-                    Nominatim(user_agent="hyundai_kia_connect_monitor")
-                location = geolocator.reverse(
-                    split[LAT].strip() + ", " + split[LON].strip())
-                location_str = ' "' + location.address + '"'
             print_summary(
                 f"MOVE  , {day_move_str:10}, {day_move_info:5}",
                 t_moves_init,
                 t_moves,
-                location_str
+                get_address(split)
             )
 
     if TRIP:
@@ -474,23 +471,19 @@ def handle_line(split, prev_split, totals):
         if t_trip[T_DRIVES] > 0:
             day_trip_str = current_day.strftime("%Y-%m-%d")
             day_info = current_day.strftime("%H:%M")
-            location_str = ""
-            if ADDRESS:
-                sleep(1)  # do not abuse Nominatim, 1 request per second
-                geolocator = \
-                    Nominatim(user_agent="hyundai_kia_connect_monitor")
-                location = geolocator.reverse(
-                    split[LAT].strip() + ", " + split[LON].strip())
-                location_str = ' "' + location.address + '"'
             print_summary(
                 f"TRIP  , {day_trip_str:10}, {day_info:5}",
                 current_day_values,
                 t_trip,
-                location_str
+                get_address(split)
             )
             t_trip = current_day_values
 
     totals = (t_day, t_week, t_month, t_year, t_trip)
+
+    if day_change:
+        debug(f"DAY change: {t_day}")
+        totals = print_summaries(current_day_values, totals)
 
     return totals
 
