@@ -70,13 +70,15 @@ T_DISCHARGED_PERC = 3
 T_CHARGES = 4
 T_DRIVES = 5
 T_ELAPSED_MINUTES = 6
-T_SOC_AVG = 7
-T_SOC_MIN = 8
-T_SOC_MAX = 9
-T_VOLT12_AVG = 10
-T_VOLT12_MIN = 11
-T_VOLT12_MAX = 12
-T_MOVES = 13
+T_SOC_CUR = 7
+T_SOC_AVG = 8
+T_SOC_MIN = 9
+T_SOC_MAX = 10
+T_VOLT12_CUR = 11
+T_VOLT12_AVG = 12
+T_VOLT12_MIN = 13
+T_VOLT12_MAX = 14
+T_MOVES = 15
 
 # indexes to totals tuples
 T_DAY = 0
@@ -95,9 +97,17 @@ def debug(line):
 def init(current_day, odo):
     """ init tuple with initial values """
     # current_day, odo, charged_perc, discharged_perc, charges, drives,
-    # elapsed_minutes, soc_avg, soc_min, soc_max, moves
+    # elapsed_minutes,
+    # soc_cur, soc_avg, soc_min, soc_max,
+    # 12v_cur, 12v_avg, 12v_min, 12v_max,
+    # moves
     debug(f"init({current_day})")
-    return (current_day, odo, 0, 0, 0, 0, 0, -1.0, 999, -1, -1.0, 999, -1, 0)
+    return (
+        current_day, odo, 0, 0, 0, 0, 0,
+        -1.0, -1.0, 999, -1,  # SOC%
+        -1.0, -1.0, 999, -1,  # 12V%
+        0                     # moves
+    )
 
 
 def to_int(string):
@@ -136,9 +146,9 @@ def same_day(d_1: datetime, d_2: datetime):
 
 
 if ADDRESS:
-    print(f"Period, date      , info , delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives, #moves, Address")  # noqa pylint:disable=line-too-long
+    print(f"Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges, #drives, #moves, Address")  # noqa pylint:disable=line-too-long
 else:
-    print(f"Period, date      , info , delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%AVG,MIN,MAX, 12V%AVG,MIN,MAX, #charges, #drives, #moves")  # noqa pylint:disable=line-too-long
+    print(f"Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges, #drives, #moves")  # noqa pylint:disable=line-too-long
 
 
 def print_summary(prefix, current, values, location_str):
@@ -147,8 +157,11 @@ def print_summary(prefix, current, values, location_str):
     debug("PREV  : " + str(values))
     debug("CURR  : " + str(current))
     debug("VALUES: " + str(values))
-    delta_odo = abs(round(current[T_ODO] - values[T_ODO], 1))
-
+    odo = current[T_ODO]
+    delta_odo = round(odo - values[T_ODO], 1)
+    odo_str = ''
+    if odo != 0.0:
+        odo_str = f"{odo:9.1f}"
     t_charged_perc = values[T_CHARGED_PERC]
     if t_charged_perc < 0:
         t_charged_perc = 0
@@ -160,6 +173,7 @@ def print_summary(prefix, current, values, location_str):
     t_moves = values[T_MOVES]
 
     t_elapsed_minutes = values[T_ELAPSED_MINUTES]
+    t_soc_cur = values[T_SOC_CUR]
     t_soc_avg = values[T_SOC_AVG]
     t_soc_min = values[T_SOC_MIN]
     t_soc_max = values[T_SOC_MAX]
@@ -167,6 +181,7 @@ def print_summary(prefix, current, values, location_str):
     if t_elapsed_minutes != 0:
         soc_average = round(t_soc_avg / t_elapsed_minutes)
 
+    t_volt12_cur = values[T_VOLT12_CUR]
     t_volt12_avg = values[T_VOLT12_AVG]
     t_volt12_min = values[T_VOLT12_MIN]
     t_volt12_max = values[T_VOLT12_MAX]
@@ -216,9 +231,9 @@ def print_summary(prefix, current, values, location_str):
     if SHOW_ZERO_VALUES or t_moves != 0:
         t_moves_str = f"{t_moves:7}"
     if ADDRESS:
-        print(f"{prefix:18},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{soc_average:8},{t_soc_min:3},{t_soc_max:3},{volt12_average:8},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_drives_str:8},{t_moves_str:7},{location_str}")  # noqa pylint:disable=line-too-long
+        print(f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{soc_average:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{volt12_average:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_drives_str:8},{t_moves_str:7},{location_str}")  # noqa pylint:disable=line-too-long
     else:
-        print(f"{prefix:18},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{soc_average:8},{t_soc_min:3},{t_soc_max:3},{volt12_average:8},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_drives_str:8},{t_moves_str:7}")  # noqa pylint:disable=line-too-long
+        print(f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{soc_average:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{volt12_average:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_drives_str:8},{t_moves_str:7}")  # noqa pylint:disable=line-too-long
 
 
 def print_summaries(current_day_values, totals):
@@ -313,9 +328,9 @@ def keep_track_of_totals(values, split, prev_split, handle_moved):
                 float(prev_split[LAT].strip()), float(prev_split[LON].strip()))
             t_odo = 0.0
             if ODO_METRIC == "km":
-                t_odo = geodesic(loc, prev_loc).kilometers
+                t_odo = -geodesic(loc, prev_loc).kilometers
             elif ODO_METRIC == "mi":
-                t_odo = geodesic(loc, prev_loc).miles
+                t_odo = -geodesic(loc, prev_loc).miles
 
     soc = to_int(split[SOC].strip())
     prev_soc = to_int(prev_split[SOC].strip())
@@ -391,9 +406,11 @@ def keep_track_of_totals(values, split, prev_split, handle_moved):
         t_charges,
         t_drives,
         t_elapsed_minutes,
+        soc,
         t_soc_avg,
         t_soc_min,
         t_soc_max,
+        volt12,
         t_volt12_avg,
         t_volt12_min,
         t_volt12_max,
