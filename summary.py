@@ -68,7 +68,7 @@ T_ODO = 1
 T_CHARGED_PERC = 2
 T_DISCHARGED_PERC = 3
 T_CHARGES = 4
-T_DRIVES = 5
+T_TRIPS = 5
 T_ELAPSED_MINUTES = 6
 T_SOC_CUR = 7
 T_SOC_AVG = 8
@@ -87,6 +87,9 @@ T_MONTH = 2
 T_YEAR = 3
 T_TRIP = 4
 
+# number of days passed in this year
+DAY_COUNTER = 0
+
 
 def debug(line):
     """ print line if debugging """
@@ -96,7 +99,7 @@ def debug(line):
 
 def init(current_day, odo):
     """ init tuple with initial values """
-    # current_day, odo, charged_perc, discharged_perc, charges, drives,
+    # current_day, odo, charged_perc, discharged_perc, charges, trips,
     # elapsed_minutes,
     # soc_cur, soc_avg, soc_min, soc_max,
     # 12v_cur, 12v_avg, 12v_min, 12v_max,
@@ -146,31 +149,36 @@ def same_day(d_1: datetime, d_2: datetime):
 
 
 if ADDRESS:
-    print(f"Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges, #drives, #moves, Address")  # noqa pylint:disable=line-too-long
+    print(f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips,   #moves, Address")  # noqa pylint:disable=line-too-long
 else:
-    print(f"Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges, #drives, #moves")  # noqa pylint:disable=line-too-long
+    print(f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips,   #moves")  # noqa pylint:disable=line-too-long
 
 
-def print_summary(prefix, current, values, location_str):
+def float_to_string(input_value):
+    """ float to string without trailing zero """
+    return (f"{input_value:9.1f}").rstrip('0').rstrip('.')
+
+
+def print_summary(prefix, current, values, location_str, factor):
     """ print_summary """
     debug("print_summary")
     debug("PREV  : " + str(values))
     debug("CURR  : " + str(current))
     debug("VALUES: " + str(values))
     odo = current[T_ODO]
-    delta_odo = round(odo - values[T_ODO], 1)
+    delta_odo = round(odo - values[T_ODO], 1) * factor
     odo_str = ''
     if odo != 0.0:
         odo_str = f"{odo:9.1f}"
-    t_charged_perc = values[T_CHARGED_PERC]
+    t_charged_perc = values[T_CHARGED_PERC] * factor
     if t_charged_perc < 0:
         t_charged_perc = 0
-    t_discharged_perc = values[T_DISCHARGED_PERC]
+    t_discharged_perc = values[T_DISCHARGED_PERC] * factor
     if t_discharged_perc > 0:
         t_discharged_perc = 0
-    t_charges = values[T_CHARGES]
-    t_drives = values[T_DRIVES]
-    t_moves = values[T_MOVES]
+    t_charges = values[T_CHARGES] * factor
+    t_trips = values[T_TRIPS] * factor
+    t_moves = values[T_MOVES] * factor
 
     t_elapsed_minutes = values[T_ELAPSED_MINUTES]
     t_soc_cur = values[T_SOC_CUR]
@@ -223,22 +231,23 @@ def print_summary(prefix, current, values, location_str):
         discharged_kwh_str = f"{discharged_kwh:9.1f}"
     t_charges_str = ""
     if SHOW_ZERO_VALUES or t_charges != 0:
-        t_charges_str = f"{t_charges:9}"
-    t_drives_str = ""
-    if SHOW_ZERO_VALUES or t_drives != 0:
-        t_drives_str = f"{t_drives:8}"
+        t_charges_str = float_to_string(t_charges)
+    t_trips_str = ""
+    if SHOW_ZERO_VALUES or t_trips != 0:
+        t_trips_str = float_to_string(t_trips)
     t_moves_str = ""
     if SHOW_ZERO_VALUES or t_moves != 0:
-        t_moves_str = f"{t_moves:7}"
+        t_moves_str = float_to_string(t_moves)
     if ADDRESS:
-        print(f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{soc_average:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{volt12_average:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_drives_str:8},{t_moves_str:7},{location_str}")  # noqa pylint:disable=line-too-long
+        print(f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{soc_average:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{volt12_average:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{t_moves_str:9},{location_str}")  # noqa pylint:disable=line-too-long
     else:
-        print(f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{soc_average:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{volt12_average:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_drives_str:8},{t_moves_str:7}")  # noqa pylint:disable=line-too-long
+        print(f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{soc_average:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{volt12_average:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{t_moves_str:9}")  # noqa pylint:disable=line-too-long
 
 
 def print_summaries(current_day_values, totals):
     """ print_summaries """
-    debug(f"print_summaries: {totals}")
+    global DAY_COUNTER  # pylint:disable=global-statement
+    debug(f"print_summaries: DAY_COUNTER: {DAY_COUNTER} {totals}")
     current_day = current_day_values[T_CURRENT_DAY]
     t_day = totals[T_DAY]
     t_week = totals[T_WEEK]
@@ -249,13 +258,16 @@ def print_summaries(current_day_values, totals):
     day_str = t_day[T_CURRENT_DAY].strftime("%Y-%m-%d")
 
     if not same_day(current_day, t_day[T_CURRENT_DAY]):
+        DAY_COUNTER += 1
+        debug(f"DAY_COUNTER increment: {DAY_COUNTER}")
         if DAY:
             day_info = t_day[T_CURRENT_DAY].strftime("%a")
             print_summary(
-                f"DAY   , {day_str}, {day_info:5}",
+                f"DAY     , {day_str}, {day_info:5}",
                 current_day_values,
                 t_day,
-                ""
+                "",
+                1.0
             )
         t_day = current_day_values
         t_trip = current_day_values
@@ -263,30 +275,70 @@ def print_summaries(current_day_values, totals):
     if WEEK and not same_week(current_day, t_week[T_CURRENT_DAY]):
         weeknr = t_week[T_CURRENT_DAY].strftime("%W")
         print_summary(
-            f"WEEK  , {day_str:10}, WK {weeknr:2}",
+            f"WEEK    , {day_str:10}, WK {weeknr:2}",
             current_day_values,
             t_week,
-            ""
+            "",
+            1.0
         )
         t_week = current_day_values
 
     if MONTH and not same_month(current_day, t_month[T_CURRENT_DAY]):
         month_info = t_month[T_CURRENT_DAY].strftime("%b")
         print_summary(
-            f"MONTH , {day_str:10}, {month_info:5}",
+            f"MONTH   , {day_str:10}, {month_info:5}",
             current_day_values,
             t_month,
-            ""
+            "",
+            1.0
         )
         t_month = current_day_values
     if YEAR and not same_year(current_day, t_year[T_CURRENT_DAY]):
         year = t_year[T_CURRENT_DAY].strftime("%Y")
         print_summary(
-            f"YEAR  , {day_str:10}, {year:5}",
+            f"YEAR    , {day_str:10}, {year:5}",
             current_day_values,
             t_year,
-            ""
+            "",
+            1.0
         )
+        trips = t_year[T_TRIPS]
+        print_summary(
+            f"TRIPAVG , {day_str:10}, {trips:3}t ",
+            current_day_values,
+            t_year,
+            "",
+            1/trips
+        )
+        print_summary(
+            f"DAYAVG  , {day_str:10}, {DAY_COUNTER:3}d ",
+            current_day_values,
+            t_year,
+            "",
+            1/DAY_COUNTER
+        )
+        print_summary(
+            f"WEEKAVG , {day_str:10}, {DAY_COUNTER:3}d ",
+            current_day_values,
+            t_year,
+            "",
+            1/DAY_COUNTER*7
+        )
+        print_summary(
+            f"MONTHAVG, {day_str:10}, {DAY_COUNTER:3}d ",
+            current_day_values,
+            t_year,
+            "",
+            365/DAY_COUNTER/12
+        )
+        print_summary(
+            f"YEARLY  , {day_str:10}, {DAY_COUNTER:3}d ",
+            current_day_values,
+            t_year,
+            "",
+            365/DAY_COUNTER
+        )
+        DAY_COUNTER = 0
         t_year = current_day_values
 
     totals = (t_day, t_week, t_month, t_year, t_trip)
@@ -303,7 +355,7 @@ def keep_track_of_totals(values, split, prev_split, handle_moved):
     t_charged_perc = values[T_CHARGED_PERC]
     t_discharged_perc = values[T_DISCHARGED_PERC]
     t_charges = values[T_CHARGES]
-    t_drives = values[T_DRIVES]
+    t_trips = values[T_TRIPS]
     t_elapsed_minutes = values[T_ELAPSED_MINUTES]
     t_soc_avg = values[T_SOC_AVG]
     t_soc_min = values[T_SOC_MIN]
@@ -394,8 +446,8 @@ def keep_track_of_totals(values, split, prev_split, handle_moved):
         debug("charges: DELTA_SOC > 1: " + str(t_charges))
 
     if delta_odo != 0.0:
-        t_drives += 1
-        debug(f"DELTA_ODO: {delta_odo:7.1f} {t_drives}")
+        t_trips += 1
+        debug(f"DELTA_ODO: {delta_odo:7.1f} {t_trips}")
 
     debug("    before: " + str(values))
     values = (
@@ -404,7 +456,7 @@ def keep_track_of_totals(values, split, prev_split, handle_moved):
         t_charged_perc,
         t_discharged_perc,
         t_charges,
-        t_drives,
+        t_trips,
         t_elapsed_minutes,
         soc,
         t_soc_avg,
@@ -477,22 +529,24 @@ def handle_line(split, prev_split, totals):
             day_move_str = current_day.strftime("%Y-%m-%d")
             day_move_info = current_day.strftime("%H:%M")
             print_summary(
-                f"MOVE  , {day_move_str:10}, {day_move_info:5}",
+                f"MOVE    , {day_move_str:10}, {day_move_info:5}",
                 t_moves_init,
                 t_moves,
-                get_address(split)
+                get_address(split),
+                1.0
             )
 
     if TRIP:
         t_trip = keep_track_of_totals(t_trip, split, prev_split, False)
-        if t_trip[T_DRIVES] > 0:
+        if t_trip[T_TRIPS] > 0:
             day_trip_str = current_day.strftime("%Y-%m-%d")
             day_info = current_day.strftime("%H:%M")
             print_summary(
-                f"TRIP  , {day_trip_str:10}, {day_info:5}",
+                f"TRIP    , {day_trip_str:10}, {day_info:5}",
                 current_day_values,
                 t_trip,
-                get_address(split)
+                get_address(split),
+                1.0
             )
             t_trip = current_day_values
 
