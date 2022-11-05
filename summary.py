@@ -7,6 +7,8 @@ import configparser
 from datetime import datetime, timedelta
 from time import sleep
 from pathlib import Path
+from collections import deque
+import gspread
 from dateutil import parser
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
@@ -31,6 +33,12 @@ MOVES = arg_has('move')
 ADDRESS = arg_has('address')
 if ADDRESS and not TRIP and not MOVES:
     TRIP = True
+SHEETUPDATE = arg_has('sheetupdate')
+if SHEETUPDATE:
+    DAY = True
+    WEEK = True
+    MONTH = True
+    YEAR = True
 
 INPUT = Path("monitor.csv")
 
@@ -90,6 +98,9 @@ T_TRIP = 4
 # number of days passed in this year
 DAY_COUNTER = 0
 
+# Initializing a queue with maximum size of 50
+LAST_OUTPUT_QUEUE = deque(maxlen=50)
+
 
 def debug(line):
     """ print line if debugging """
@@ -148,10 +159,20 @@ def same_day(d_1: datetime, d_2: datetime):
     return d_1.year == d_2.year
 
 
-if ADDRESS:
-    print(f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips,   #moves, Address")  # noqa pylint:disable=line-too-long
-else:
-    print(f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips,   #moves")  # noqa pylint:disable=line-too-long
+def print_output_and_update_queue(output):
+    """print output and update queue"""
+    if SHEETUPDATE:
+        LAST_OUTPUT_QUEUE.append(output)
+    print(output)
+
+
+def print_header_and_update_queue():
+    """print header and update queue"""
+    if ADDRESS:
+        output=f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips,   #moves, Address"  # noqa pylint:disable=line-too-long
+    else:
+        output=f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips,   #moves"  # noqa pylint:disable=line-too-long
+    print_output_and_update_queue(output)
 
 
 def float_to_string(input_value):
@@ -238,10 +259,93 @@ def print_summary(prefix, current, values, location_str, factor):
     t_moves_str = ""
     if SHOW_ZERO_VALUES or t_moves != 0:
         t_moves_str = float_to_string(t_moves)
-    if ADDRESS:
-        print(f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{soc_average:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{volt12_average:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{t_moves_str:9},{location_str}")  # noqa pylint:disable=line-too-long
+
+    if SHEETUPDATE and prefix.startswith('SHEET'):
+        prefix = prefix.replace("SHEET ", "")
+        SHEET.batch_update([{
+            'range': 'A1:B1',
+            'values': [["Last update", f"{prefix}"]],
+        }, {
+            'range': 'A2:B2',
+            'values': [[f"Odometer {ODO_METRIC}", f"{odo:.1f}"]],
+        }, {
+            'range': 'A3:B3',
+            'values': [[f"Driven {ODO_METRIC}", f"{delta_odo:.1f}"]],
+        }, {
+            'range': 'A4:B4',
+            'values': [["+kWh", f"{charged_kwh:.1f}"]],
+        }, {
+            'range': 'A5:B5',
+            'values': [["-kWh", f"{discharged_kwh:.1f}"]],
+        }, {
+            'range': 'A6:B6',
+            'values': [[f"{ODO_METRIC}/kWh", f"{km_mi_per_kwh:.1f}"]],
+        }, {
+            'range': 'A7:B7',
+            'values': [[f"kWh/100{ODO_METRIC}", f"{kwh_per_km_mi:.1f}"]],
+        }, {
+            'range': 'A8:B8',
+            'values': [[f"Cost {COST_CURRENCY}", f"{cost:.2f}"]],
+        }, {
+            'range': 'A9:B9',
+            'values': [["Current SOC%", f"{t_soc_cur}"]],
+        }, {
+            'range': 'A10:B10',
+            'values': [["Average SOC%", f"{soc_average}"]],
+        }, {
+            'range': 'A11:B11',
+            'values': [["Min SOC%", f"{t_soc_min}"]],
+        }, {
+            'range': 'A12:B12',
+            'values': [["Max SOC%", f"{t_soc_max}"]],
+        }, {
+            'range': 'A13:B13',
+            'values': [["Current 12V%", f"{t_volt12_cur}"]],
+        }, {
+            'range': 'A14:B14',
+            'values': [["Average 12V%", f"{volt12_average}"]],
+        }, {
+            'range': 'A15:B15',
+            'values': [["Min 12V%", f"{t_volt12_min}"]],
+        }, {
+            'range': 'A16:B16',
+            'values': [["Max 12V%", f"{t_volt12_max}"]],
+        }, {
+            'range': 'A17:B17',
+            'values': [["#Charges", f"{t_charges}"]],
+        }, {
+            'range': 'A18:B18',
+            'values': [["#Trips", f"{t_trips}"]],
+         }, {
+            'range': 'A19:B19',
+            'values': [["#Moves", f"{t_moves}"]],
+        }])
     else:
-        print(f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{soc_average:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{volt12_average:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{t_moves_str:9}")  # noqa pylint:disable=line-too-long
+        if ADDRESS:
+            output=f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{soc_average:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{volt12_average:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{t_moves_str:9},{location_str}"  # noqa pylint:disable=line-too-long
+        else:
+            output=f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{soc_average:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{volt12_average:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{t_moves_str:9}"  # noqa pylint:disable=line-too-long
+        print_output_and_update_queue(output)
+
+
+def split_output_to_sheet_list(queue_output):
+    """ split output to sheet list """
+    split = queue_output.split(',')
+    return [split]
+
+
+def print_output_queue():
+    """ print output queue """
+    array = []
+    current_row = 20
+    for queue_output in LAST_OUTPUT_QUEUE:
+        current_row += 1
+        list_output = split_output_to_sheet_list(queue_output)
+        array.append({
+            'range': f"A{current_row}:U{current_row}",
+            'values': list_output,
+        })
+    SHEET.batch_update(array)
 
 
 def print_summaries(current_day_values, totals):
@@ -338,6 +442,16 @@ def print_summaries(current_day_values, totals):
             "",
             365/DAY_COUNTER
         )
+        if SHEETUPDATE and current_day.year == 2999:
+            day_info = t_day[T_CURRENT_DAY].strftime("%a %H:%M")
+            print_summary(
+                f"SHEET {day_str:10} {day_info} {DAY_COUNTER:3}d",
+                current_day_values,
+                t_year,
+                "",
+                1.0
+            )
+
         DAY_COUNTER = 0
         t_year = current_day_values
 
@@ -513,42 +627,44 @@ def handle_line(split, prev_split, totals):
             current_day.replace(hour=23, minute=59) - timedelta(days=1)
 
     # take into account totals per line
-    if DAY:
-        t_day = keep_track_of_totals(t_day, split, prev_split, False)
-    if WEEK:
-        t_week = keep_track_of_totals(t_week, split, prev_split, False)
-    if MONTH:
-        t_month = keep_track_of_totals(t_month, split, prev_split, False)
-    if YEAR:
-        t_year = keep_track_of_totals(t_year, split, prev_split, False)
+    if current_day.year != 2999:  # skip keep_track_of_totals for last entry
+        if DAY:
+            t_day = keep_track_of_totals(t_day, split, prev_split, False)
+        if WEEK:
+            t_week = keep_track_of_totals(t_week, split, prev_split, False)
+        if MONTH:
+            t_month = keep_track_of_totals(t_month, split, prev_split, False)
+        if YEAR:
+            t_year = keep_track_of_totals(t_year, split, prev_split, False)
 
-    if MOVES:
-        t_moves_init = init(current_day, 0.0)
-        t_moves = keep_track_of_totals(t_moves_init, split, prev_split, True)
-        if t_moves[T_MOVES] > 0:
-            day_move_str = current_day.strftime("%Y-%m-%d")
-            day_move_info = current_day.strftime("%H:%M")
-            print_summary(
-                f"MOVE    , {day_move_str:10}, {day_move_info:5}",
-                t_moves_init,
-                t_moves,
-                get_address(split),
-                1.0
-            )
+        if MOVES:
+            t_moves_init = init(current_day, 0.0)
+            t_moves = keep_track_of_totals(
+                t_moves_init, split, prev_split, True)
+            if t_moves[T_MOVES] > 0:
+                day_move_str = current_day.strftime("%Y-%m-%d")
+                day_move_info = current_day.strftime("%H:%M")
+                print_summary(
+                    f"MOVE    , {day_move_str:10}, {day_move_info:5}",
+                    t_moves_init,
+                    t_moves,
+                    get_address(split),
+                    1.0
+                )
 
-    if TRIP:
-        t_trip = keep_track_of_totals(t_trip, split, prev_split, False)
-        if t_trip[T_TRIPS] > 0:
-            day_trip_str = current_day.strftime("%Y-%m-%d")
-            day_info = current_day.strftime("%H:%M")
-            print_summary(
-                f"TRIP    , {day_trip_str:10}, {day_info:5}",
-                current_day_values,
-                t_trip,
-                get_address(split),
-                1.0
-            )
-            t_trip = current_day_values
+        if TRIP:
+            t_trip = keep_track_of_totals(t_trip, split, prev_split, False)
+            if t_trip[T_TRIPS] > 0:
+                day_trip_str = current_day.strftime("%Y-%m-%d")
+                day_info = current_day.strftime("%H:%M")
+                print_summary(
+                    f"TRIP    , {day_trip_str:10}, {day_info:5}",
+                    current_day_values,
+                    t_trip,
+                    get_address(split),
+                    1.0
+                )
+                t_trip = current_day_values
 
     totals = (t_day, t_week, t_month, t_year, t_trip)
 
@@ -561,13 +677,13 @@ def handle_line(split, prev_split, totals):
 
 def summary():
     """ summary of monitor.csv file """
-
     with INPUT.open("r", encoding="utf-8") as inputfile:
         linecount = 0
         prev_index = -1
         prev_line = ''
         prev_split = ()
         totals = ((), (), (), (), ())
+        print_header_and_update_queue()
 
         for line in inputfile:
             line = line.strip()
@@ -596,6 +712,15 @@ def summary():
             prev_split,
             totals
         )
+        print_header_and_update_queue()
 
+
+if SHEETUPDATE:
+    gc = gspread.service_account()
+    spreadsheet = gc.open("hyundai-kia-connect-monitor")
+    SHEET = spreadsheet.sheet1
 
 summary()  # do the work
+
+if SHEETUPDATE:
+    print_output_queue()
