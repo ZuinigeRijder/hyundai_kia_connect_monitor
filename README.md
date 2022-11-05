@@ -26,8 +26,9 @@ Region Daily Limits    Per Action  Comments
 - KR   ???
 ```
 
-So maybe you can capture more than once per hour, but you might run into the problem that you use too much API calls, especially when you also regularly use the Hyndai Bluelink or Kia UVO Connect app. 
+So maybe you can capture more than once per hour, but you might run into the problem that you use too much API calls, especially when you also regularly use the Hyndai Bluelink or Kia UVO Connect app. Also the 12 volt battery will be draining more, so be careful with too much api calls.
 You also can consider only to monitor between e.g. 6:00 and 22:00 (saves 1/3 of the calls). Dependent on your regular driving habit, choose the best option for you. Examples:
+- twice a day, e.g. 6.00 and 21:00, when you normally do not drive that late in the evening and charge in the night after 21:00
 - each hour means 24 requests per day
 - each hour between 6:00 and 19:00 means 13 requests per day
 - each hour between 6:00 and 22:00 means 16 requests per day
@@ -131,6 +132,43 @@ Explanation of configuration items:
 - ignore_small_positive_delta_soc, do not see this as charge% when not charging/moved, because with temperature changes the percentage can increase
 - ignore_small_negative_delta_soc, do not see this as discharge% when not moved, because with temperature changes the percentage can decrease
 - show_zero_values = True shows also zero values in the standard output, can be easier for spreadsheets, but more difficult to read
+
+## summary.py sheetupdate
+make summary per DAY, WEEK, MONTH, YEAR with monitor.csv as input and write summary to Google Spreadsheet
+
+Usage: 
+```
+python summary.py sheetupdate
+```
+
+- INPUTFILE: summary.cfg (configuration of kilometers or miles, net battery size in kWh, average cost per kWh and cost currency)
+- INPUTFILE: monitor.csv
+- standard output: summary per DAY, WEEK, MONTH, YEAR in csv format
+- Google spreadsheet update with name: hyundai-kia-connect-monitor
+
+### configuration of gspread for "python summary.py sheetupdate"
+For updating the Google Spreadsheet, summary.py is using the package gspread. For Authentication with Google Spreadsheet you have to configure authentication for gspread. This is described here: https://docs.gspread.org/en/latest/oauth2.html
+The summary.py script uses access to the Google spreadsheets on behalf of a bot account using Service Account.
+Follow the steps in this link above, here is the summary of these steps:
+- Enable API Access for a Project
+- - Head to Google Developers Console and create a new project (or select the one you already have).
+- - In the box labeled ‚ÄúSearch for APIs and Services‚Äù, search for ‚ÄúGoogle Drive API‚Äù and enable it.
+- - In the box labeled ‚ÄúSearch for APIs and Services‚Äù, search for ‚ÄúGoogle Sheets API‚Äù and enable it.
+- For Bots: Using Service Account
+- - Go to ‚ÄúAPIs & Services > Credentials‚Äù and choose ‚ÄúCreate credentials > Service account key‚Äù.
+- - Fill out the form
+- - Click ‚ÄúCreate‚Äù and ‚ÄúDone‚Äù.
+- - Press ‚ÄúManage service accounts‚Äù above Service Accounts.
+- - Press on ‚ãÆ near recently created service account and select ‚ÄúManage keys‚Äù and then click on ‚ÄúADD KEY > Create new key‚Äù.
+- - Select JSON key type and press ‚ÄúCreate‚Äù.
+- - You will automatically download a JSON file with credentials
+- - Remember the path to the downloaded credentials json file. Also, in the next step you‚Äôll need the value of client_email from this file.
+- - Move the downloaded json file to ~/.config/gspread/service_account.json. Windows users should put this file to %APPDATA%\gspread\service_account.json.
+- Setup a Google Spreasheet to be updated by sheetupdate
+- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai-kia-connect-monitor
+- - Go to your spreadsheet and share it with a client_email from the step above
+- run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor spreadheet will be updated with a summary and the last 50 lines of standard output
+- configure to run "python summary.py sheetupdate" regularly, after having run "python monitor.py"
 
 ## kml.py
 transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations.
@@ -433,15 +471,15 @@ MOVE    , 2022-09-24, 11:00,         ,      0.9,        ,     -0.7,       ,     
 MOVE    , 2022-09-24, 11:30,         ,     23.8,        ,     -4.9,    4.9,      20.6,      1.21,      91, 94, 91, 91,      97, 94, 97, 97,         ,         ,      1  , "Rijksweg A2, Enspijk, West Betuwe, Gelderland, Nederland, 4153 RN, Nederland"
 MOVE    , 2022-09-24, 12:00,         ,     41.6,        ,     -7.0,    5.9,      16.8,      1.72,      81, 86, 81, 81,      98, 97, 98, 98,         ,         ,      1  , "Rijksweg A27, Eemnes, Utrecht, Nederland, 3755 AS, Nederland"
 MOVE    , 2022-09-24, 12:30,         ,     40.7,        ,     -8.4,    4.8,      20.6,      2.07,      69, 75, 69, 69,      98, 98, 98, 98,         ,         ,      1  , "Rijksweg A6, Lelystad, Flevoland, Nederland, 8221 RD, Nederland"
-MOVE    , 2022-09-24, 13:00,         ,     39.1,        ,     -8.4,    4.7,      21.5,      2.07,      57, 63, 57, 57,      98, 98, 98, 98,         ,         ,      1  , "A6, Oldeouwer, De Fryske Marren, Frysl‚n, Nederland, 8516 DD, Nederland"
-MOVE    , 2022-09-24, 13:21,         ,     16.4,        ,     -3.5,    4.7,      21.3,      0.86,      52, 54, 52, 52,      96, 97, 96, 96,         ,      1  ,      1  , "17-101, Dekamalaan, Sneek, S˙dwest-Frysl‚n, Frysl‚n, Nederland, 8604 ZG, Nederland"
-TRIP    , 2022-09-24, 13:21,  17589.2,    198.4,        ,    -32.9,    6.0,      16.6,      8.09,      52, 80, 52, 98,      96, 96, 92, 98,         ,      1  ,      6  , "17-101, Dekamalaan, Sneek, S˙dwest-Frysl‚n, Frysl‚n, Nederland, 8604 ZG, Nederland"
-MOVE    , 2022-09-24, 14:31,         ,      2.2,        ,     -0.7,       ,          ,          ,      51, 51, 51, 51,      94, 95, 94, 94,         ,      1  ,      1  , "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, S˙dwest-Frysl‚n, Frysl‚n, Nederland, 8606 KZ, Nederland"
-TRIP    , 2022-09-24, 14:31,  17592.5,      3.3,        ,     -0.7,       ,          ,          ,      51, 51, 51, 51,      94, 95, 94, 94,         ,      1  ,      1  , "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, S˙dwest-Frysl‚n, Frysl‚n, Nederland, 8606 KZ, Nederland"
-MOVE    , 2022-09-24, 15:00,         ,      1.6,        ,         ,       ,          ,          ,      51, 51, 51, 51,      93, 93, 93, 93,         ,         ,      1  , "Stadsrondweg-Oost, Houkesloot, Sneek, S˙dwest-Frysl‚n, Frysl‚n, Nederland, 8604 GC, Nederland"
-MOVE    , 2022-09-24, 15:23,         ,      0.7,        ,     -0.7,       ,          ,          ,      50, 50, 50, 50,      96, 94, 96, 96,         ,      1  ,      1  , "17-101, Dekamalaan, Sneek, S˙dwest-Frysl‚n, Frysl‚n, Nederland, 8604 ZG, Nederland"
-TRIP    , 2022-09-24, 15:23,  17597.3,      4.8,        ,     -0.7,       ,          ,          ,      50, 51, 50, 51,      96, 94, 93, 96,         ,      1  ,      2  , "17-101, Dekamalaan, Sneek, S˙dwest-Frysl‚n, Frysl‚n, Nederland, 8604 ZG, Nederland"
-MOVE    , 2022-09-24, 16:30,         ,      0.2,        ,         ,       ,          ,          ,      50, 50, 50, 50,      94, 95, 94, 94,         ,         ,      1  , "10, Groenedijk, Sneek, S˙dwest-Frysl‚n, Frysl‚n, Nederland, 8604 AB, Nederland"
+MOVE    , 2022-09-24, 13:00,         ,     39.1,        ,     -8.4,    4.7,      21.5,      2.07,      57, 63, 57, 57,      98, 98, 98, 98,         ,         ,      1  , "A6, Oldeouwer, De Fryske Marren, Frysl√¢n, Nederland, 8516 DD, Nederland"
+MOVE    , 2022-09-24, 13:21,         ,     16.4,        ,     -3.5,    4.7,      21.3,      0.86,      52, 54, 52, 52,      96, 97, 96, 96,         ,      1  ,      1  , "17-101, Dekamalaan, Sneek, S√∫dwest-Frysl√¢n, Frysl√¢n, Nederland, 8604 ZG, Nederland"
+TRIP    , 2022-09-24, 13:21,  17589.2,    198.4,        ,    -32.9,    6.0,      16.6,      8.09,      52, 80, 52, 98,      96, 96, 92, 98,         ,      1  ,      6  , "17-101, Dekamalaan, Sneek, S√∫dwest-Frysl√¢n, Frysl√¢n, Nederland, 8604 ZG, Nederland"
+MOVE    , 2022-09-24, 14:31,         ,      2.2,        ,     -0.7,       ,          ,          ,      51, 51, 51, 51,      94, 95, 94, 94,         ,      1  ,      1  , "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, S√∫dwest-Frysl√¢n, Frysl√¢n, Nederland, 8606 KZ, Nederland"
+TRIP    , 2022-09-24, 14:31,  17592.5,      3.3,        ,     -0.7,       ,          ,          ,      51, 51, 51, 51,      94, 95, 94, 94,         ,      1  ,      1  , "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, S√∫dwest-Frysl√¢n, Frysl√¢n, Nederland, 8606 KZ, Nederland"
+MOVE    , 2022-09-24, 15:00,         ,      1.6,        ,         ,       ,          ,          ,      51, 51, 51, 51,      93, 93, 93, 93,         ,         ,      1  , "Stadsrondweg-Oost, Houkesloot, Sneek, S√∫dwest-Frysl√¢n, Frysl√¢n, Nederland, 8604 GC, Nederland"
+MOVE    , 2022-09-24, 15:23,         ,      0.7,        ,     -0.7,       ,          ,          ,      50, 50, 50, 50,      96, 94, 96, 96,         ,      1  ,      1  , "17-101, Dekamalaan, Sneek, S√∫dwest-Frysl√¢n, Frysl√¢n, Nederland, 8604 ZG, Nederland"
+TRIP    , 2022-09-24, 15:23,  17597.3,      4.8,        ,     -0.7,       ,          ,          ,      50, 51, 50, 51,      96, 94, 93, 96,         ,      1  ,      2  , "17-101, Dekamalaan, Sneek, S√∫dwest-Frysl√¢n, Frysl√¢n, Nederland, 8604 ZG, Nederland"
+MOVE    , 2022-09-24, 16:30,         ,      0.2,        ,         ,       ,          ,          ,      50, 50, 50, 50,      94, 95, 94, 94,         ,         ,      1  , "10, Groenedijk, Sneek, S√∫dwest-Frysl√¢n, Frysl√¢n, Nederland, 8604 AB, Nederland"
 MOVE    , 2022-09-24, 17:00,         ,     36.9,        ,     -7.0,    5.3,      19.0,      1.72,      40, 45, 40, 40,      94, 94, 94, 94,         ,         ,      1  , "A6, De Zuidert, Emmeloord, Noordoostpolder, Flevoland, Nederland, 8305 AC, Nederland"
 MOVE    , 2022-09-24, 17:30,         ,     42.7,        ,     -7.0,    6.1,      16.4,      1.72,      30, 35, 30, 30,      95, 94, 95, 95,         ,         ,      1  , "Rijksweg A6, Lelystad, Flevoland, Nederland, 3897 MA, Nederland"
 MOVE    , 2022-09-24, 18:00,         ,     38.1,        ,     -6.3,    6.0,      16.5,      1.55,      21, 25, 21, 21,      94, 94, 94, 94,         ,         ,      1  , "A27, Rijnsweerd, Utrecht, Nederland, 3731 GC, Nederland"
@@ -662,6 +700,36 @@ What has happended on those TRIPs:
 - I cannot detect these situations and also do not know how to divide these, because of the moment of capturing AND odometer is not constantly updated
 - you can compute a better consumption by combining those 2 trips, in this case the DAY gives the real consumption
 
+## python summary.py sheetupdate
+
+Example standard output:
+```
+C:\Users\Rick\git\monitor>python summary.py sheetupdate
+  Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips,   #moves
+DAY     , 2022-09-17, Sat  ,  17324.2,         ,     2.8,         ,       ,          ,          ,      58, 55, 55, 58,      91, 91, 91, 91,      1  ,         ,
+DAY     , 2022-09-18, Sun  ,  17324.2,         ,     0.7,         ,       ,          ,          ,      59, 59, 59, 60,      91, 91, 91, 91,         ,         ,
+WEEK    , 2022-09-18, WK 37,  17324.2,         ,     3.5,         ,       ,          ,          ,      59, 59, 55, 60,      91, 91, 91, 91,      1  ,         ,
+DAY     , 2022-09-19, Mon  ,  17330.7,      6.5,        ,         ,       ,          ,          ,      59, 60, 59, 61,      86, 88, 85, 91,         ,      2  ,      2
+DAY     , 2022-09-20, Tue  ,  17378.3,     47.6,        ,     -7.0,    6.8,      14.7,      1.72,      45, 48, 45, 59,      91, 91, 87, 92,         ,      3  ,      6
+DAY     , 2022-09-21, Wed  ,  17383.5,      5.2,    18.2,     -0.7,       ,          ,          ,      70, 63, 46, 70,      91, 91, 91, 92,      2  ,      2  ,      2
+DAY     , 2022-09-22, Thu  ,  17383.5,         ,        ,         ,       ,          ,          ,      72, 72, 72, 72,      91, 91, 91, 91,      1  ,         ,
+DAY     , 2022-09-23, Fri  ,  17387.1,      3.6,    20.3,     -0.7,       ,          ,          ,     100, 86, 71,100,      87, 87, 87, 88,      2  ,      2  ,      2
+DAY     , 2022-09-24, Sat  ,  17794.9,    407.8,    25.9,    -66.5,    6.1,      16.3,     16.36,      42, 40,  5,100,      97, 96, 92, 98,      1  ,      5  ,     15
+DAY     , 2022-09-25, Sun  ,  17794.9,         ,     5.6,         ,       ,          ,          ,      50, 46, 43, 50,      97, 97, 97, 97,         ,         ,
+WEEK    , 2022-09-25, WK 38,  17794.9,    470.7,    67.2,    -73.5,    6.4,      15.6,     18.08,      50, 60,  5,100,      97, 91, 85, 98,      6  ,     14  ,     27
+MONTH   , 2022-09-25, Sep  ,  17794.9,    470.7,    70.7,    -73.5,    6.4,      15.6,     18.08,      50, 59,  5,100,      97, 91, 85, 98,      7  ,     14  ,     27
+YEAR    , 2022-09-25, 2022 ,  17794.9,    470.7,    70.7,    -73.5,    6.4,      15.6,     18.08,      50, 59,  5,100,      97, 91, 85, 98,      7  ,     14  ,     27
+TRIPAVG , 2022-09-25,  14t ,  17794.9,     33.6,     5.0,     -5.2,    6.4,      15.6,      1.29,      50, 59,  5,100,      97, 91, 85, 98,      0.5,      1  ,      1.9
+DAYAVG  , 2022-09-25,   9d ,  17794.9,     52.3,     7.9,     -8.2,    6.4,      15.6,      2.01,      50, 59,  5,100,      97, 91, 85, 98,      0.8,      1.6,      3
+WEEKAVG , 2022-09-25,   9d ,  17794.9,    366.1,    55.0,    -57.2,    6.4,      15.6,     14.06,      50, 59,  5,100,      97, 91, 85, 98,      5.4,     10.9,     21
+MONTHAVG, 2022-09-25,   9d ,  17794.9,   1590.8,   238.9,   -248.4,    6.4,      15.6,     61.11,      50, 59,  5,100,      97, 91, 85, 98,     23.7,     47.3,     91.2
+YEARLY  , 2022-09-25,   9d ,  17794.9,  19089.5,  2867.3,  -2980.8,    6.4,      15.6,    733.29,      50, 59,  5,100,      97, 91, 85, 98,    283.9,    567.8,   1095
+  Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips,   #moves
+```
+
+Screenshot of spreadsheet:
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/GoogleSpreadsheet.png)
+
 ## python kml.py
 
 Input is previous monitor.csv file.
@@ -744,12 +812,12 @@ C:\Users\Rick\git\monitor>python kml.py address
  23: 20220924 11:30  D (5.204728,51.883719) SOC: 91% 12V: 97% ODO: 17390.8 Address: "Rijksweg A2, Enspijk, West Betuwe, Gelderland, Nederland, 4153 RN, Nederland"       drive
  24: 20220924 12:00  D (5.250064,52.256122) SOC: 81% 12V: 98% ODO: 17390.8 Address: "Rijksweg A27, Eemnes, Utrecht, Nederland, 3755 AS, Nederland"       drive
  25: 20220924 12:30  D (5.540714,52.575733) SOC: 69% 12V: 98% ODO: 17390.8 Address: "Rijksweg A6, Lelystad, Flevoland, Nederland, 8221 RD, Nederland"       drive
- 26: 20220924 13:00  D (5.768325,52.898894) SOC: 57% 12V: 98% ODO: 17390.8 Address: "A6, Oldeouwer, De Fryske Marren, Frysl‚n, Nederland, 8516 DD, Nederland"       drive
- 27: 20220924 13:21    (5.683261,53.036686) SOC: 52% 12V: 96% ODO: 17589.2 Address: "17-101, Dekamalaan, Sneek, S˙dwest-Frysl‚n, Frysl‚n, Nederland, 8604 ZG, Nederland"       (+198.4 since 20220924 13:00)
- 28: 20220924 14:31    (5.681147,53.016858) SOC: 51% 12V: 94% ODO: 17592.5 Address: "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, S˙dwest-Frysl‚n, Frysl‚n, Nederland, 8606 KZ, Nederland"       (+3.3 since 20220924 14:00)
- 29: 20220924 15:00  D (5.686422,53.030697) SOC: 51% 12V: 93% ODO: 17592.5 Address: "Stadsrondweg-Oost, Houkesloot, Sneek, S˙dwest-Frysl‚n, Frysl‚n, Nederland, 8604 GC, Nederland"       drive
- 30: 20220924 15:23    (5.68325 ,53.036683) SOC: 50% 12V: 96% ODO: 17597.3 Address: "17-101, Dekamalaan, Sneek, S˙dwest-Frysl‚n, Frysl‚n, Nederland, 8604 ZG, Nederland"       (+4.8 since 20220924 15:00)
- 31: 20220924 16:30  D (5.6802  ,53.035853) SOC: 50% 12V: 94% ODO: 17597.3 Address: "10, Groenedijk, Sneek, S˙dwest-Frysl‚n, Frysl‚n, Nederland, 8604 AB, Nederland"       drive
+ 26: 20220924 13:00  D (5.768325,52.898894) SOC: 57% 12V: 98% ODO: 17390.8 Address: "A6, Oldeouwer, De Fryske Marren, Frysl√¢n, Nederland, 8516 DD, Nederland"       drive
+ 27: 20220924 13:21    (5.683261,53.036686) SOC: 52% 12V: 96% ODO: 17589.2 Address: "17-101, Dekamalaan, Sneek, S√∫dwest-Frysl√¢n, Frysl√¢n, Nederland, 8604 ZG, Nederland"       (+198.4 since 20220924 13:00)
+ 28: 20220924 14:31    (5.681147,53.016858) SOC: 51% 12V: 94% ODO: 17592.5 Address: "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, S√∫dwest-Frysl√¢n, Frysl√¢n, Nederland, 8606 KZ, Nederland"       (+3.3 since 20220924 14:00)
+ 29: 20220924 15:00  D (5.686422,53.030697) SOC: 51% 12V: 93% ODO: 17592.5 Address: "Stadsrondweg-Oost, Houkesloot, Sneek, S√∫dwest-Frysl√¢n, Frysl√¢n, Nederland, 8604 GC, Nederland"       drive
+ 30: 20220924 15:23    (5.68325 ,53.036683) SOC: 50% 12V: 96% ODO: 17597.3 Address: "17-101, Dekamalaan, Sneek, S√∫dwest-Frysl√¢n, Frysl√¢n, Nederland, 8604 ZG, Nederland"       (+4.8 since 20220924 15:00)
+ 31: 20220924 16:30  D (5.6802  ,53.035853) SOC: 50% 12V: 94% ODO: 17597.3 Address: "10, Groenedijk, Sneek, S√∫dwest-Frysl√¢n, Frysl√¢n, Nederland, 8604 AB, Nederland"       drive
  32: 20220924 17:00  D (5.771994,52.709039) SOC: 40% 12V: 94% ODO: 17597.3 Address: "A6, De Zuidert, Emmeloord, Noordoostpolder, Flevoland, Nederland, 8305 AC, Nederland"       drive
  33: 20220924 17:30  D (5.375436,52.411236) SOC: 30% 12V: 95% ODO: 17597.3 Address: "Rijksweg A6, Lelystad, Flevoland, Nederland, 3897 MA, Nederland"       drive
  34: 20220924 18:00  D (5.158522,52.095317) SOC: 21% 12V: 94% ODO: 17597.3 Address: "A27, Rijnsweerd, Utrecht, Nederland, 3731 GC, Nederland"       drive
@@ -798,14 +866,16 @@ Steps:
 Probably some packages needed for Hyundai Connect API are not installed (error messages). Learn more about installing Python packages: https://packaging.python.org/en/latest/tutorials/installing-packages/
 I have installed the following packages (e.g. use python -m pip install "package_name"), see https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements.txt
 
-    python-dateutil    2.8.2
-    beautifulsoup4     4.11.1
-    pytz               2022.2.1
-    requests           2.28.1
+    beautifulsoup4==4.11.1
+    python_dateutil==2.8.2
+    pytz==2022.2.1
+    requests==2.28.1
     
-In hyundai_kia_connect_monitor also geopy packages is used, so also install this package:
-    geopy  2.2.0
+In hyundai_kia_connect_monitor summary.py also the following packages are used:
 
+    geopy==2.2.0
+    gspread==5.6.2
+    
 If everything works, it's a matter of regularly collecting the information, for example by running the "python monitor.py" command once an hour. A server is of course best, I use a Raspberry Pi, but it can also regularly be done on a Windows 10 or Mac computer, provided the computer is on.
 
 By then, if you want to show the summary information in monitor.csv, configure the summary.cfg once and run the command: python summary.py
