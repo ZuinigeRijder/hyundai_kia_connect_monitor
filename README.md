@@ -151,7 +151,7 @@ For updating the Google Spreadsheet, summary.py is using the package gspread. Fo
 The summary.py script uses access to the Google spreadsheets on behalf of a bot account using Service Account.
 Follow the steps in this link above, here is the summary of these steps:
 - Enable API Access for a Project
-- - Head to Google Developers Console and create a new project (or select the one you already have).
+- - Head to [Google Developers Console](https://console.developers.google.com/) and create a new project (or select the one you already have).
 - - In the box labeled “Search for APIs and Services”, search for “Google Drive API” and enable it.
 - - In the box labeled “Search for APIs and Services”, search for “Google Sheets API” and enable it.
 - For Bots: Using Service Account
