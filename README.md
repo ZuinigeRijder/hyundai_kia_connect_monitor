@@ -312,7 +312,9 @@ My previous Kia EV Soul with 27 kWh battery has driven 145,000 km in 7 years and
 
 But in the summary above, you see that my average SOC is 59%, which is pretty good.
 
-Also the 12 Volt battery is shown and it has not become beneath 85%, with an average of 91%.
+Also the 12 Volt battery is shown and it has not become beneath 85%, with an average of 91%. Here the mapping of percentage to volt for a typical Lead Acid Battery:
+
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/Lead-Acid-Battery-Voltage-Charts.jpg)
 
 Example output when filtering on DAY:
 ```
