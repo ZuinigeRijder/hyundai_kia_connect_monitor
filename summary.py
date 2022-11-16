@@ -108,7 +108,7 @@ def debug(line):
         print(line)
 
 
-def init(current_day, odo):
+def init(current_day, odo, soc, volt12):
     """ init tuple with initial values """
     # current_day, odo, charged_perc, discharged_perc, charges, trips,
     # elapsed_minutes,
@@ -118,15 +118,15 @@ def init(current_day, odo):
     debug(f"init({current_day})")
     return (
         current_day, odo, 0, 0, 0, 0, 0,
-        -1.0, -1.0, 999, -1,  # SOC%
-        -1.0, -1.0, 999, -1,  # 12V%
+        soc, soc, soc, soc,  # SOC%
+        volt12, volt12, volt12, volt12,  # 12V%
         0                     # moves
     )
 
 
 def to_int(string):
     """ convert to int """
-    if string == "None":
+    if "None" in string:
         return -1
     return int(string)
 
@@ -201,22 +201,16 @@ def print_summary(prefix, current, values, location_str, factor):
     t_trips = values[T_TRIPS] * factor
     t_moves = values[T_MOVES] * factor
 
-    t_elapsed_minutes = values[T_ELAPSED_MINUTES]
+    t_elapsed_minutes = max(values[T_ELAPSED_MINUTES], 1)
     t_soc_cur = values[T_SOC_CUR]
-    t_soc_avg = values[T_SOC_AVG]
+    t_soc_avg = round(values[T_SOC_AVG] / t_elapsed_minutes)
     t_soc_min = values[T_SOC_MIN]
     t_soc_max = values[T_SOC_MAX]
-    soc_average = 0
-    if t_elapsed_minutes != 0:
-        soc_average = round(t_soc_avg / t_elapsed_minutes)
 
     t_volt12_cur = values[T_VOLT12_CUR]
-    t_volt12_avg = values[T_VOLT12_AVG]
+    t_volt12_avg = round(values[T_VOLT12_AVG] / t_elapsed_minutes)
     t_volt12_min = values[T_VOLT12_MIN]
     t_volt12_max = values[T_VOLT12_MAX]
-    volt12_average = 0
-    if t_elapsed_minutes != 0:
-        volt12_average = round(t_volt12_avg / t_elapsed_minutes)
 
     charged_kwh = NET_BATTERY_SIZE_KWH / 100 * t_charged_perc
     discharged_kwh = NET_BATTERY_SIZE_KWH / 100 * t_discharged_perc
@@ -291,7 +285,7 @@ def print_summary(prefix, current, values, location_str, factor):
             'values': [["Current SOC%", f"{t_soc_cur}"]],
         }, {
             'range': 'A10:B10',
-            'values': [["Average SOC%", f"{soc_average}"]],
+            'values': [["Average SOC%", f"{t_soc_avg}"]],
         }, {
             'range': 'A11:B11',
             'values': [["Min SOC%", f"{t_soc_min}"]],
@@ -303,7 +297,7 @@ def print_summary(prefix, current, values, location_str, factor):
             'values': [["Current 12V%", f"{t_volt12_cur}"]],
         }, {
             'range': 'A14:B14',
-            'values': [["Average 12V%", f"{volt12_average}"]],
+            'values': [["Average 12V%", f"{t_volt12_avg}"]],
         }, {
             'range': 'A15:B15',
             'values': [["Min 12V%", f"{t_volt12_min}"]],
@@ -322,9 +316,9 @@ def print_summary(prefix, current, values, location_str, factor):
         }])
     else:
         if ADDRESS:
-            output=f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{soc_average:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{volt12_average:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{t_moves_str:9},{location_str}"  # noqa pylint:disable=line-too-long
+            output=f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{t_moves_str:9},{location_str}"  # noqa pylint:disable=line-too-long
         else:
-            output=f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{soc_average:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{volt12_average:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{t_moves_str:9}"  # noqa pylint:disable=line-too-long
+            output=f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{t_moves_str:9}"  # noqa pylint:disable=line-too-long
         print_output_and_update_queue(output)
 
 
@@ -603,7 +597,11 @@ def handle_line(split, prev_split, totals):
     """ handle_line """
     debug(f"handle_line: {split}, {prev_split}")
     current_day = parser.parse(split[DT])
-    current_day_values = init(current_day, float(split[ODO].strip()))
+    current_day_values = init(
+        current_day,
+        float(split[ODO].strip()),
+        to_int(split[SOC]),
+        to_int(split[V12]))
     t_day = totals[T_DAY]
     if not t_day:  # first time, fill in with initial values
         debug(f"not TDAY: {t_day}")
@@ -638,7 +636,8 @@ def handle_line(split, prev_split, totals):
             t_year = keep_track_of_totals(t_year, split, prev_split, False)
 
         if MOVES:
-            t_moves_init = init(current_day, 0.0)
+            t_moves_init = init(
+                current_day, 0.0,  to_int(split[SOC]), to_int(split[V12]))
             t_moves = keep_track_of_totals(
                 t_moves_init, split, prev_split, True)
             if t_moves[T_MOVES] > 0:
