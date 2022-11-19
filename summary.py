@@ -342,7 +342,7 @@ def print_output_queue():
     SHEET.batch_update(array)
 
 
-def print_summaries(current_day_values, totals):
+def print_summaries(current_day_values, totals, last):
     """ print_summaries """
     global DAY_COUNTER  # pylint:disable=global-statement
     debug(f"print_summaries: DAY_COUNTER: {DAY_COUNTER} {totals}")
@@ -355,7 +355,7 @@ def print_summaries(current_day_values, totals):
 
     day_str = t_day[T_CURRENT_DAY].strftime("%Y-%m-%d")
 
-    if not same_day(current_day, t_day[T_CURRENT_DAY]):
+    if not same_day(current_day, t_day[T_CURRENT_DAY]) or last:
         DAY_COUNTER += 1
         debug(f"DAY_COUNTER increment: {DAY_COUNTER}")
         if DAY:
@@ -370,7 +370,7 @@ def print_summaries(current_day_values, totals):
         t_day = current_day_values
         t_trip = current_day_values
 
-    if WEEK and not same_week(current_day, t_week[T_CURRENT_DAY]):
+    if WEEK and (not same_week(current_day, t_week[T_CURRENT_DAY]) or last):
         weeknr = t_week[T_CURRENT_DAY].strftime("%W")
         print_summary(
             f"WEEK    , {day_str:10}, WK {weeknr:2}",
@@ -381,7 +381,7 @@ def print_summaries(current_day_values, totals):
         )
         t_week = current_day_values
 
-    if MONTH and not same_month(current_day, t_month[T_CURRENT_DAY]):
+    if MONTH and (not same_month(current_day, t_month[T_CURRENT_DAY]) or last):
         month_info = t_month[T_CURRENT_DAY].strftime("%b")
         print_summary(
             f"MONTH   , {day_str:10}, {month_info:5}",
@@ -391,7 +391,7 @@ def print_summaries(current_day_values, totals):
             1.0
         )
         t_month = current_day_values
-    if YEAR and not same_year(current_day, t_year[T_CURRENT_DAY]):
+    if YEAR and (not same_year(current_day, t_year[T_CURRENT_DAY]) or last):
         year = t_year[T_CURRENT_DAY].strftime("%Y")
         print_summary(
             f"YEAR    , {day_str:10}, {year:5}",
@@ -436,8 +436,9 @@ def print_summaries(current_day_values, totals):
             "",
             365/DAY_COUNTER
         )
-        if SHEETUPDATE and current_day.year == 2999:
-            day_info = t_day[T_CURRENT_DAY].strftime("%a %H:%M")
+        if SHEETUPDATE and last:
+            day_info = current_day.strftime("%a %H:%M")
+            debug('SHEETUPDATE: ' + day_info)
             print_summary(
                 f"SHEET {day_str:10} {day_info} {DAY_COUNTER:3}d",
                 current_day_values,
@@ -593,7 +594,7 @@ def get_address(split):
     return location_str
 
 
-def handle_line(split, prev_split, totals):
+def handle_line(split, prev_split, totals, last):
     """ handle_line """
     debug(f"handle_line: {split}, {prev_split}")
     current_day = parser.parse(split[DT])
@@ -625,7 +626,7 @@ def handle_line(split, prev_split, totals):
             current_day.replace(hour=23, minute=59) - timedelta(days=1)
 
     # take into account totals per line
-    if current_day.year != 2999:  # skip keep_track_of_totals for last entry
+    if not last:  # skip keep_track_of_totals for last entry
         if DAY:
             t_day = keep_track_of_totals(t_day, split, prev_split, False)
         if WEEK:
@@ -667,9 +668,9 @@ def handle_line(split, prev_split, totals):
 
     totals = (t_day, t_week, t_month, t_year, t_trip)
 
-    if day_change:
+    if day_change or last:
         debug(f"DAY change: {t_day}")
-        totals = print_summaries(current_day_values, totals)
+        totals = print_summaries(current_day_values, totals, last)
 
     return totals
 
@@ -697,7 +698,8 @@ def summary():
                 totals = handle_line(
                     split,
                     prev_split,
-                    totals
+                    totals,
+                    False
                 )
 
             prev_index = index
@@ -707,9 +709,10 @@ def summary():
         # also compute last last day/week/month
         debug("Handling last values")
         handle_line(
-            ("2999" + prev_line[4:]).split(","),
             prev_split,
-            totals
+            prev_split,
+            totals,
+            True
         )
         print_header_and_update_queue()
 
