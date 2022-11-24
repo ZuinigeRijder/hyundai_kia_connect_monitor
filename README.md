@@ -1,3 +1,24 @@
+# index
+- [Introduction](#introduction-hyundai_kia_connect_monitor)
+- [How to install python, packages and hyundai_connect_monitor](#how-to-install-python-packages-and-hyundai_connect_monitor)
+- [monitor.py](#monitorpy)
+- [python monitor.py cacheupdate](#python-monitorpy-cacheupdate)
+- [python monitor.py forceupdate](#python-monitorpy-forceupdate)
+- [summary.py](#summarypy)
+- [summary.py sheetupdate](#summarypy-sheetupdate)
+- - [configuration of gspread for "python summary.py sheetupdate"](#configuration-of-gspread-for-python-summarypy-sheetupdate)
+- [kml.py](#kmlpy)
+- [shrink.py](#shrinkpy)
+- [Raspberry Pi configuration](#raspberry-pi-configuration)
+- [debug.py](#debugpy)
+- [Examples](#examples)
+- - [monitor.csv](#monitorcsv)
+- - [python summary.py](#python-summarypy)
+- - [python summary.py sheetupdate](#python-summarypy-sheetupdate)
+- - [python kml.py](#python-kmlpy)
+- - [python shrink.py](#python-shrinkpy)
+- [Remarks of using the tools for a month](#remarks-of-using-the-tools-for-a-month)
+
 # Introduction hyundai_kia_connect_monitor
 Automatic trip administration tools for Hyundai Bluelink or Kia UVO Connect users.
 Determining afterwards your private and/or business trips and information about those trips and usage of the car.
@@ -26,9 +47,36 @@ The following tools are available as pure Python3 scripts:
 - Raspberry pi configuration: example script to run monitor.py once per hour on a linux based system
 - debug.py: same sort of python script as monitor.py, but debug logging enabled and all the (internal) data is just printed to standard output in pretty print
 
-# Tools
+# How to install python, packages and hyundai_connect_monitor
+Explanation for someone with no knowledge of python. I don't know what computer you have. Part of the tools is the regular retrieval of the data with the Python script monitor.py.
+For this you need to install Python. I have installed Python 3.9.13.
+[Here is more information about installing Python](https://realpython.com/installing-python/)
 
-## monitor.py
+Steps:
+- Download the source code of [hyundai_kia_connect_api v1.40.11 here](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases/tag/v1.40.11)
+- Download the [latest hyundai_kia_connect_monitor release here](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases)
+- Extract both and move the hyundai_kia_connect_api subfolder of hyundai_kia_connect_api-1.40.11 under hyundai_kia_connect_monitor.
+- Then configure monitor.cfg
+- Then run: python monitor.py
+
+Probably some packages needed for Hyundai Connect API are not installed (error messages). [Learn more about installing Python packages](https://packaging.python.org/en/latest/tutorials/installing-packages/)
+I have installed the following packages (e.g. use python -m pip install "package_name"), see [requirements.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements.txt)
+
+    beautifulsoup4==4.11.1
+    python_dateutil==2.8.2
+    pytz==2022.2.1
+    requests==2.28.1
+    
+In hyundai_kia_connect_monitor summary.py also the following packages are used:
+
+    geopy==2.2.0
+    gspread==5.6.2
+    
+If everything works, it's a matter of regularly collecting the information, for example by running the "python monitor.py" command once an hour. A server is of course best, I use a Raspberry Pi, but it can also regularly be done on a Windows 10 or Mac computer, provided the computer is on.
+
+By then, if you want to show the summary information in monitor.csv, configure the summary.cfg once and run the command: python summary.py
+
+# monitor.py
 Simple Python3 script to monitor values using [hyundai_kia_connect_api](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api)
 
 Usage:
@@ -106,7 +154,7 @@ You also can consider only to monitor between e.g. 6:00 and 22:00 (saves 1/3 of 
 - each quarter hour between 6:00 and 19:00 means 52 requests per day
 - each quarter hour between 6:00 and 22:00 means 64 requests per day
 
-### python monitor.py cacheupdate
+## python monitor.py cacheupdate
 If you only ask for cached values, the car will not be woken up, the 12 volt battery of the car will not be drained by the tool and you will only get the cached values from the server.
 
 The car sends the updates (push messages) to the server when something happens on the car side. This is the case when the car is started or switched off, when charging is complete and possibly in other situations.
@@ -121,7 +169,7 @@ No 12 volt battery drain, because of server calls using cached values only.
 
 See also [Raspberry Pi Configuration](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor#raspberry-pi-configuration)
 
-### python monitor.py forceupdate
+## python monitor.py forceupdate
 I did choose to run forceupdate once per day at 6:10 in the morning:
 - python monitor.py forceupdate
 
@@ -135,7 +183,7 @@ With 60-minute forced updates:
 93% to 82% in 14 hours, approx. 0.78%/hour
 ```
 
-## summary.py
+# summary.py
 make summary per TRIP, DAY, WEEK, MONTH, YEAR, MOVE, ADDRESS or a combination with monitor.csv as input
 
 Usage: 
@@ -198,7 +246,7 @@ Explanation of configuration items:
 - ignore_small_negative_delta_soc, do not see this as discharge% when not moved, because with temperature changes the percentage can decrease
 - show_zero_values = True shows also zero values in the standard output, can be easier for spreadsheets, but more difficult to read
 
-## summary.py sheetupdate
+# summary.py sheetupdate
 make summary per DAY, WEEK, MONTH, YEAR with monitor.csv as input and write summary to Google Spreadsheet
 
 Usage: 
@@ -238,7 +286,7 @@ And thereafter the last 50 lines of the summary in reverse order, so you do not 
   Period     date        info    odometer    delta km       +kWh         -kWh    km/kWh  kWh/100km   cost Euro   SOC%CUR    AVG MIN MAX  12V%CUR    AVG MIN MAX  #charges      #trips      #moves
 ```
   
-### configuration of gspread for "python summary.py sheetupdate"
+## configuration of gspread for "python summary.py sheetupdate"
 For updating the Google Spreadsheet, summary.py is using the package gspread. For Authentication with Google Spreadsheet you have to configure authentication for gspread. This [authentication configuration is described here](https://docs.gspread.org/en/latest/oauth2.html)
 The summary.py script uses access to the Google spreadsheets on behalf of a bot account using Service Account.
 Follow the steps in this link above, here is the summary of these steps:
@@ -251,7 +299,7 @@ Follow the steps in this link above, here is the summary of these steps:
 - - Fill out the form
 - - Click "Create" and "Done".
 - - Press "Manage service accounts" above Service Accounts.
-- - Press on : near recently created service account and select �Manage keys� and then click on "ADD KEY > Create new key".
+- - Press on : near recently created service account and select Manage keys and then click on "ADD KEY > Create new key".
 - - Select JSON key type and press "Create".
 - - You will automatically download a JSON file with credentials
 - - Remember the path to the downloaded credentials json file. Also, in the next step you will need the value of client_email from this file.
@@ -262,7 +310,7 @@ Follow the steps in this link above, here is the summary of these steps:
 - run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor spreadheet will be updated with a summary and the last 50 lines of standard output
 - configure to run "python summary.py sheetupdate" regularly, after having run "python monitor.py"
 
-## kml.py
+# kml.py
 Transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations.
 Lines are not written, when the following info is the same as previous line: longitude, latitude, engineOn, charging
 
@@ -286,7 +334,7 @@ Note:
 
 [How to import kml in Google Maps](https://www.spotzi.com/en/about/help-center/how-to-import-a-kml-into-google-maps/)
 
-## shrink.py
+# shrink.py
 Simple Python3 script to shrink monitor.csv, identical lines removed (first date/time column excluded). Handy for analyzing with other tools (e.g. Excel) with less data.
 
 Usage:
@@ -299,7 +347,7 @@ python shrink.py
 Note: 
 - True and False for EngineOn and Driving are replaced into respectively 1 and 0, so it is shorter and easier usable in e.g. Excel.
 
-## Raspberry pi configuration
+# Raspberry pi configuration
 Example script [run_monitor_once.sh](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/run_monitor_once.sh) to run monitor.py on a linux based system.
 
 Steps:
@@ -337,7 +385,7 @@ crontab -e:
 10 6 * * * /usr/bin/python -u ~/hyundai_kia_connect_monitor/monitor.py forceupdate >> ~/hyundai_kia_connect_monitor/run_monitor_once.log 2>&1
 ```
 
-## debug.py
+# debug.py
 Same sort of python script as monitor.py, but debug logging enabled and all the (internal) data is just printed to standard output in pretty print.
 It uses the configuration from monitor.cfg.
 
@@ -583,15 +631,15 @@ MOVE    , 2022-09-24, 11:00,         ,      0.9,        ,     -0.7,       ,     
 MOVE    , 2022-09-24, 11:30,         ,     23.8,        ,     -4.9,    4.9,      20.6,      1.21,      91, 94, 91, 91,      97, 94, 97, 97,         ,         ,      1  , "Rijksweg A2, Enspijk, West Betuwe, Gelderland, Nederland, 4153 RN, Nederland"
 MOVE    , 2022-09-24, 12:00,         ,     41.6,        ,     -7.0,    5.9,      16.8,      1.72,      81, 86, 81, 81,      98, 97, 98, 98,         ,         ,      1  , "Rijksweg A27, Eemnes, Utrecht, Nederland, 3755 AS, Nederland"
 MOVE    , 2022-09-24, 12:30,         ,     40.7,        ,     -8.4,    4.8,      20.6,      2.07,      69, 75, 69, 69,      98, 98, 98, 98,         ,         ,      1  , "Rijksweg A6, Lelystad, Flevoland, Nederland, 8221 RD, Nederland"
-MOVE    , 2022-09-24, 13:00,         ,     39.1,        ,     -8.4,    4.7,      21.5,      2.07,      57, 63, 57, 57,      98, 98, 98, 98,         ,         ,      1  , "A6, Oldeouwer, De Fryske Marren, Fryslân, Nederland, 8516 DD, Nederland"
-MOVE    , 2022-09-24, 13:21,         ,     16.4,        ,     -3.5,    4.7,      21.3,      0.86,      52, 54, 52, 52,      96, 97, 96, 96,         ,      1  ,      1  , "17-101, Dekamalaan, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 ZG, Nederland"
-TRIP    , 2022-09-24, 13:21,  17589.2,    198.4,        ,    -32.9,    6.0,      16.6,      8.09,      52, 80, 52, 98,      96, 96, 92, 98,         ,      1  ,      6  , "17-101, Dekamalaan, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 ZG, Nederland"
-MOVE    , 2022-09-24, 14:31,         ,      2.2,        ,     -0.7,       ,          ,          ,      51, 51, 51, 51,      94, 95, 94, 94,         ,      1  ,      1  , "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8606 KZ, Nederland"
-TRIP    , 2022-09-24, 14:31,  17592.5,      3.3,        ,     -0.7,       ,          ,          ,      51, 51, 51, 51,      94, 95, 94, 94,         ,      1  ,      1  , "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8606 KZ, Nederland"
-MOVE    , 2022-09-24, 15:00,         ,      1.6,        ,         ,       ,          ,          ,      51, 51, 51, 51,      93, 93, 93, 93,         ,         ,      1  , "Stadsrondweg-Oost, Houkesloot, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 GC, Nederland"
-MOVE    , 2022-09-24, 15:23,         ,      0.7,        ,     -0.7,       ,          ,          ,      50, 50, 50, 50,      96, 94, 96, 96,         ,      1  ,      1  , "17-101, Dekamalaan, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 ZG, Nederland"
-TRIP    , 2022-09-24, 15:23,  17597.3,      4.8,        ,     -0.7,       ,          ,          ,      50, 51, 50, 51,      96, 94, 93, 96,         ,      1  ,      2  , "17-101, Dekamalaan, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 ZG, Nederland"
-MOVE    , 2022-09-24, 16:30,         ,      0.2,        ,         ,       ,          ,          ,      50, 50, 50, 50,      94, 95, 94, 94,         ,         ,      1  , "10, Groenedijk, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 AB, Nederland"
+MOVE    , 2022-09-24, 13:00,         ,     39.1,        ,     -8.4,    4.7,      21.5,      2.07,      57, 63, 57, 57,      98, 98, 98, 98,         ,         ,      1  , "A6, Oldeouwer, De Fryske Marren, FryslÃ¢n, Nederland, 8516 DD, Nederland"
+MOVE    , 2022-09-24, 13:21,         ,     16.4,        ,     -3.5,    4.7,      21.3,      0.86,      52, 54, 52, 52,      96, 97, 96, 96,         ,      1  ,      1  , "17-101, Dekamalaan, Sneek, SÃºdwest-FryslÃ¢n, FryslÃ¢n, Nederland, 8604 ZG, Nederland"
+TRIP    , 2022-09-24, 13:21,  17589.2,    198.4,        ,    -32.9,    6.0,      16.6,      8.09,      52, 80, 52, 98,      96, 96, 92, 98,         ,      1  ,      6  , "17-101, Dekamalaan, Sneek, SÃºdwest-FryslÃ¢n, FryslÃ¢n, Nederland, 8604 ZG, Nederland"
+MOVE    , 2022-09-24, 14:31,         ,      2.2,        ,     -0.7,       ,          ,          ,      51, 51, 51, 51,      94, 95, 94, 94,         ,      1  ,      1  , "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, SÃºdwest-FryslÃ¢n, FryslÃ¢n, Nederland, 8606 KZ, Nederland"
+TRIP    , 2022-09-24, 14:31,  17592.5,      3.3,        ,     -0.7,       ,          ,          ,      51, 51, 51, 51,      94, 95, 94, 94,         ,      1  ,      1  , "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, SÃºdwest-FryslÃ¢n, FryslÃ¢n, Nederland, 8606 KZ, Nederland"
+MOVE    , 2022-09-24, 15:00,         ,      1.6,        ,         ,       ,          ,          ,      51, 51, 51, 51,      93, 93, 93, 93,         ,         ,      1  , "Stadsrondweg-Oost, Houkesloot, Sneek, SÃºdwest-FryslÃ¢n, FryslÃ¢n, Nederland, 8604 GC, Nederland"
+MOVE    , 2022-09-24, 15:23,         ,      0.7,        ,     -0.7,       ,          ,          ,      50, 50, 50, 50,      96, 94, 96, 96,         ,      1  ,      1  , "17-101, Dekamalaan, Sneek, SÃºdwest-FryslÃ¢n, FryslÃ¢n, Nederland, 8604 ZG, Nederland"
+TRIP    , 2022-09-24, 15:23,  17597.3,      4.8,        ,     -0.7,       ,          ,          ,      50, 51, 50, 51,      96, 94, 93, 96,         ,      1  ,      2  , "17-101, Dekamalaan, Sneek, SÃºdwest-FryslÃ¢n, FryslÃ¢n, Nederland, 8604 ZG, Nederland"
+MOVE    , 2022-09-24, 16:30,         ,      0.2,        ,         ,       ,          ,          ,      50, 50, 50, 50,      94, 95, 94, 94,         ,         ,      1  , "10, Groenedijk, Sneek, SÃºdwest-FryslÃ¢n, FryslÃ¢n, Nederland, 8604 AB, Nederland"
 MOVE    , 2022-09-24, 17:00,         ,     36.9,        ,     -7.0,    5.3,      19.0,      1.72,      40, 45, 40, 40,      94, 94, 94, 94,         ,         ,      1  , "A6, De Zuidert, Emmeloord, Noordoostpolder, Flevoland, Nederland, 8305 AC, Nederland"
 MOVE    , 2022-09-24, 17:30,         ,     42.7,        ,     -7.0,    6.1,      16.4,      1.72,      30, 35, 30, 30,      95, 94, 95, 95,         ,         ,      1  , "Rijksweg A6, Lelystad, Flevoland, Nederland, 3897 MA, Nederland"
 MOVE    , 2022-09-24, 18:00,         ,     38.1,        ,     -6.3,    6.0,      16.5,      1.55,      21, 25, 21, 21,      94, 94, 94, 94,         ,         ,      1  , "A27, Rijnsweerd, Utrecht, Nederland, 3731 GC, Nederland"
@@ -924,12 +972,12 @@ C:\Users\Rick\git\monitor>python kml.py address
  23: 20220924 11:30  D (5.204728,51.883719) SOC: 91% 12V: 97% ODO: 17390.8 Address: "Rijksweg A2, Enspijk, West Betuwe, Gelderland, Nederland, 4153 RN, Nederland"       drive
  24: 20220924 12:00  D (5.250064,52.256122) SOC: 81% 12V: 98% ODO: 17390.8 Address: "Rijksweg A27, Eemnes, Utrecht, Nederland, 3755 AS, Nederland"       drive
  25: 20220924 12:30  D (5.540714,52.575733) SOC: 69% 12V: 98% ODO: 17390.8 Address: "Rijksweg A6, Lelystad, Flevoland, Nederland, 8221 RD, Nederland"       drive
- 26: 20220924 13:00  D (5.768325,52.898894) SOC: 57% 12V: 98% ODO: 17390.8 Address: "A6, Oldeouwer, De Fryske Marren, Fryslân, Nederland, 8516 DD, Nederland"       drive
- 27: 20220924 13:21    (5.683261,53.036686) SOC: 52% 12V: 96% ODO: 17589.2 Address: "17-101, Dekamalaan, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 ZG, Nederland"       (+198.4 since 20220924 13:00)
- 28: 20220924 14:31    (5.681147,53.016858) SOC: 51% 12V: 94% ODO: 17592.5 Address: "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8606 KZ, Nederland"       (+3.3 since 20220924 14:00)
- 29: 20220924 15:00  D (5.686422,53.030697) SOC: 51% 12V: 93% ODO: 17592.5 Address: "Stadsrondweg-Oost, Houkesloot, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 GC, Nederland"       drive
- 30: 20220924 15:23    (5.68325 ,53.036683) SOC: 50% 12V: 96% ODO: 17597.3 Address: "17-101, Dekamalaan, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 ZG, Nederland"       (+4.8 since 20220924 15:00)
- 31: 20220924 16:30  D (5.6802  ,53.035853) SOC: 50% 12V: 94% ODO: 17597.3 Address: "10, Groenedijk, Sneek, Súdwest-Fryslân, Fryslân, Nederland, 8604 AB, Nederland"       drive
+ 26: 20220924 13:00  D (5.768325,52.898894) SOC: 57% 12V: 98% ODO: 17390.8 Address: "A6, Oldeouwer, De Fryske Marren, FryslÃ¢n, Nederland, 8516 DD, Nederland"       drive
+ 27: 20220924 13:21    (5.683261,53.036686) SOC: 52% 12V: 96% ODO: 17589.2 Address: "17-101, Dekamalaan, Sneek, SÃºdwest-FryslÃ¢n, FryslÃ¢n, Nederland, 8604 ZG, Nederland"       (+198.4 since 20220924 13:00)
+ 28: 20220924 14:31    (5.681147,53.016858) SOC: 51% 12V: 94% ODO: 17592.5 Address: "Van der Valk Hotel Sneek, 1, Burgemeester Rasterhofflaan, Houkesloot, Sneek, SÃºdwest-FryslÃ¢n, FryslÃ¢n, Nederland, 8606 KZ, Nederland"       (+3.3 since 20220924 14:00)
+ 29: 20220924 15:00  D (5.686422,53.030697) SOC: 51% 12V: 93% ODO: 17592.5 Address: "Stadsrondweg-Oost, Houkesloot, Sneek, SÃºdwest-FryslÃ¢n, FryslÃ¢n, Nederland, 8604 GC, Nederland"       drive
+ 30: 20220924 15:23    (5.68325 ,53.036683) SOC: 50% 12V: 96% ODO: 17597.3 Address: "17-101, Dekamalaan, Sneek, SÃºdwest-FryslÃ¢n, FryslÃ¢n, Nederland, 8604 ZG, Nederland"       (+4.8 since 20220924 15:00)
+ 31: 20220924 16:30  D (5.6802  ,53.035853) SOC: 50% 12V: 94% ODO: 17597.3 Address: "10, Groenedijk, Sneek, SÃºdwest-FryslÃ¢n, FryslÃ¢n, Nederland, 8604 AB, Nederland"       drive
  32: 20220924 17:00  D (5.771994,52.709039) SOC: 40% 12V: 94% ODO: 17597.3 Address: "A6, De Zuidert, Emmeloord, Noordoostpolder, Flevoland, Nederland, 8305 AC, Nederland"       drive
  33: 20220924 17:30  D (5.375436,52.411236) SOC: 30% 12V: 95% ODO: 17597.3 Address: "Rijksweg A6, Lelystad, Flevoland, Nederland, 3897 MA, Nederland"       drive
  34: 20220924 18:00  D (5.158522,52.095317) SOC: 21% 12V: 94% ODO: 17597.3 Address: "A27, Rijnsweerd, Utrecht, Nederland, 3731 GC, Nederland"       drive
@@ -948,7 +996,7 @@ Example (based on earlier monitor.csv) outputfile [shrinked_monitor.csv](https:/
 Screenshot of excel example with some graphs:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/shrinked_monitor.jpg)
 
-## Remarks of using the tools for a month
+# Remarks of using the tools for a month
 - The hyundai_kia_connect_api gives regularly exceptions, [see this issue 62](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/issues/62#issuecomment-1280045102)
 - The retry mechanism (wait one minute and retry twice) seems a good workaround
 - If the car cannot be reached by bluelink then an exception will be thrown and no entry will appear in monitor.csv
@@ -963,32 +1011,3 @@ Occurrence of SOC% of 0:
 2022-10-11 12:00:54+02:00, 5.124957, 51.68260, False, 91, 18161.6, 0, False, 0
 2022-10-11 12:30:48+02:00, 5.124957, 51.68260, False, 91, 18161.6, 48, False, 0
 ```
-
-## How to install python, packages and hyundai_connect_monitor
-Explanation for someone with no knowledge of python. I don't know what computer you have. Part of the tools is the regular retrieval of the data with the Python script monitor.py.
-For this you need to install Python. I have installed Python 3.9.13.
-[Here is more information about installing Python](https://realpython.com/installing-python/)
-
-Steps:
-- Download the source code of [hyundai_kia_connect_api v1.40.11 here](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases/tag/v1.40.11)
-- Download the [latest hyundai_kia_connect_monitor release here](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases)
-- Extract both and move the hyundai_kia_connect_api subfolder of hyundai_kia_connect_api-1.40.11 under hyundai_kia_connect_monitor.
-- Then configure monitor.cfg
-- Then run: python monitor.py
-
-Probably some packages needed for Hyundai Connect API are not installed (error messages). [Learn more about installing Python packages](https://packaging.python.org/en/latest/tutorials/installing-packages/)
-I have installed the following packages (e.g. use python -m pip install "package_name"), see [requirements.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements.txt)
-
-    beautifulsoup4==4.11.1
-    python_dateutil==2.8.2
-    pytz==2022.2.1
-    requests==2.28.1
-    
-In hyundai_kia_connect_monitor summary.py also the following packages are used:
-
-    geopy==2.2.0
-    gspread==5.6.2
-    
-If everything works, it's a matter of regularly collecting the information, for example by running the "python monitor.py" command once an hour. A server is of course best, I use a Raspberry Pi, but it can also regularly be done on a Windows 10 or Mac computer, provided the computer is on.
-
-By then, if you want to show the summary information in monitor.csv, configure the summary.cfg once and run the command: python summary.py
