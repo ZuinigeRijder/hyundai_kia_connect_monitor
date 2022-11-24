@@ -181,13 +181,14 @@ def convert():
             prev_location = ''
             prev_engine_on = ''
             prev_charging = ''
+            prev_line = ''
             prev_items = []
             for line in inputfile:
                 if line.find('datetime') == 0:
                     continue  # skip this header line
                 location = ''
                 items = line.split(',')
-                if len(items) > 8:
+                if len(items) > 8 and line != prev_line:
                     location = items[1] + ", " + items[2]
                     engine_on = items[3].strip()
                     charging = items[7].strip()
@@ -199,6 +200,7 @@ def convert():
                     prev_location = location
                     prev_engine_on = engine_on
                     prev_charging = charging
+                    prev_line = line
                     prev_items = items
 
         writeline(outputfile, '</Document>')

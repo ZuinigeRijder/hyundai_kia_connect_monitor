@@ -1,8 +1,9 @@
-# hyundai_kia_connect_monitor
+# Introduction hyundai_kia_connect_monitor
 Automatic trip administration tools for Hyundai Bluelink or Kia UVO Connect users.
 Determining afterwards your private and/or business trips and information about those trips and usage of the car.
+Best of all is the fact that it does NOT drain your 12 volt battery of the car, because it default uses the cached server information!
 
-Run monitor.py e.g. once per hour (I use it on a Raspberry Pi and on Windows 10 with pure Python) and you can always check afterwards:
+Run monitor.py e.g. once per hour (I use it on a Raspberry Pi and on Windows 10 with pure Python, buit it will also run on Mac or a linux Operating System) and you can always check afterwards:
 - captured locations
 - odometer at specific day/hour
 - how much driven at a specific day
@@ -11,13 +12,79 @@ Run monitor.py e.g. once per hour (I use it on a Raspberry Pi and on Windows 10 
 - when you have charged and how much
 - see your 12 volt battery percentage fluctuation
 
-Idea is that you can analyze the information over time with other scripts or e.g. with Excel:
+You can analyze the information over time with other scripts or e.g. with Excel:
 - summaries (see summary.py script)
 - odometer trend over the lifetime
 - SOC trend and charging trend
 - 12V battery fluctuations
 
-Note that the number of API calls is restricted for Hyundai Bluelink or Kia UVO Connect users, see this page for API Rate Limits: https://github.com/Hacksore/bluelinky/wiki/API-Rate-Limits
+The following tools are available as pure Python3 scripts:
+- monitor.py: Simple Python3 script to monitor values using [hyundai_kia_connect_api](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api)
+- kml.py: transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations
+- summary.py: make summary per MOVE, TRIP, DAY, WEEK, MONTH, YEAR with monitor.csv as input
+- shrink.py: Simple Python3 script to shrink monitor.csv, identical lines removed (first date/time column excluded)
+- Raspberry pi configuration: example script to run monitor.py once per hour on a linux based system
+- debug.py: same sort of python script as monitor.py, but debug logging enabled and all the (internal) data is just printed to standard output in pretty print
+
+# Tools
+
+## monitor.py
+Simple Python3 script to monitor values using [hyundai_kia_connect_api](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api)
+
+Usage:
+```
+python monitor.py
+or
+python monitor.py cacheupdate
+or
+python monitor.py forceupdate
+```
+- INPUTFILE: monitor.cfg (configuration of input to hyundai_kia_connect_api)
+- OUTPUTFILE: monitor.csv (appended)
+
+Make sure to configure monitor.cfg once:
+```
+[monitor]
+region = 1
+brand = 2
+username = your_email
+password = your_password
+pin =
+force_update_seconds = 28800
+```
+
+Explanation of the configuration items:
+- region: 1: REGION_EUROPE, 2: REGION_CANADA, 3: REGION_USA
+- brand: 1: BRAND_KIA, 2: BRAND_HYUNDAI
+- username: your bluelink account email address
+- password: password of your bluelink account
+- pin: pincode of your bluelink account, required for CANADA, and potentially USA, otherwise pass a blank string
+- force_update_seconds: do a forceupdate when the latest cached server information is older than the specified seconds (28800 seconds = 8 hours)
+
+Following information from hyundai_kia_connect_api is added to the monitor.csv file:
+- datetime
+- longitude
+- latitude
+- engineOn
+- 12V%
+- odometer
+- SOC%
+- charging
+- plugged
+
+This information is used by the other tools:
+- summary.py
+- kml.py
+- shrink.py
+
+The monitor tool will by default only do a forced update when the last server update is more than 8 hours ago. 
+So only a maximum of 3 times a day the car could be asked for the latest information with the default configuration.
+This time difference is configurable, so you can decide to do it even less, e.g. max once a day, or more often, e.g. max 12 times a day.
+But you have also the option to only use cacheupdate as parameter to monitor.py.
+And you can also run a forceupdate as parameter to monitor.py, or e.g. once a day.
+Choose the options you like the most.
+
+Note that the number of API calls is restricted for Hyundai Bluelink or Kia UVO Connect users, see [this page for API Rate Limits](https://github.com/Hacksore/bluelinky/wiki/API-Rate-Limits)
 ```
 Region Daily Limits    Per Action  Comments
 - USA  30              10  
@@ -26,7 +93,7 @@ Region Daily Limits    Per Action  Comments
 - KR   ???
 ```
 
-So maybe you can capture more than once per hour, but you might run into the problem that you use too much API calls, especially when you also regularly use the Hyndai Bluelink or Kia UVO Connect app. Also the 12 volt battery will be draining more, so be careful with too much api calls.
+So maybe you can capture more than once per hour, but you might run into the problem that you use too much API calls, especially when you also regularly use the Hyndai Bluelink or Kia UVO Connect app.
 You also can consider only to monitor between e.g. 6:00 and 22:00 (saves 1/3 of the calls). Dependent on your regular driving habit, choose the best option for you. Examples:
 - twice a day, e.g. 6.00 and 21:00, when you normally do not drive that late in the evening and charge in the night after 21:00
 - each hour means 24 requests per day
@@ -39,36 +106,34 @@ You also can consider only to monitor between e.g. 6:00 and 22:00 (saves 1/3 of 
 - each quarter hour between 6:00 and 19:00 means 52 requests per day
 - each quarter hour between 6:00 and 22:00 means 64 requests per day
 
-The following tools are available as pure Python3 scripts:
-- monitor.py: Simple Python3 script to monitor values using hyundai_kia_connect_api https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api
-- kml.py: transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations
-- summary.py: make summary per DAY, WEEK, MONTH, YEAR with monitor.csv as input
-- shrink.py: Simple Python3 script to shrink monitor.csv, identical lines removed (first date/time column excluded)
-- Raspberry pi configuration: example script to run monitor.py once per hour on a linux based system
-- debug.py: same sort of python script as monitor.py, but debug logging enabled and all the (internal) data is just printed to standard output in pretty print
+### python monitor.py cacheupdate
+If you only ask for cached values, the car will not be woken up, the 12 volt battery of the car will not be drained by the tool and you will only get the cached values from the server.
 
-# Tools
+The car sends the updates (push messages) to the server when something happens on the car side. This is the case when the car is started or switched off, when charging is complete and possibly in other situations.
+So no extra drain of the 12 volt battery because of the hyundai_kia_connect_monitor tool!
 
-## monitor.py
-Simple Python3 script to monitor values using hyundai_kia_connect_api https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api
+And of course when you run an update or command through the Bluelink app, but that is on purpose.
 
-Usage:
+I do not know if the cacheupdate calls are part of the daily limits or if this is only related to forceupdate.
+Because in Europe the limit is 200, I did choose to run once per 15 minutes, so more accurate trips and charging sessions are recorded.
+No 12 volt battery drain, because of server calls using cached values only.
+- python monitor.py cacheupdate
+
+See also [Raspberry Pi Configuration](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor#raspberry-pi-configuration)
+
+### python monitor.py forceupdate
+I did choose to run forceupdate once per day at 6:10 in the morning:
+- python monitor.py forceupdate
+
+Note that if you do a lot of forceupdate calls, than definitely the car 12 volt battery can be drained.
+See [here some results of someone with an IONIQ 5 using forceupdate](https://community.home-assistant.io/t/hyundai-bluelink-integration/319129/132), so use this forceupdate option carefully:
 ```
-python monitor.py
-```
-- INPUTFILE: monitor.cfg (configuration of input to hyundai_kia_connect_api)
-- OUTPUTFILE: monitor.csv (appended)
+With 15-minute forced updates:
+95% to 80% in 8 hours, approx. 1.8%/hour
 
-Following information from hyundai_kia_connect_api is added to the monitor.csv file:
-- datetime
-- longitude
-- latitude
-- engineOn
-- 12V%
-- odometer
-- SOC%
-- charging
-- plugged
+With 60-minute forced updates:
+93% to 82% in 14 hours, approx. 0.78%/hour
+```
 
 ## summary.py
 make summary per TRIP, DAY, WEEK, MONTH, YEAR, MOVE, ADDRESS or a combination with monitor.csv as input
@@ -146,23 +211,50 @@ python summary.py sheetupdate
 - standard output: summary per DAY, WEEK, MONTH, YEAR in csv format
 - Google spreadsheet update with name: hyundai-kia-connect-monitor
 
+For easier use on a mobile phone, the spreadsheet will contain first the overall information in row 1 till 20:
+- Last update
+- Odometer km
+- Driven km
+- +kWh
+- -kWh
+-  km/kWh
+- kWh/100km
+- Cost Euro
+- Current SOC%
+- Average SOC%
+- Min SOC%
+- Max SOC%
+- Current 12V%
+- Average 12V%
+- Min 12V%
+- Max 12V%
+- #Charges
+- #Trips
+- #Moves
+- Last entry
+
+And thereafter the last 50 lines of the summary in reverse order, so you do not need to scroll to the bottom for the latest values. The following columns per row:
+```
+  Period     date        info    odometer    delta km       +kWh         -kWh    km/kWh  kWh/100km   cost Euro   SOC%CUR    AVG MIN MAX  12V%CUR    AVG MIN MAX  #charges      #trips      #moves
+```
+  
 ### configuration of gspread for "python summary.py sheetupdate"
-For updating the Google Spreadsheet, summary.py is using the package gspread. For Authentication with Google Spreadsheet you have to configure authentication for gspread. This is described here: https://docs.gspread.org/en/latest/oauth2.html
+For updating the Google Spreadsheet, summary.py is using the package gspread. For Authentication with Google Spreadsheet you have to configure authentication for gspread. This [authentication configuration is described here](https://docs.gspread.org/en/latest/oauth2.html)
 The summary.py script uses access to the Google spreadsheets on behalf of a bot account using Service Account.
 Follow the steps in this link above, here is the summary of these steps:
 - Enable API Access for a Project
 - - Head to [Google Developers Console](https://console.developers.google.com/) and create a new project (or select the one you already have).
-- - In the box labeled “Search for APIs and Services”, search for “Google Drive API” and enable it.
-- - In the box labeled “Search for APIs and Services”, search for “Google Sheets API” and enable it.
+- - In the box labeled "Search for APIs and Services", search for "Google Drive API" and enable it.
+- - In the box labeled "Search for APIs and Services", search for "Google Sheets API" and enable it
 - For Bots: Using Service Account
-- - Go to “APIs & Services > Credentials” and choose “Create credentials > Service account key”.
+- - Go to "APIs & Services > Credentials" and choose "Create credentials > Service account key".
 - - Fill out the form
-- - Click “Create” and “Done”.
-- - Press “Manage service accounts” above Service Accounts.
-- - Press on ⋮ near recently created service account and select “Manage keys” and then click on “ADD KEY > Create new key”.
-- - Select JSON key type and press “Create”.
+- - Click "Create" and "Done".
+- - Press "Manage service accounts" above Service Accounts.
+- - Press on : near recently created service account and select �Manage keys� and then click on "ADD KEY > Create new key".
+- - Select JSON key type and press "Create".
 - - You will automatically download a JSON file with credentials
-- - Remember the path to the downloaded credentials json file. Also, in the next step you’ll need the value of client_email from this file.
+- - Remember the path to the downloaded credentials json file. Also, in the next step you will need the value of client_email from this file.
 - - Move the downloaded json file to ~/.config/gspread/service_account.json. Windows users should put this file to %APPDATA%\gspread\service_account.json.
 - Setup a Google Spreasheet to be updated by sheetupdate
 - - In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai-kia-connect-monitor
@@ -171,7 +263,7 @@ Follow the steps in this link above, here is the summary of these steps:
 - configure to run "python summary.py sheetupdate" regularly, after having run "python monitor.py"
 
 ## kml.py
-transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations.
+Transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations.
 Lines are not written, when the following info is the same as previous line: longitude, latitude, engineOn, charging
 
 Usage: 
@@ -192,8 +284,7 @@ The following information is written in the kml file:
 Note:
 - the placemark lines are one-liners, so you can also search in monitor.kml
 
-How to import kml in Google Maps:
-https://www.spotzi.com/en/about/help-center/how-to-import-a-kml-into-google-maps/
+[How to import kml in Google Maps](https://www.spotzi.com/en/about/help-center/how-to-import-a-kml-into-google-maps/)
 
 ## shrink.py
 Simple Python3 script to shrink monitor.csv, identical lines removed (first date/time column excluded). Handy for analyzing with other tools (e.g. Excel) with less data.
@@ -209,7 +300,7 @@ Note:
 - True and False for EngineOn and Driving are replaced into respectively 1 and 0, so it is shorter and easier usable in e.g. Excel.
 
 ## Raspberry pi configuration
-Example script to run monitor.py once per hour on a linux based system.
+Example script [run_monitor_once.sh](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/run_monitor_once.sh) to run monitor.py on a linux based system.
 
 Steps:
 - create a directory hyundai_kia_connect_monitor in your home directory
@@ -227,8 +318,28 @@ crontab -e:
 Note: 
 - there is a limit in the number of request per country, but 1 request per hour should not hamper using the Bluelink or UVO Connect App at the same time
 
+I also want to update the google spreadsheet, so I adapted [run_monitor_once.sh](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/run_monitor_once.sh) to run a summary after running cacheupdate.
+The last line of run_monitor_once.sh is changed into:
+```
+/usr/bin/python -u ~/hyundai_kia_connect_monitor/monitor.py cacheupdate >> run_monitor_once.log 2>&1
+/usr/bin/python -u ~/hyundai_kia_connect_monitor/summary.py trip sheetupdate > run_monitor_once.summary.log 2>&1
+```
+
+And I did configure to run cacheupdate every 15 minutes (I have a 200 API calls limit in Europe and cacheupdate does not drain 12 volt battery).
+crontab -e:
+```
+*/15 * * * * ~/hyundai_kia_connect_monitor/run_monitor_once.sh >> ~/hyundai_kia_connect_monitor/run_monitor_once.log 2>&1
+```
+
+And I configured once a day a forceupdate at 6:10.
+crontab -e:
+```
+10 6 * * * /usr/bin/python -u ~/hyundai_kia_connect_monitor/monitor.py forceupdate >> ~/hyundai_kia_connect_monitor/run_monitor_once.log 2>&1
+```
+
 ## debug.py
-Same sort of python script as monitor.py, but debug logging enabled and all the (internal) data is just printed to standard output in pretty print. It uses the configuration from monitor.cfg
+Same sort of python script as monitor.py, but debug logging enabled and all the (internal) data is just printed to standard output in pretty print.
+It uses the configuration from monitor.cfg.
 
 Usage:
 ```
@@ -246,12 +357,11 @@ Here a csv file from 2022-09-17 till 2022-09-25 (about one week). I started with
 */30 6-19 * * * ~/hyundai_kia_connect_monitor/run_monitor_once.sh >> ~/hyundai_kia_connect_monitor/run_monitor_once.log 2>&1
 ```
 
-Example output file monitor.csv: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/monitor.csv
+Example output file [monitor.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/monitor.csv)
 
 ## python summary.py
 
-The summary.py standard output of the previous monitor.csv file: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_output.txt
-
+The summary.py [standard output of the previous monitor.csv file](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_output.txt)
 
 output:
 ```
@@ -296,7 +406,7 @@ YEARLY  , 2022-09-25,   9d ,  17794.9,  19089.5,  2867.3,  -2980.8,    6.4,     
 - 198.4 km one way with 6.0 km/kWh and 16.6 kWh/100km, 197.6 km back with 6.3 km/kWh and 15.9 km/kWh.
 - also shown is the average, minimum and maximum State Of Charge percentage and average, minimum and maximum of 12 Volt percentage. 
 - for better readability zero values are left out, because of configuration show_zero_values = False
-- At the end, averages are shown based on the data so far, TRIPAVG, DAYAVG, WEEKAVG, MONTHAVG and the predicition for a year: YEARLY
+- At the end, averages are shown based on the data so far, TRIPAVG, DAYAVG, WEEKAVG, MONTHAVG and the prediction for a year: YEARLY
 
 The SOC% can be used to see your habits about charging. Because wrongly someone posted for the IONIQ 5:
 > My dealer told me that Hyundai has no restrictions on battery charging. So that it is not an issue to just load up to 100% (and leave it). Have you heard any stories other than this?
@@ -492,9 +602,9 @@ DAY     , 2022-09-24, Sat  ,  17794.9,    407.8,    25.9,    -66.5,    6.1,     
 DAY     , 2022-09-25, Sun  ,  17794.9,         ,     5.6,         ,       ,          ,          ,      50, 50, 43, 50,      97, 97, 97, 97,         ,         ,         ,
 ```
 
-You can redirect the standard output to a file, e.g. summary.day.csv: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.csv
+You can redirect the standard output to a file, e.g. [summary.day.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.csv)
 
-Excel example using python summary.py day > summary.day.csv: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/blob/main/examples/summary.day.xlsx
+[Excel example using python summary.py day > summary.day.csv](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/blob/main/examples/summary.day.xlsx)
 
 Screenshot of excel example with some graphs:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.png)
@@ -681,7 +791,7 @@ TRIP  , 2022-10-13, 08:00,  18221.0,     21.3,        ,         ,       ,       
 DAY   , 2022-10-13, Thu  ,  18221.0,     28.2,    17.5,     -4.2,    6.7,      14.9,      1.03,      60, 51, 35, 60,      95, 95, 94, 95,        2,       2,      3
 ```
 
-If you look at the corresonding entries of monitor.csv:
+If you look at the corresponding entries of monitor.csv:
 ```
 2022-10-12 19:30:42+02:00, 5.124957, 51.68260, False, 85, 18192.8, 41, False, 0
 2022-10-13 06:00:42+02:00, 5.124957, 51.68260, False, 85, 18192.8, 41, False, 0
@@ -692,7 +802,7 @@ If you look at the corresonding entries of monitor.csv:
 2022-10-13 08:30:43+02:00, 5.124957, 51.68260, False, 95, 18221, 35, False, 0
 ```
 
-What has happended on those TRIPs:
+What has happened on those TRIPs:
 - till 07:30 I have driven 6.9 km till 07:05, put the car off (odometer is updated) and started a new trip around 7:10, which trip ended around 7:25, but did NOT put the car off (odometer is NOT updated).
 - these intermediate trips are not captured
 - At 7:25 I drove home again, only a few km, got home after 7:30, which has been captured at 8:00
@@ -736,7 +846,7 @@ Screenshot of spreadsheet:
 
 Input is previous monitor.csv file.
 
-The kml standard output: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/kml.py_output.txt
+[The kml standard output](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/kml.py_output.txt)
 ```
 C:\Users\Rick\git\monitor>python kml.py
   1: 20220917 15:00    (5.124957,51.68260 ) SOC: 54% 12V: 90% ODO: 17324.2
@@ -777,7 +887,7 @@ C:\Users\Rick\git\monitor>python kml.py
  36: 20220924 19:00 C  (5.124957,51.68260 ) SOC:  5% 12V: 97% ODO: 17794.9 (+197.6 since 20220924 18:30) charging plugged:2
 ```
 
-The kml output file monitor.kml: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/monitor.kml
+The kml output file [monitor.kml](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/monitor.kml)
 
 2022-09-24 I did a trip from 100% SOC to 5% SOC and driven around 400 km and started charging when back at home.
 
@@ -831,21 +941,21 @@ Note: "address" shows the address of a coordinate with geopy, because Nominatim 
 
 ## python shrink.py
 
-Example (based on earlier monitor.csv) outputfile shrinked_monitor.csv: https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/shrinked_monitor.csv
+Example (based on earlier monitor.csv) outputfile [shrinked_monitor.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/shrinked_monitor.csv)
 
-Excel example using shrinked_monitor.csv: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/blob/main/examples/shrinked_monitor.xlsx
+[Excel example using shrinked_monitor.csv](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/blob/main/examples/shrinked_monitor.xlsx)
 
 Screenshot of excel example with some graphs:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/shrinked_monitor.jpg)
 
 ## Remarks of using the tools for a month
-- The hyundai_kia_connect_api gives regularly exceptions, see this issue: https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/issues/62#issuecomment-1280045102
+- The hyundai_kia_connect_api gives regularly exceptions, [see this issue 62](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/issues/62#issuecomment-1280045102)
 - The retry mechanism (wait one minute and retry twice) seems a good workaround
 - If the car cannot be reached by bluelink then an exception will be thrown and no entry will appear in monitor.csv
-- I do not know what happens if the the number of calls allowed per day have been exceeded, probably an exception will be thrown and no entry will appear in monitor.csv
+- I do not know what happens if the number of calls allowed per day have been exceeded, probably an exception will be thrown and no entry will appear in monitor.csv
 - I have seen small drops and increases of SOC% (on my IONIQ 5 around 1% to 2%), because of temperature changes between e.g. evening and morning, I made this configurable via summary.cfg
-- Small trips will give inaccurate consumption figures, on the IONIQ 5 1% SOC difference is 0.7 kWh difference, so I made the minimum kWh consumption configurable via summary.cfg. A Smaller battery will have better accurracy, because 1% of e.g. 27 kWh makes 0.27 kWh delta's instead of 0.7 kWh in my case
-- I have seen once that SOC was reported wrongly in monitor.csv as zero, in summary.py I corrected this when the previous SOC% was not zero and delta is greather than 5
+- Small trips will give inaccurate consumption figures, on the IONIQ 5 1% SOC difference is 0.7 kWh difference, so I made the minimum kWh consumption configurable via summary.cfg. A Smaller battery will have better accuracy, because 1% of e.g. 27 kWh makes 0.27 kWh delta's instead of 0.7 kWh in my case
+- I have seen once that SOC was reported wrongly in monitor.csv as zero, in summary.py I corrected this when the previous SOC% was not zero and delta is greater than 5
 
 Occurrence of SOC% of 0: 
 ```
@@ -855,18 +965,19 @@ Occurrence of SOC% of 0:
 ```
 
 ## How to install python, packages and hyundai_connect_monitor
-Explanation for someone with no knowledge of python. I don't know what computer you have. Part of the tools is the regular retrieval of the data with the Python script monitor.py.   For this you need to install Python. I have installed Python 3.9.13.
-Here's more information about installing Python: https://realpython.com/installing-python/
+Explanation for someone with no knowledge of python. I don't know what computer you have. Part of the tools is the regular retrieval of the data with the Python script monitor.py.
+For this you need to install Python. I have installed Python 3.9.13.
+[Here is more information about installing Python](https://realpython.com/installing-python/)
 
 Steps:
-- Download the source code of hyundai_kia_connect_api v1.34.4 here: https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases/tag/v1.34.4
-- Download the latest hyundai_kia_connect_monitor release here: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases
-- Extract both and move the hyundai_kia_connect_api subfolder of hyundai_kia_connect_api-1.34.4 under hyundai_kia_connect_monitor.
+- Download the source code of [hyundai_kia_connect_api v1.40.11 here](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases/tag/v1.40.11)
+- Download the [latest hyundai_kia_connect_monitor release here](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases)
+- Extract both and move the hyundai_kia_connect_api subfolder of hyundai_kia_connect_api-1.40.11 under hyundai_kia_connect_monitor.
 - Then configure monitor.cfg
 - Then run: python monitor.py
 
-Probably some packages needed for Hyundai Connect API are not installed (error messages). Learn more about installing Python packages: https://packaging.python.org/en/latest/tutorials/installing-packages/
-I have installed the following packages (e.g. use python -m pip install "package_name"), see https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements.txt
+Probably some packages needed for Hyundai Connect API are not installed (error messages). [Learn more about installing Python packages](https://packaging.python.org/en/latest/tutorials/installing-packages/)
+I have installed the following packages (e.g. use python -m pip install "package_name"), see [requirements.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements.txt)
 
     beautifulsoup4==4.11.1
     python_dateutil==2.8.2

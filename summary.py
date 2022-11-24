@@ -19,9 +19,19 @@ def arg_has(string):
     for i in range(1, len(sys.argv)):
         if sys.argv[i].lower() == string:
             return True
-
     return False
 
+
+KEYWORD_LIST = ['trip', 'day', 'week', 'month', 'year', 'move', 'address', 'sheetupdate', '-trip', 'help', 'debug'] # noqa pylint:disable=line-too-long
+KEYWORD_ERROR = False
+for kindex in range(1, len(sys.argv)):
+    if not sys.argv[kindex].lower() in KEYWORD_LIST:
+        print("Unknown keyword: " + sys.argv[kindex])
+        KEYWORD_ERROR = True
+
+if KEYWORD_ERROR or arg_has('help'):
+    print('Usage: python summary.py [trip] [day] [week] [month] [year] [move] [address] [sheetupdate]') # noqa pylint:disable=line-too-long
+    exit()
 
 DEBUG = arg_has('debug')
 TRIP = len(sys.argv) == 1 or (arg_has('trip') and not arg_has('-trip'))
@@ -40,7 +50,7 @@ if SHEETUPDATE:
     MONTH = True
     YEAR = True
 
-INPUT = Path("monitor.csv")
+INPUT_CSV_FILE = Path("monitor.csv")
 
 # == read monitor in monitor.cfg ===========================
 config_parser = configparser.ConfigParser()
@@ -256,9 +266,12 @@ def print_summary(prefix, current, values, location_str, factor):
 
     if SHEETUPDATE and prefix.startswith('SHEET'):
         prefix = prefix.replace("SHEET ", "")
+        last_update_datetime = datetime.fromtimestamp(
+            INPUT_CSV_FILE.stat().st_mtime)
+        day_info = last_update_datetime.strftime("%Y-%m-%d %H:%M %a")
         SHEET.batch_update([{
             'range': 'A1:B1',
-            'values': [["Last update", f"{prefix}"]],
+            'values': [["Last update", f"{day_info}"]],
         }, {
             'range': 'A2:B2',
             'values': [[f"Odometer {ODO_METRIC}", f"{odo:.1f}"]],
@@ -313,6 +326,9 @@ def print_summary(prefix, current, values, location_str, factor):
          }, {
             'range': 'A19:B19',
             'values': [["#Moves", f"{t_moves}"]],
+        }, {
+            'range': 'A20:B20',
+            'values': [["Last entry", f"{prefix}"]],
         }])
     else:
         if ADDRESS:
@@ -331,11 +347,18 @@ def split_output_to_sheet_list(queue_output):
 def print_output_queue():
     """ print output queue """
     array = []
-    current_row = 20
+    current_row = 72
     for queue_output in LAST_OUTPUT_QUEUE:
-        current_row += 1
+        current_row -= 1
         list_output = split_output_to_sheet_list(queue_output)
         array.append({
+            'range': f"A{current_row}:U{current_row}",
+            'values': list_output,
+        })
+    # also generate empty row
+    current_row -= 1
+    list_output = split_output_to_sheet_list(',,,,,,,,,,,,,,,,,,,,')
+    array.append({
             'range': f"A{current_row}:U{current_row}",
             'values': list_output,
         })
@@ -677,7 +700,7 @@ def handle_line(split, prev_split, totals, last):
 
 def summary():
     """ summary of monitor.csv file """
-    with INPUT.open("r", encoding="utf-8") as inputfile:
+    with INPUT_CSV_FILE.open("r", encoding="utf-8") as inputfile:
         linecount = 0
         prev_index = -1
         prev_line = ''
@@ -690,8 +713,8 @@ def summary():
             linecount += 1
             debug(str(linecount) + ': LINE=[' + line + ']')
             index = line.find(',')
-            if index <= 0 or line.startswith("datetime"):
-                debug("Skipping line")
+            if index <= 0 or line.startswith("datetime") or prev_line == line:
+                debug(f"Skipping line:\n{line}\n{prev_line}")
                 continue  # skip headers and lines starting or without ,
             split = line.split(',')
             if not totals[T_DAY] or not same_day(parser.parse(split[DT]), parser.parse(prev_split[DT])) or prev_line[prev_index:] != line[index:]:    # noqa pylint:disable=line-too-long

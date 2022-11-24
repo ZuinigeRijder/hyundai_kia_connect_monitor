@@ -30,12 +30,39 @@ e.g. with Excel:
 - charging pattern over time
 - visited places
 """
+import sys
 import configparser
 import traceback
 import time
 from datetime import datetime
 from pathlib import Path
 from hyundai_kia_connect_api import VehicleManager
+
+
+# == arg_has =================================================================
+def arg_has(string):
+    """ arguments has string """
+    for i in range(1, len(sys.argv)):
+        if sys.argv[i].lower() == string:
+            return True
+
+    return False
+
+
+KEYWORD_LIST = ['forceupdate', 'cacheupdate', 'debug']
+KEYWORD_ERROR = False
+for kindex in range(1, len(sys.argv)):
+    if not sys.argv[kindex].lower() in KEYWORD_LIST:
+        print("Unknown keyword: " + sys.argv[kindex])
+        KEYWORD_ERROR = True
+
+if KEYWORD_ERROR or arg_has('help'):
+    print('Usage: python monitor.py [forceupdate|cacheupdate]')
+    exit()
+
+DEBUG = arg_has('debug')
+FORCEUPDATE = arg_has('forceupdate')
+CACHEUPDATE = arg_has('cacheupdate')
 
 MFILE = Path("monitor.csv")
 
@@ -49,9 +76,16 @@ BRAND = monitor_settings['brand']
 USERNAME = monitor_settings['username']
 PASSWORD = monitor_settings['password']
 PIN = monitor_settings['pin']
+FORCE_SECONDS = int(monitor_settings['force_update_seconds'])
 
 
-# == log =====================================================================
+# == subroutines =============================================================
+def debug(line):
+    """ print line if debugging """
+    if DEBUG:
+        print(datetime.now().strftime("%Y%m%d %H:%M:%S") + ': ' + line)
+
+
 def log(msg):
     """log a message prefixed with a date/time format yyyymmdd hh:mm:ss"""
     print(datetime.now().strftime("%Y%m%d %H:%M:%S") + ': ' + msg)
@@ -59,6 +93,7 @@ def log(msg):
 
 def writeln(string):
     """ append line at monitor text file with end of line character """
+    debug(string)
     with MFILE.open("a", encoding="utf-8") as file:
         file.write(string)
         file.write('\n')
@@ -78,8 +113,15 @@ def get_append_data():
                 pin=PIN
             )
             manager.check_and_refresh_token()
-            manager.check_and_force_update_vehicles(600)
-            # vm.update_all_vehicles_with_cached_state()
+            if CACHEUPDATE:
+                debug("CACHEUPDATE")
+                manager.update_all_vehicles_with_cached_state()
+            elif FORCEUPDATE:
+                debug("FORCEUPDATE")
+                manager.check_and_force_update_vehicles(600)
+            else:
+                debug(f"check_and_force_update_vehicles: {FORCE_SECONDS}")
+                manager.check_and_force_update_vehicles(FORCE_SECONDS)
 
             for _, vehicle in manager.vehicles.items():
                 writeln(
