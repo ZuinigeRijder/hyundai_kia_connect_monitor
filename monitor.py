@@ -77,6 +77,8 @@ USERNAME = monitor_settings['username']
 PASSWORD = monitor_settings['password']
 PIN = monitor_settings['pin']
 FORCE_SECONDS = int(monitor_settings['force_update_seconds'])
+USE_GEOCODE = monitor_settings['use_geocode'].lower() == 'true'
+USE_GEOCODE_EMAIL = monitor_settings['use_geocode_email'].lower() == 'true'
 
 
 # == subroutines =============================================================
@@ -110,7 +112,9 @@ def get_append_data():
                 brand=int(BRAND),
                 username=USERNAME,
                 password=PASSWORD,
-                pin=PIN
+                pin=PIN,
+                geocode_api_enable=USE_GEOCODE,
+                geocode_api_use_email=USE_GEOCODE_EMAIL
             )
             manager.check_and_refresh_token()
             if CACHEUPDATE:
@@ -124,6 +128,12 @@ def get_append_data():
                 manager.check_and_force_update_vehicles(FORCE_SECONDS)
 
             for _, vehicle in manager.vehicles.items():
+                geocode = ''
+                if USE_GEOCODE:
+                    if len(vehicle.geocode) > 0:
+                        # replace comma by semicolon for easier splitting
+                        geocode = ', ' + vehicle.geocode[0].replace(',', ';')
+
                 writeln(
                     str(vehicle.last_updated_at) +
                     ', ' + str(vehicle.location_longitude) +
@@ -133,7 +143,8 @@ def get_append_data():
                     ', ' + str(vehicle.odometer) +
                     ', ' + str(vehicle.ev_battery_percentage) +
                     ', ' + str(vehicle.ev_battery_is_charging) +
-                    ', ' + str(vehicle.ev_battery_is_plugged_in)
+                    ', ' + str(vehicle.ev_battery_is_plugged_in) +
+                    geocode
                 )
             retries = 0  # successfully end while loop
         except Exception as ex:  # pylint: disable=broad-except
@@ -149,6 +160,6 @@ if not MFILE.is_file():
     MFILE.touch()
     writeln(
         "datetime, longitude, latitude, engineOn" +
-        ", 12V%, odometer, SOC%, charging, plugged"
+        ", 12V%, odometer, SOC%, charging, plugged, address"
     )
 get_append_data()  # do the work

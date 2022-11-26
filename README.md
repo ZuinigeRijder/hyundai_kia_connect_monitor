@@ -99,6 +99,8 @@ username = your_email
 password = your_password
 pin =
 force_update_seconds = 28800
+use_geocode = True
+use_geocode_email = True
 ```
 
 Explanation of the configuration items:
@@ -108,6 +110,8 @@ Explanation of the configuration items:
 - password: password of your bluelink account
 - pin: pincode of your bluelink account, required for CANADA, and potentially USA, otherwise pass a blank string
 - force_update_seconds: do a forceupdate when the latest cached server information is older than the specified seconds (28800 seconds = 8 hours)
+- use_geocode: (default: True) find address with the longitude/latitude for each entry
+- use_geocode_email: (default: True) use email to avoid abuse of address lookup  
 
 Following information from hyundai_kia_connect_api is added to the monitor.csv file:
 - datetime
@@ -119,6 +123,7 @@ Following information from hyundai_kia_connect_api is added to the monitor.csv f
 - SOC%
 - charging
 - plugged
+- address (dependent on use_geocode configuration)
 
 This information is used by the other tools:
 - summary.py

@@ -79,6 +79,7 @@ ODO = 5  # odometer
 SOC = 6  # SOC%
 CHARGING = 7  # charging
 PLUGGED = 8  # plugged
+LOCATION = 9  # location address (optional field)
 
 # indexes to total tuples
 T_CURRENT_DAY = 0
@@ -176,12 +177,55 @@ def print_output_and_update_queue(output):
     print(output)
 
 
+def split_output_to_sheet_list(queue_output):
+    """ split output to sheet list """
+    split = queue_output.split(',')
+    return [split]
+
+
+def print_output_queue():
+    """ print output queue """
+    first_row = 22
+    last_row = 73
+    array = []
+
+    # first row is empty row, clean it
+    current_row = first_row
+    list_output = split_output_to_sheet_list(",,,,,,,,,,,,,,,,,,,,,")
+    debug(f"clear row: {current_row}")
+    array.append({
+        'range': f"A{current_row}:V{current_row}",
+        'values': list_output,
+    })
+
+    # clean bottom rows
+    qlen = len(LAST_OUTPUT_QUEUE)
+    current_row = last_row - (50 - qlen)
+    debug(f"current_row={current_row} last_row={last_row} queue_len={qlen}")
+    for _ in range(current_row, last_row):
+        debug(f"clear row: {current_row}")
+        array.append({
+                'range': f"A{current_row}:V{current_row}",
+                'values': list_output,
+            })
+        current_row += 1
+
+    # print queue entries in reverse order, so in spreadsheet latest is first
+    current_row = last_row - (50 - qlen)
+    for queue_output in LAST_OUTPUT_QUEUE:
+        current_row -= 1
+        debug(f"write row: {current_row} {queue_output}")
+        list_output = split_output_to_sheet_list(queue_output)
+        array.append({
+            'range': f"A{current_row}:V{current_row}",
+            'values': list_output,
+        })
+    SHEET.batch_update(array)
+
+
 def print_header_and_update_queue():
     """print header and update queue"""
-    if ADDRESS:
-        output=f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips,   #moves, Address"  # noqa pylint:disable=line-too-long
-    else:
-        output=f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips,   #moves"  # noqa pylint:disable=line-too-long
+    output=f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips,   #moves, Address"  # noqa pylint:disable=line-too-long
     print_output_and_update_queue(output)
 
 
@@ -190,7 +234,29 @@ def float_to_string(input_value):
     return (f"{input_value:9.1f}").rstrip('0').rstrip('.')
 
 
-def print_summary(prefix, current, values, location_str, factor):
+def get_address(split):
+    """ get address """
+    debug(f"get_address: str{split}")
+    location_str = ""
+    if len(split) > 9:
+        location_str = split[LOCATION].strip()
+        if len(location_str) > 0:
+            location_str = ' "' + location_str + '"'
+
+    if ADDRESS and len(location_str) == 0:
+        sleep(1)  # do not abuse Nominatim, 1 request per second
+        geolocator = \
+            Nominatim(user_agent="hyundai_kia_connect_monitor")
+        location = geolocator.reverse(
+            split[LAT].strip() + ", " + split[LON].strip()
+        )
+        if len(location.address) > 0:
+            location_str = ' "' + location.address + '"'
+
+    return location_str
+
+
+def print_summary(prefix, current, values, split, factor):
     """ print_summary """
     debug("print_summary")
     debug("PREV  : " + str(values))
@@ -240,7 +306,6 @@ def print_summary(prefix, current, values, location_str, factor):
             if km_mi_per_kwh > 0.0:
                 kwh_per_km_mi = 100 / km_mi_per_kwh
                 kwh_per_km_mi_str = f"{kwh_per_km_mi:10.1f}"
-
     else:
         # do not show positive discharges
         t_discharged_perc = 0
@@ -264,6 +329,8 @@ def print_summary(prefix, current, values, location_str, factor):
     if SHOW_ZERO_VALUES or t_moves != 0:
         t_moves_str = float_to_string(t_moves)
 
+    location_str = get_address(split)
+
     if SHEETUPDATE and prefix.startswith('SHEET'):
         prefix = prefix.replace("SHEET ", "")
         last_update_datetime = datetime.fromtimestamp(
@@ -274,98 +341,71 @@ def print_summary(prefix, current, values, location_str, factor):
             'values': [["Last update", f"{day_info}"]],
         }, {
             'range': 'A2:B2',
-            'values': [[f"Odometer {ODO_METRIC}", f"{odo:.1f}"]],
+            'values': [["Last entry", f"{prefix}"]],
         }, {
             'range': 'A3:B3',
-            'values': [[f"Driven {ODO_METRIC}", f"{delta_odo:.1f}"]],
+            'values': [["Last address", f"{location_str}"]],
         }, {
             'range': 'A4:B4',
-            'values': [["+kWh", f"{charged_kwh:.1f}"]],
+            'values': [[f"Odometer {ODO_METRIC}", f"{odo:.1f}"]],
         }, {
             'range': 'A5:B5',
-            'values': [["-kWh", f"{discharged_kwh:.1f}"]],
+            'values': [[f"Driven {ODO_METRIC}", f"{delta_odo:.1f}"]],
         }, {
             'range': 'A6:B6',
-            'values': [[f"{ODO_METRIC}/kWh", f"{km_mi_per_kwh:.1f}"]],
+            'values': [["+kWh", f"{charged_kwh:.1f}"]],
         }, {
             'range': 'A7:B7',
-            'values': [[f"kWh/100{ODO_METRIC}", f"{kwh_per_km_mi:.1f}"]],
+            'values': [["-kWh", f"{discharged_kwh:.1f}"]],
         }, {
             'range': 'A8:B8',
-            'values': [[f"Cost {COST_CURRENCY}", f"{cost:.2f}"]],
+            'values': [[f"{ODO_METRIC}/kWh", f"{km_mi_per_kwh_str}"]],
         }, {
             'range': 'A9:B9',
-            'values': [["Current SOC%", f"{t_soc_cur}"]],
+            'values': [[f"kWh/100{ODO_METRIC}", f"{kwh_per_km_mi_str}"]],
         }, {
             'range': 'A10:B10',
-            'values': [["Average SOC%", f"{t_soc_avg}"]],
+            'values': [[f"Cost {COST_CURRENCY}", f"{cost_str}"]],
         }, {
             'range': 'A11:B11',
-            'values': [["Min SOC%", f"{t_soc_min}"]],
+            'values': [["Current SOC%", f"{t_soc_cur}"]],
         }, {
             'range': 'A12:B12',
-            'values': [["Max SOC%", f"{t_soc_max}"]],
+            'values': [["Average SOC%", f"{t_soc_avg}"]],
         }, {
             'range': 'A13:B13',
-            'values': [["Current 12V%", f"{t_volt12_cur}"]],
+            'values': [["Min SOC%", f"{t_soc_min}"]],
         }, {
             'range': 'A14:B14',
-            'values': [["Average 12V%", f"{t_volt12_avg}"]],
+            'values': [["Max SOC%", f"{t_soc_max}"]],
         }, {
             'range': 'A15:B15',
-            'values': [["Min 12V%", f"{t_volt12_min}"]],
+            'values': [["Current 12V%", f"{t_volt12_cur}"]],
         }, {
             'range': 'A16:B16',
-            'values': [["Max 12V%", f"{t_volt12_max}"]],
+            'values': [["Average 12V%", f"{t_volt12_avg}"]],
         }, {
             'range': 'A17:B17',
-            'values': [["#Charges", f"{t_charges}"]],
+            'values': [["Min 12V%", f"{t_volt12_min}"]],
         }, {
             'range': 'A18:B18',
-            'values': [["#Trips", f"{t_trips}"]],
-         }, {
+            'values': [["Max 12V%", f"{t_volt12_max}"]],
+        }, {
             'range': 'A19:B19',
-            'values': [["#Moves", f"{t_moves}"]],
+            'values': [["#Charges", f"{t_charges}"]],
         }, {
             'range': 'A20:B20',
-            'values': [["Last entry", f"{prefix}"]],
+            'values': [["#Trips", f"{t_trips}"]],
+         }, {
+            'range': 'A21:B21',
+            'values': [["#Moves", f"{t_moves}"]],
         }])
     else:
-        if ADDRESS:
-            output=f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{t_moves_str:9},{location_str}"  # noqa pylint:disable=line-too-long
-        else:
-            output=f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{t_moves_str:9}"  # noqa pylint:disable=line-too-long
+        output=f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{t_moves_str:9},{location_str}"  # noqa pylint:disable=line-too-long
         print_output_and_update_queue(output)
 
 
-def split_output_to_sheet_list(queue_output):
-    """ split output to sheet list """
-    split = queue_output.split(',')
-    return [split]
-
-
-def print_output_queue():
-    """ print output queue """
-    array = []
-    current_row = 72
-    for queue_output in LAST_OUTPUT_QUEUE:
-        current_row -= 1
-        list_output = split_output_to_sheet_list(queue_output)
-        array.append({
-            'range': f"A{current_row}:U{current_row}",
-            'values': list_output,
-        })
-    # also generate empty row
-    current_row -= 1
-    list_output = split_output_to_sheet_list(',,,,,,,,,,,,,,,,,,,,')
-    array.append({
-            'range': f"A{current_row}:U{current_row}",
-            'values': list_output,
-        })
-    SHEET.batch_update(array)
-
-
-def print_summaries(current_day_values, totals, last):
+def print_summaries(current_day_values, totals, split, last):
     """ print_summaries """
     global DAY_COUNTER  # pylint:disable=global-statement
     debug(f"print_summaries: DAY_COUNTER: {DAY_COUNTER} {totals}")
@@ -387,7 +427,7 @@ def print_summaries(current_day_values, totals, last):
                 f"DAY     , {day_str}, {day_info:5}",
                 current_day_values,
                 t_day,
-                "",
+                split,
                 1.0
             )
         t_day = current_day_values
@@ -399,7 +439,7 @@ def print_summaries(current_day_values, totals, last):
             f"WEEK    , {day_str:10}, WK {weeknr:2}",
             current_day_values,
             t_week,
-            "",
+            split,
             1.0
         )
         t_week = current_day_values
@@ -410,7 +450,7 @@ def print_summaries(current_day_values, totals, last):
             f"MONTH   , {day_str:10}, {month_info:5}",
             current_day_values,
             t_month,
-            "",
+            split,
             1.0
         )
         t_month = current_day_values
@@ -420,7 +460,7 @@ def print_summaries(current_day_values, totals, last):
             f"YEAR    , {day_str:10}, {year:5}",
             current_day_values,
             t_year,
-            "",
+            split,
             1.0
         )
         trips = t_year[T_TRIPS]
@@ -428,35 +468,35 @@ def print_summaries(current_day_values, totals, last):
             f"TRIPAVG , {day_str:10}, {trips:3}t ",
             current_day_values,
             t_year,
-            "",
+            split,
             1/trips
         )
         print_summary(
             f"DAYAVG  , {day_str:10}, {DAY_COUNTER:3}d ",
             current_day_values,
             t_year,
-            "",
+            split,
             1/DAY_COUNTER
         )
         print_summary(
             f"WEEKAVG , {day_str:10}, {DAY_COUNTER:3}d ",
             current_day_values,
             t_year,
-            "",
+            split,
             1/DAY_COUNTER*7
         )
         print_summary(
             f"MONTHAVG, {day_str:10}, {DAY_COUNTER:3}d ",
             current_day_values,
             t_year,
-            "",
+            split,
             365/DAY_COUNTER/12
         )
         print_summary(
             f"YEARLY  , {day_str:10}, {DAY_COUNTER:3}d ",
             current_day_values,
             t_year,
-            "",
+            split,
             365/DAY_COUNTER
         )
         if SHEETUPDATE and last:
@@ -466,7 +506,7 @@ def print_summaries(current_day_values, totals, last):
                 f"SHEET {day_str:10} {day_info} {DAY_COUNTER:3}d",
                 current_day_values,
                 t_year,
-                "",
+                split,
                 1.0
             )
 
@@ -604,19 +644,6 @@ def keep_track_of_totals(values, split, prev_split, handle_moved):
     return values
 
 
-def get_address(split):
-    """ get address """
-    location_str = ""
-    if ADDRESS:
-        sleep(1)  # do not abuse Nominatim, 1 request per second
-        geolocator = \
-            Nominatim(user_agent="hyundai_kia_connect_monitor")
-        location = geolocator.reverse(
-            split[LAT].strip() + ", " + split[LON].strip())
-        location_str = ' "' + location.address + '"'
-    return location_str
-
-
 def handle_line(split, prev_split, totals, last):
     """ handle_line """
     debug(f"handle_line: {split}, {prev_split}")
@@ -671,7 +698,7 @@ def handle_line(split, prev_split, totals, last):
                     f"MOVE    , {day_move_str:10}, {day_move_info:5}",
                     t_moves_init,
                     t_moves,
-                    get_address(split),
+                    split,
                     1.0
                 )
 
@@ -684,7 +711,7 @@ def handle_line(split, prev_split, totals, last):
                     f"TRIP    , {day_trip_str:10}, {day_info:5}",
                     current_day_values,
                     t_trip,
-                    get_address(split),
+                    split,
                     1.0
                 )
                 t_trip = current_day_values
@@ -693,7 +720,7 @@ def handle_line(split, prev_split, totals, last):
 
     if day_change or last:
         debug(f"DAY change: {t_day}")
-        totals = print_summaries(current_day_values, totals, last)
+        totals = print_summaries(current_day_values, totals, split, last)
 
     return totals
 
