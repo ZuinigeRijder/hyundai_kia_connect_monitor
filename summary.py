@@ -4,14 +4,18 @@ Simple Python3 script to make a summary of monitor.csv
 """
 import sys
 import configparser
+import traceback
+import time
 from datetime import datetime, timedelta
-from time import sleep
 from pathlib import Path
 from collections import deque
 import gspread
 from dateutil import parser
-from geopy.distance import geodesic
-from geopy.geocoders import Nominatim
+
+
+def log(msg):
+    """log a message prefixed with a date/time format yyyymmdd hh:mm:ss"""
+    print(datetime.now().strftime("%Y%m%d %H:%M:%S") + ': ' + msg)
 
 
 def arg_has(string):
@@ -22,7 +26,21 @@ def arg_has(string):
     return False
 
 
-KEYWORD_LIST = ['trip', 'day', 'week', 'month', 'year', 'move', 'address', 'sheetupdate', '-trip', 'help', 'debug'] # noqa pylint:disable=line-too-long
+def to_int(string):
+    """ convert to int """
+    if "None" in string:
+        return -1
+    return int(string)
+
+
+def to_float(string):
+    """ convert to float """
+    if "None" in string:
+        return 0.0
+    return float(string)
+
+
+KEYWORD_LIST = ['trip', 'day', 'week', 'month', 'year', 'sheetupdate', '-trip', 'help', 'debug'] # noqa pylint:disable=line-too-long
 KEYWORD_ERROR = False
 for kindex in range(1, len(sys.argv)):
     if not sys.argv[kindex].lower() in KEYWORD_LIST:
@@ -30,7 +48,7 @@ for kindex in range(1, len(sys.argv)):
         KEYWORD_ERROR = True
 
 if KEYWORD_ERROR or arg_has('help'):
-    print('Usage: python summary.py [trip] [day] [week] [month] [year] [move] [address] [sheetupdate]') # noqa pylint:disable=line-too-long
+    print('Usage: python summary.py [trip] [day] [week] [month] [year] [sheetupdate]') # noqa pylint:disable=line-too-long
     exit()
 
 DEBUG = arg_has('debug')
@@ -39,10 +57,6 @@ DAY = len(sys.argv) == 1 or arg_has('day') or arg_has('-trip')
 WEEK = len(sys.argv) == 1 or arg_has('week') or arg_has('-trip')
 MONTH = len(sys.argv) == 1 or arg_has('month') or arg_has('-trip')
 YEAR = len(sys.argv) == 1 or arg_has('year') or arg_has('-trip')
-MOVES = arg_has('move')
-ADDRESS = arg_has('address')
-if ADDRESS and not TRIP and not MOVES:
-    TRIP = True
 SHEETUPDATE = arg_has('sheetupdate')
 if SHEETUPDATE:
     DAY = True
@@ -58,10 +72,10 @@ config_parser.read('summary.cfg')
 monitor_settings = dict(config_parser.items('summary'))
 
 ODO_METRIC = monitor_settings['odometer_metric'].lower()
-NET_BATTERY_SIZE_KWH = float(monitor_settings['net_battery_size_kwh'])
-AVERAGE_COST_PER_KWH = float(monitor_settings['average_cost_per_kwh'])
+NET_BATTERY_SIZE_KWH = to_float(monitor_settings['net_battery_size_kwh'])
+AVERAGE_COST_PER_KWH = to_float(monitor_settings['average_cost_per_kwh'])
 COST_CURRENCY = monitor_settings['cost_currency']
-MIN_CONSUMPTION_DISCHARGE_KWH = float(
+MIN_CONSUMPTION_DISCHARGE_KWH = to_float(
     monitor_settings['min_consumption_discharge_kwh'])
 SMALL_POSITIVE_DELTA = int(
     monitor_settings['ignore_small_positive_delta_soc'])
@@ -97,7 +111,6 @@ T_VOLT12_CUR = 11
 T_VOLT12_AVG = 12
 T_VOLT12_MIN = 13
 T_VOLT12_MAX = 14
-T_MOVES = 15
 
 # indexes to totals tuples
 T_DAY = 0
@@ -124,22 +137,13 @@ def init(current_day, odo, soc, volt12):
     # current_day, odo, charged_perc, discharged_perc, charges, trips,
     # elapsed_minutes,
     # soc_cur, soc_avg, soc_min, soc_max,
-    # 12v_cur, 12v_avg, 12v_min, 12v_max,
-    # moves
+    # 12v_cur, 12v_avg, 12v_min, 12v_max
     debug(f"init({current_day})")
     return (
         current_day, odo, 0, 0, 0, 0, 0,
         soc, soc, soc, soc,  # SOC%
-        volt12, volt12, volt12, volt12,  # 12V%
-        0                     # moves
+        volt12, volt12, volt12, volt12  # 12V%
     )
-
-
-def to_int(string):
-    """ convert to int """
-    if "None" in string:
-        return -1
-    return int(string)
 
 
 def same_year(d_1: datetime, d_2: datetime):
@@ -225,7 +229,7 @@ def print_output_queue():
 
 def print_header_and_update_queue():
     """print header and update queue"""
-    output=f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips,   #moves, Address"  # noqa pylint:disable=line-too-long
+    output=f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips, Address"  # noqa pylint:disable=line-too-long
     print_output_and_update_queue(output)
 
 
@@ -243,16 +247,6 @@ def get_address(split):
         if len(location_str) > 0:
             location_str = ' "' + location_str + '"'
 
-    if ADDRESS and len(location_str) == 0:
-        sleep(1)  # do not abuse Nominatim, 1 request per second
-        geolocator = \
-            Nominatim(user_agent="hyundai_kia_connect_monitor")
-        location = geolocator.reverse(
-            split[LAT].strip() + ", " + split[LON].strip()
-        )
-        if len(location.address) > 0:
-            location_str = ' "' + location.address + '"'
-
     return location_str
 
 
@@ -263,6 +257,9 @@ def print_summary(prefix, current, values, split, factor):
     debug("CURR  : " + str(current))
     debug("VALUES: " + str(values))
     odo = current[T_ODO]
+    if odo == 0.0:
+        return  # bad line
+
     delta_odo = round(odo - values[T_ODO], 1) * factor
     odo_str = ''
     if odo != 0.0:
@@ -275,7 +272,6 @@ def print_summary(prefix, current, values, split, factor):
         t_discharged_perc = 0
     t_charges = values[T_CHARGES] * factor
     t_trips = values[T_TRIPS] * factor
-    t_moves = values[T_MOVES] * factor
 
     t_elapsed_minutes = max(values[T_ELAPSED_MINUTES], 1)
     t_soc_cur = values[T_SOC_CUR]
@@ -325,9 +321,6 @@ def print_summary(prefix, current, values, split, factor):
     t_trips_str = ""
     if SHOW_ZERO_VALUES or t_trips != 0:
         t_trips_str = float_to_string(t_trips)
-    t_moves_str = ""
-    if SHOW_ZERO_VALUES or t_moves != 0:
-        t_moves_str = float_to_string(t_moves)
 
     location_str = get_address(split)
 
@@ -396,12 +389,9 @@ def print_summary(prefix, current, values, split, factor):
         }, {
             'range': 'A20:B20',
             'values': [["#Trips", f"{t_trips}"]],
-         }, {
-            'range': 'A21:B21',
-            'values': [["#Moves", f"{t_moves}"]],
         }])
     else:
-        output=f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{t_moves_str:9},{location_str}"  # noqa pylint:disable=line-too-long
+        output=f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{location_str}"  # noqa pylint:disable=line-too-long
         print_output_and_update_queue(output)
 
 
@@ -517,11 +507,18 @@ def print_summaries(current_day_values, totals, split, last):
     return totals
 
 
-def keep_track_of_totals(values, split, prev_split, handle_moved):
+def keep_track_of_totals(values, split, prev_split):
     """ keep_track_of_totals """
     debug("keep track of totals")
     debug("prev_split: " + str(prev_split))
     debug("     split: " + str(split))
+
+    odo = to_float(split[ODO].strip())
+    if odo == 0.0:
+        return values  # bad line
+    prev_odo = to_float(prev_split[ODO].strip())
+    if prev_odo == 0.0:
+        return values  # bad line
 
     t_odo = values[T_ODO]
     t_charged_perc = values[T_CHARGED_PERC]
@@ -535,26 +532,13 @@ def keep_track_of_totals(values, split, prev_split, handle_moved):
     t_volt12_avg = values[T_VOLT12_AVG]
     t_volt12_min = values[T_VOLT12_MIN]
     t_volt12_max = values[T_VOLT12_MAX]
-    t_moves = values[T_MOVES]
 
-    delta_odo = float(split[ODO].strip()) - float(prev_split[ODO].strip())
+    delta_odo = max(0.0, odo - prev_odo)
     coord_changed = (
-        float(split[LAT].strip()) != float(prev_split[LAT].strip()) or
-        float(split[LON].strip()) != float(prev_split[LON].strip())
+        to_float(split[LAT].strip()) != to_float(prev_split[LAT].strip()) or
+        to_float(split[LON].strip()) != to_float(prev_split[LON].strip())
     )
-    moved = coord_changed or delta_odo
-    if coord_changed:
-        t_moves += 1
-        if MOVES and handle_moved:
-            debug("Coordinate changed")
-            loc = (float(split[LAT].strip()), float(split[LON].strip()))
-            prev_loc = (
-                float(prev_split[LAT].strip()), float(prev_split[LON].strip()))
-            t_odo = 0.0
-            if ODO_METRIC == "km":
-                t_odo = -geodesic(loc, prev_loc).kilometers
-            elif ODO_METRIC == "mi":
-                t_odo = -geodesic(loc, prev_loc).miles
+    moved = coord_changed or delta_odo != 0.0
 
     soc = to_int(split[SOC].strip())
     prev_soc = to_int(prev_split[SOC].strip())
@@ -637,8 +621,7 @@ def keep_track_of_totals(values, split, prev_split, handle_moved):
         volt12,
         t_volt12_avg,
         t_volt12_min,
-        t_volt12_max,
-        t_moves
+        t_volt12_max
     )
     debug("     after: " + str(values))
     return values
@@ -647,10 +630,13 @@ def keep_track_of_totals(values, split, prev_split, handle_moved):
 def handle_line(split, prev_split, totals, last):
     """ handle_line """
     debug(f"handle_line: {split}, {prev_split}")
+    odo = to_float(split[ODO].strip())
+    if odo == 0.0:
+        return totals  # bad line
     current_day = parser.parse(split[DT])
     current_day_values = init(
         current_day,
-        float(split[ODO].strip()),
+        odo,
         to_int(split[SOC]),
         to_int(split[V12]))
     t_day = totals[T_DAY]
@@ -678,32 +664,15 @@ def handle_line(split, prev_split, totals, last):
     # take into account totals per line
     if not last:  # skip keep_track_of_totals for last entry
         if DAY:
-            t_day = keep_track_of_totals(t_day, split, prev_split, False)
+            t_day = keep_track_of_totals(t_day, split, prev_split)
         if WEEK:
-            t_week = keep_track_of_totals(t_week, split, prev_split, False)
+            t_week = keep_track_of_totals(t_week, split, prev_split)
         if MONTH:
-            t_month = keep_track_of_totals(t_month, split, prev_split, False)
+            t_month = keep_track_of_totals(t_month, split, prev_split)
         if YEAR:
-            t_year = keep_track_of_totals(t_year, split, prev_split, False)
-
-        if MOVES:
-            t_moves_init = init(
-                current_day, 0.0,  to_int(split[SOC]), to_int(split[V12]))
-            t_moves = keep_track_of_totals(
-                t_moves_init, split, prev_split, True)
-            if t_moves[T_MOVES] > 0:
-                day_move_str = current_day.strftime("%Y-%m-%d")
-                day_move_info = current_day.strftime("%H:%M")
-                print_summary(
-                    f"MOVE    , {day_move_str:10}, {day_move_info:5}",
-                    t_moves_init,
-                    t_moves,
-                    split,
-                    1.0
-                )
-
+            t_year = keep_track_of_totals(t_year, split, prev_split)
         if TRIP:
-            t_trip = keep_track_of_totals(t_trip, split, prev_split, False)
+            t_trip = keep_track_of_totals(t_trip, split, prev_split)
             if t_trip[T_TRIPS] > 0:
                 day_trip_str = current_day.strftime("%Y-%m-%d")
                 day_info = current_day.strftime("%H:%M")
@@ -768,11 +737,31 @@ def summary():
 
 
 if SHEETUPDATE:
-    gc = gspread.service_account()
-    spreadsheet = gc.open("hyundai-kia-connect-monitor")
-    SHEET = spreadsheet.sheet1
+    RETRIES = 2
+    while RETRIES > 0:
+        try:
+            gc = gspread.service_account()
+            spreadsheet = gc.open("hyundai-kia-connect-monitor")
+            SHEET = spreadsheet.sheet1
+            RETRIES = 0
+        except Exception as ex:  # pylint: disable=broad-except
+            log('Exception: ' + str(ex))
+            traceback.print_exc()
+            RETRIES -= 1
+            log("Sleeping a minute")
+            time.sleep(60)
 
 summary()  # do the work
 
 if SHEETUPDATE:
-    print_output_queue()
+    RETRIES = 2
+    while RETRIES > 0:
+        try:
+            print_output_queue()
+            RETRIES = 0
+        except Exception as ex:  # pylint: disable=broad-except
+            log('Exception: ' + str(ex))
+            traceback.print_exc()
+            RETRIES -= 1
+            log("Sleeping a minute")
+            time.sleep(60)

@@ -30,8 +30,6 @@ https://www.spotzi.com/en/about/help-center/how-to-import-a-kml-into-google-maps
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from time import sleep
-from geopy.geocoders import Nominatim
 
 INPUT = Path("monitor.csv")
 OUTPUT = Path("monitor.kml")
@@ -46,6 +44,7 @@ ODO = 5  # odometer
 SOC = 6  # SOC%
 CHARGING = 7  # charging
 PLUGGED = 8  # plugged
+LOCATION = 9  # location address (optional field)
 
 
 def arg_has(string):
@@ -57,7 +56,11 @@ def arg_has(string):
     return False
 
 
-ADDRESS = arg_has('address')
+def to_float(string):
+    """ convert to float """
+    if "None" in string:
+        return 0.0
+    return float(string)
 
 
 def write(outputfile, line):
@@ -90,16 +93,12 @@ def strip_datetime(string) -> str:
     return string
 
 
-def get_address(lat, lon):
+def get_address(split):
     """ get address """
-    location_str = ""
-    if ADDRESS:
-        sleep(1)  # do not abuse Nominatim, 1 request per second
-        geolocator = \
-            Nominatim(user_agent="hyundai_kia_connect_monitor")
-        location = geolocator.reverse(
-            lat + ", " + lon)
-        location_str = ' "' + location.address + '"'
+    location_str = ''
+    if len(split) > 9:
+        location_str = split[LOCATION].strip()
+
     return location_str
 
 
@@ -112,7 +111,9 @@ def write_kml(outputfile, count, items, prev_items):
     voltage_12 = items[V12].strip()
     if voltage_12 == 'None':
         voltage_12 = '-1'
-    odometer = float(items[ODO].strip())
+    odometer = to_float(items[ODO].strip())
+    if odometer == 0.0:
+        return  # bad line
     soc = items[SOC].strip()
     if soc == 'None':
         soc = '-1'
@@ -129,16 +130,16 @@ def write_kml(outputfile, count, items, prev_items):
         name += ' '
 
     coordinates = f'<coordinates>{lon}, {lat}</coordinates>'
-    address = get_address(lat, lon)
+    address = get_address(items)
     if address == '':
         description = f'SOC:{soc:>3}% 12V:{voltage_12:>3}% ODO:{odometer:8.1f}'  # noqa pylint:disable=line-too-long
     else:
-        description = f'SOC:{soc:>3}% 12V:{voltage_12:>3}% ODO:{odometer:8.1f} Address:{address}      '  # noqa pylint:disable=line-too-long
+        description = f'SOC:{soc:>3}% 12V:{voltage_12:>3}% ODO:{odometer:8.1f} Address: {address}'  # noqa pylint:disable=line-too-long
 
     delta_odometer = 0
     if len(prev_items) > 8:
         delta_odometer = round(
-            odometer - float(prev_items[ODO].strip()), 1)
+            odometer - to_float(prev_items[ODO].strip()), 1)
         if delta_odometer != 0.0:
             if delta_odometer > 0.0:
                 description += ' (+' + str(delta_odometer)

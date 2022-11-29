@@ -127,6 +127,7 @@ def get_append_data():
                 debug(f"check_and_force_update_vehicles: {FORCE_SECONDS}")
                 manager.check_and_force_update_vehicles(FORCE_SECONDS)
 
+            line = ''
             for _, vehicle in manager.vehicles.items():
                 geocode = ''
                 if USE_GEOCODE:
@@ -134,7 +135,7 @@ def get_append_data():
                         # replace comma by semicolon for easier splitting
                         geocode = ', ' + vehicle.geocode[0].replace(',', ';')
 
-                writeln(
+                line = (
                     str(vehicle.last_updated_at) +
                     ', ' + str(vehicle.location_longitude) +
                     ', ' + str(vehicle.location_latitude) +
@@ -146,7 +147,17 @@ def get_append_data():
                     ', ' + str(vehicle.ev_battery_is_plugged_in) +
                     geocode
                 )
-            retries = 0  # successfully end while loop
+                if 'None, None' in line:  # something gone wrong, retry
+                    log(f"Skipping Unexpected line: {line}")
+                else:
+                    writeln(line)
+
+            if 'None, None' in line:  # something gone wrong, retry
+                retries -= 1
+                log("Sleeping a minute")
+                time.sleep(60)
+            else:
+                retries = 0  # successfully end while loop
         except Exception as ex:  # pylint: disable=broad-except
             log('Exception: ' + str(ex))
             traceback.print_exc()
