@@ -97,7 +97,7 @@ brand = 2
 username = your_email
 password = your_password
 pin =
-force_update_seconds = 28800
+force_update_seconds = 604800
 use_geocode = True
 use_geocode_email = True
 ```
@@ -108,7 +108,7 @@ Explanation of the configuration items:
 - username: your bluelink account email address
 - password: password of your bluelink account
 - pin: pincode of your bluelink account, required for CANADA, and potentially USA, otherwise pass a blank string
-- force_update_seconds: do a forceupdate when the latest cached server information is older than the specified seconds (28800 seconds = 8 hours)
+- force_update_seconds: do a forceupdate when the latest cached server information is older than the specified seconds (604800 seconds = 7 days)
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
 - use_geocode_email: (default: True) use email to avoid abuse of address lookup  
 
@@ -129,10 +129,9 @@ This information is used by the other tools:
 - kml.py
 - shrink.py
 
-The monitor tool will by default only do a forced update when the last server update is more than 8 hours ago. 
-So only a maximum of 3 times a day the car could be asked for the latest information with the default configuration.
-This time difference is configurable, so you can decide to do it even less, e.g. max once a day, or more often, e.g. max 12 times a day.
-But you have also the option to only use cacheupdate as parameter to monitor.py.
+The monitor tool will by default only do a forced update when the last server update is more than 7 days ago, so the 12 volt battery is NOT drained by the tool. 
+This time difference is configurable, so you can decide to do it more often, e.g. once a day.
+But you have also the option to only use cacheupdate as parameter to monitor.py, so never the car is asked for actual values by the tool.
 And you can also run a forceupdate as parameter to monitor.py, or e.g. once a day.
 Choose the options you like the most.
 
@@ -368,12 +367,6 @@ And I did configure to run cacheupdate every 15 minutes (I have a 200 API calls 
 crontab -e:
 ```
 */15 * * * * ~/hyundai_kia_connect_monitor/run_monitor_once.sh >> ~/hyundai_kia_connect_monitor/run_monitor_once.log 2>&1
-```
-
-And I configured once a day a forceupdate at 6:10.
-crontab -e:
-```
-10 6 * * * /usr/bin/python -u ~/hyundai_kia_connect_monitor/monitor.py forceupdate >> ~/hyundai_kia_connect_monitor/run_monitor_once.log 2>&1
 ```
 
 # debug.py

@@ -189,14 +189,19 @@ def split_output_to_sheet_list(queue_output):
 
 def print_output_queue():
     """ print output queue """
-    first_row = 22
+    first_row = 21
     last_row = 73
     array = []
 
-    # first row is empty row, clean it
+    # first two rows are empty row, clean it
     current_row = first_row
     list_output = split_output_to_sheet_list(",,,,,,,,,,,,,,,,,,,,,")
     debug(f"clear row: {current_row}")
+    array.append({
+        'range': f"A{current_row}:V{current_row}",
+        'values': list_output,
+    })
+    current_row += 1
     array.append({
         'range': f"A{current_row}:V{current_row}",
         'values': list_output,
@@ -325,6 +330,9 @@ def print_summary(prefix, current, values, split, factor):
     location_str = get_address(split)
 
     if SHEETUPDATE and prefix.startswith('SHEET'):
+        km_mi_per_kwh_str = km_mi_per_kwh_str.strip()
+        kwh_per_km_mi_str = kwh_per_km_mi_str.strip()
+        cost_str = cost_str.strip()
         prefix = prefix.replace("SHEET ", "")
         last_update_datetime = datetime.fromtimestamp(
             INPUT_CSV_FILE.stat().st_mtime)
