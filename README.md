@@ -24,6 +24,8 @@ Automatic trip administration tools for Hyundai Bluelink or Kia UVO Connect user
 Determining afterwards your private and/or business trips and information about those trips and usage of the car.
 Best of all is the fact that it does NOT drain your 12 volt battery of the car, because it default uses the cached server information!
 
+[This video shows why it is important to avoid awakening the car for actual values.](https://youtu.be/rpLWEe-2aUU?t=121) 30 nov 6:10 a forceupdate has been done and you see a dip from 12.92 Volt to 12.42 Volt for a moment and then back to 12.83 Volt. Note by default the tool asks only for server cache updates and the car decides when to send push notifications with actual values to the server.
+
 Run monitor.py e.g. once per hour (I use it on a Raspberry Pi and on Windows 10 with pure Python, buit it will also run on Mac or a linux Operating System) and you can always check afterwards:
 - captured locations
 - odometer at specific day/hour
