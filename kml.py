@@ -1,13 +1,13 @@
-# == monitor_csv_to_kml.py Author: Zuinige Rijder ============================
+# == kml.py Author: Zuinige Rijder ===========================================
 """
 Simple Python3 script to convert monitor.csv to monitor.kml
 
-INPUTFILE: monitor.csv
-OUTPUTFILE: monitor.kml
+INPUTFILE: monitor.csv or monitor.VIN.csv (latter if vin=VIN parameter)
+OUTPUTFILE: monitor.kml or monitor.VIN.kml (latter if vin=VIN parameter)
 standard output: summary per kml placemark
 
 Usage:
-python monitor_csv_to_kml.py
+python kml.py [vin=VIN]
 
 Lines are not written, when the following info is the same as previous line:
 - longitude, latitude, engineOn, charging
@@ -31,8 +31,6 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-INPUT = Path("monitor.csv")
-OUTPUT = Path("monitor.kml")
 
 # indexes to splitted monitor.csv items
 DT = 0   # datetime
@@ -47,13 +45,24 @@ PLUGGED = 8  # plugged
 LOCATION = 9  # location address (optional field)
 
 
-def arg_has(string):
-    """ arguments has string """
+def get_vin_arg():
+    """ get vin arg """
     for i in range(1, len(sys.argv)):
-        if sys.argv[i].lower() == string:
-            return True
+        if "vin=" in sys.argv[i].lower():
+            vin = sys.argv[i]
+            vin = vin.replace("vin=", "")
+            vin = vin.replace("VIN=", "")
+            return vin
 
-    return False
+    return ''
+
+
+INPUT_CSV_FILE = Path("monitor.csv")
+OUTPUT_KML_FILE = Path("monitor.kml")
+VIN = get_vin_arg()
+if VIN != '':
+    INPUT_CSV_FILE = Path(f"monitor.{VIN}.csv")
+    OUTPUT_KML_FILE = Path(f"monitor.{VIN}.kml")
 
 
 def to_float(string):
@@ -166,7 +175,7 @@ def write_kml(outputfile, count, items, prev_items):
 
 def convert():
     """ convert csv file to kml """
-    with OUTPUT.open("w", encoding="utf-8") as outputfile:
+    with OUTPUT_KML_FILE.open("w", encoding="utf-8") as outputfile:
         count = 0
         writeline(outputfile, '<?xml version="1.0" encoding="UTF-8"?>')
         writeline(outputfile, '<kml xmlns="http://www.opengis.net/kml/2.2">')
@@ -178,7 +187,7 @@ def convert():
             '</name>'
         )
 
-        with INPUT.open("r", encoding="utf-8") as inputfile:
+        with INPUT_CSV_FILE.open("r", encoding="utf-8") as inputfile:
             prev_location = ''
             prev_engine_on = ''
             prev_charging = ''

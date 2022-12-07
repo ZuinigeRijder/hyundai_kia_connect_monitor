@@ -64,7 +64,6 @@ DEBUG = arg_has('debug')
 FORCEUPDATE = arg_has('forceupdate')
 CACHEUPDATE = arg_has('cacheupdate')
 
-MFILE = Path("monitor.csv")
 
 # == read monitor in monitor.cfg ===========================
 parser = configparser.ConfigParser()
@@ -93,10 +92,21 @@ def log(msg):
     print(datetime.now().strftime("%Y%m%d %H:%M:%S") + ': ' + msg)
 
 
-def writeln(string):
+def writeln(filename, string):
     """ append line at monitor text file with end of line character """
     debug(string)
-    with MFILE.open("a", encoding="utf-8") as file:
+    monitor_csv_file = Path(filename)
+    write_header = False
+    # create header if file does not exists
+    if not monitor_csv_file.is_file():
+        monitor_csv_file.touch()
+        write_header = True
+    with monitor_csv_file.open("a", encoding="utf-8") as file:
+        if write_header:
+            file.write(
+                "datetime, longitude, latitude, engineOn" +
+                ", 12V%, odometer, SOC%, charging, plugged, address\n"
+            )
         file.write(string)
         file.write('\n')
 
@@ -128,6 +138,7 @@ def get_append_data():
                 manager.check_and_force_update_vehicles(FORCE_SECONDS)
 
             line = ''
+            number_of_vehicles = len(manager.vehicles)
             for _, vehicle in manager.vehicles.items():
                 geocode = ''
                 if USE_GEOCODE:
@@ -150,7 +161,10 @@ def get_append_data():
                 if 'None, None' in line:  # something gone wrong, retry
                     log(f"Skipping Unexpected line: {line}")
                 else:
-                    writeln(line)
+                    filename = "monitor.csv"
+                    if number_of_vehicles > 1:
+                        filename = "monitor." + vehicle.VIN + ".csv"
+                    writeln(filename, line)
 
             if 'None, None' in line:  # something gone wrong, retry
                 retries -= 1
@@ -166,11 +180,4 @@ def get_append_data():
             time.sleep(60)
 
 
-# create header if file does not exists
-if not MFILE.is_file():
-    MFILE.touch()
-    writeln(
-        "datetime, longitude, latitude, engineOn" +
-        ", 12V%, odometer, SOC%, charging, plugged, address"
-    )
 get_append_data()  # do the work

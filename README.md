@@ -87,7 +87,7 @@ or
 python monitor.py forceupdate
 ```
 - INPUTFILE: monitor.cfg (configuration of input to hyundai_kia_connect_api)
-- OUTPUTFILE: monitor.csv (appended)
+- OUTPUTFILE: monitor.csv (appended) or monitor.VIN.csv (latter when multiple vehicles found)
 
 Make sure to configure monitor.cfg once:
 ```
@@ -187,11 +187,13 @@ With 60-minute forced updates:
 ```
 
 # summary.py
-make summary per TRIP, DAY, WEEK, MONTH, YEAR or a combination with monitor.csv as input
+make summary per TRIP, DAY, WEEK, MONTH, YEAR or a combination with monitor.csv as input or monitor.VIN.csv (latter if vin=VIN is given as parameter)
 
 Usage: 
 ```
 python summary.py
+or 
+python summary.py vin=VIN
 or
 python summary.py -trip
 or
@@ -208,7 +210,7 @@ or
 python summary.py year
 ```
 - INPUTFILE: summary.cfg (configuration of kilometers or miles, net battery size in kWh, average cost per kWh and cost currency)
-- INPUTFILE: monitor.csv
+- INPUTFILE: monitor.csv or monitor.VIN.csv (latter if vin=VIN is given as parameter)
 - standard output: summary per TRIP, DAY, WEEK, MONTH, YEAR in csv format, default all summaries when no parameters given
 
 Notes:
@@ -243,12 +245,14 @@ make summary per DAY, WEEK, MONTH, YEAR with monitor.csv as input and write summ
 Usage: 
 ```
 python summary.py sheetupdate
+or
+python summary.py sheetupdate vin=VIN
 ```
 
 - INPUTFILE: summary.cfg (configuration of kilometers or miles, net battery size in kWh, average cost per kWh and cost currency)
-- INPUTFILE: monitor.csv
+- INPUTFILE: monitor.csv or or monitor.VIN.csv (latter if vin=VIN is given as parameter)
 - standard output: summary per DAY, WEEK, MONTH, YEAR in csv format
-- Google spreadsheet update with name: hyundai-kia-connect-monitor
+- Google spreadsheet update with name: hyundai-kia-connect-monitor or monitor.VIN or (latter if vin=VIN is given as parameter)
 
 For easier use on a mobile phone, the spreadsheet will contain first the overall information in row 1 till 20:
 - Last update
@@ -295,9 +299,9 @@ Follow the steps in this link above, here is the summary of these steps:
 - - Remember the path to the downloaded credentials json file. Also, in the next step you will need the value of client_email from this file.
 - - Move the downloaded json file to ~/.config/gspread/service_account.json. Windows users should put this file to %APPDATA%\gspread\service_account.json.
 - Setup a Google Spreasheet to be updated by sheetupdate
-- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai-kia-connect-monitor
+- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai-kia-connect-monitor or monitor.VIN (latter if if vin=VIN is given as parameter)
 - - Go to your spreadsheet and share it with a client_email from the step above
-- run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor spreadheet will be updated with a summary and the last 50 lines of standard output
+- run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor or monitor.VIN spreadheet will be updated with a summary and the last 50 lines of standard output
 - configure to run "python summary.py sheetupdate" regularly, after having run "python monitor.py"
 
 # kml.py
@@ -306,10 +310,12 @@ Lines are not written, when the following info is the same as previous line: lon
 
 Usage: 
 ```
-python kml.py
+python kml.py 
+or
+python kml.py vin=VIN
 ```
-- INPUTFILE: monitor.csv
-- OUTPUTFILE: monitor.kml
+- INPUTFILE: monitor.csv or monitor.VIN.csv (latter if vin=VIN as parameter given)
+- OUTPUTFILE: monitor.kml or monitor.VIN.kml (latter if vin=VIN as parameter given)
 - standard output: summary per kml placemark
 
 The following information is written in the kml file:
@@ -330,9 +336,11 @@ Simple Python3 script to shrink monitor.csv, identical lines removed (first date
 Usage:
 ```
 python shrink.py
+or
+python shrink.py vin=VIN
 ```
-- INPUTFILE: monitor.csv
-- OUTPUTFILE: shrinked_monitor.csv
+- INPUTFILE: monitor.csv or monitor.VIN.csv (latter if vin=VIN as parameter given)
+- OUTPUTFILE: shrinked_monitor.csv or shrinked_monitor.vin.csv (latter if vin=VIN as parameter given)
 
 Note: 
 - True and False for EngineOn and Driving are replaced into respectively 1 and 0, so it is shorter and easier usable in e.g. Excel.

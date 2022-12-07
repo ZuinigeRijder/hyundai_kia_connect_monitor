@@ -1,4 +1,4 @@
-# == summary.py Author: Zuinige Rijder ===================
+# == summary.py Author: Zuinige Rijder =======================================
 """
 Simple Python3 script to make a summary of monitor.csv
 """
@@ -26,6 +26,28 @@ def arg_has(string):
     return False
 
 
+DEBUG = arg_has('debug')
+
+
+def debug(line):
+    """ print line if debugging """
+    if DEBUG:
+        print(line)
+
+
+def get_vin_arg():
+    """ get vin argument"""
+    for i in range(1, len(sys.argv)):
+        if "vin=" in sys.argv[i].lower():
+            vin = sys.argv[i]
+            vin = vin.replace("vin=", "")
+            vin = vin.replace("VIN=", "")
+            debug(f"VIN = {vin}")
+            return vin
+
+    return ''
+
+
 def to_int(string):
     """ convert to int """
     if "None" in string:
@@ -44,19 +66,33 @@ KEYWORD_LIST = ['trip', 'day', 'week', 'month', 'year', 'sheetupdate', '-trip', 
 KEYWORD_ERROR = False
 for kindex in range(1, len(sys.argv)):
     if not sys.argv[kindex].lower() in KEYWORD_LIST:
-        print("Unknown keyword: " + sys.argv[kindex])
-        KEYWORD_ERROR = True
+        arg = sys.argv[kindex]
+        if "vin=" in arg.tolower():
+            debug("vin parameter: " + arg)
+        else:
+            print("Unknown keyword: " + arg)
+            KEYWORD_ERROR = True
 
 if KEYWORD_ERROR or arg_has('help'):
-    print('Usage: python summary.py [trip] [day] [week] [month] [year] [sheetupdate]') # noqa pylint:disable=line-too-long
+    print('Usage: python summary.py [trip] [day] [week] [month] [year] [sheetupdate] [vin=VIN]') # noqa pylint:disable=line-too-long
     exit()
 
-DEBUG = arg_has('debug')
-TRIP = len(sys.argv) == 1 or (arg_has('trip') and not arg_has('-trip'))
-DAY = len(sys.argv) == 1 or arg_has('day') or arg_has('-trip')
-WEEK = len(sys.argv) == 1 or arg_has('week') or arg_has('-trip')
-MONTH = len(sys.argv) == 1 or arg_has('month') or arg_has('-trip')
-YEAR = len(sys.argv) == 1 or arg_has('year') or arg_has('-trip')
+
+INPUT_CSV_FILE = Path("monitor.csv")
+OUTPUT_SPREADSHEET_NAME = "hyundai-kia-connect-monitor"
+LENCHECK = 1
+VIN = get_vin_arg()
+if VIN != '':
+    INPUT_CSV_FILE = Path(f"monitor.{VIN}.csv")
+    OUTPUT_SPREADSHEET_NAME = f"monitor.{VIN}"
+    LENCHECK = 2
+debug(f"INPUT_CSV_FILE: {INPUT_CSV_FILE.name}")
+
+TRIP = len(sys.argv) == LENCHECK or (arg_has('trip') and not arg_has('-trip'))
+DAY = len(sys.argv) == LENCHECK or arg_has('day') or arg_has('-trip')
+WEEK = len(sys.argv) == LENCHECK or arg_has('week') or arg_has('-trip')
+MONTH = len(sys.argv) == LENCHECK or arg_has('month') or arg_has('-trip')
+YEAR = len(sys.argv) == LENCHECK or arg_has('year') or arg_has('-trip')
 SHEETUPDATE = arg_has('sheetupdate')
 if SHEETUPDATE:
     DAY = True
@@ -64,7 +100,6 @@ if SHEETUPDATE:
     MONTH = True
     YEAR = True
 
-INPUT_CSV_FILE = Path("monitor.csv")
 
 # == read monitor in monitor.cfg ===========================
 config_parser = configparser.ConfigParser()
@@ -124,12 +159,6 @@ DAY_COUNTER = 0
 
 # Initializing a queue with maximum size of 50
 LAST_OUTPUT_QUEUE = deque(maxlen=50)
-
-
-def debug(line):
-    """ print line if debugging """
-    if DEBUG:
-        print(line)
 
 
 def init(current_day, odo, soc, volt12):
@@ -193,28 +222,15 @@ def print_output_queue():
     last_row = 73
     array = []
 
-    # first two rows are empty row, clean it
-    current_row = first_row
-    list_output = split_output_to_sheet_list(",,,,,,,,,,,,,,,,,,,,,")
-    debug(f"clear row: {current_row}")
-    array.append({
-        'range': f"A{current_row}:V{current_row}",
-        'values': list_output,
-    })
-    current_row += 1
-    array.append({
-        'range': f"A{current_row}:V{current_row}",
-        'values': list_output,
-    })
-
-    # clean bottom rows
+    # clean rows first
+    list_output = split_output_to_sheet_list(",,,,,,,,,,,,,,,,,,,,,,")
     qlen = len(LAST_OUTPUT_QUEUE)
-    current_row = last_row - (50 - qlen)
+    current_row = first_row
     debug(f"current_row={current_row} last_row={last_row} queue_len={qlen}")
     for _ in range(current_row, last_row):
         debug(f"clear row: {current_row}")
         array.append({
-                'range': f"A{current_row}:V{current_row}",
+                'range': f"A{current_row}:W{current_row}",
                 'values': list_output,
             })
         current_row += 1
@@ -541,7 +557,11 @@ def keep_track_of_totals(values, split, prev_split):
     t_volt12_min = values[T_VOLT12_MIN]
     t_volt12_max = values[T_VOLT12_MAX]
 
-    delta_odo = max(0.0, odo - prev_odo)
+    delta_odo = odo - prev_odo
+    if delta_odo < 0.0:
+        debug(f"negative odometer:\n{prev_split}\n{split}")
+        delta_odo = 0.0
+
     coord_changed = (
         to_float(split[LAT].strip()) != to_float(prev_split[LAT].strip()) or
         to_float(split[LON].strip()) != to_float(prev_split[LON].strip())
@@ -664,11 +684,6 @@ def handle_line(split, prev_split, totals, last):
     t_month = totals[T_MONTH]
     t_year = totals[T_YEAR]
 
-    day_change = not same_day(current_day, t_day[T_CURRENT_DAY])
-    if day_change:  # assume just before 24 hour
-        current_day = \
-            current_day.replace(hour=23, minute=59) - timedelta(days=1)
-
     # take into account totals per line
     if not last:  # skip keep_track_of_totals for last entry
         if DAY:
@@ -695,7 +710,7 @@ def handle_line(split, prev_split, totals, last):
 
     totals = (t_day, t_week, t_month, t_year, t_trip)
 
-    if day_change or last:
+    if last or not same_day(current_day, t_day[T_CURRENT_DAY]):
         debug(f"DAY change: {t_day}")
         totals = print_summaries(current_day_values, totals, split, last)
 
@@ -721,7 +736,13 @@ def summary():
                 debug(f"Skipping line:\n{line}\n{prev_line}")
                 continue  # skip headers and lines starting or without ,
             split = line.split(',')
-            if not totals[T_DAY] or not same_day(parser.parse(split[DT]), parser.parse(prev_split[DT])) or prev_line[prev_index:] != line[index:]:    # noqa pylint:disable=line-too-long
+            if not totals[T_DAY] or not same_day(parser.parse(split[DT]), parser.parse(prev_split[DT])) or prev_line[prev_index:] != line[index:]:  # noqa pylint:disable=line-too-long
+                if totals[T_DAY] and not same_day(parser.parse(split[DT]), parser.parse(prev_split[DT])):  # noqa pylint:disable=line-too-long
+                    # handle end of day previous day
+                    eod_line = line[0:11] + "00:00:00" + prev_line[19:]
+                    debug(f"prev_line: {prev_line}\n eod_line: {eod_line}")
+                    last_split = eod_line.split(',')
+                    totals = handle_line(last_split, prev_split, totals, False)
                 totals = handle_line(
                     split,
                     prev_split,
@@ -735,9 +756,19 @@ def summary():
 
         # also compute last last day/week/month
         debug("Handling last values")
+        # handle end of day for last value
+        date_string = prev_line[0:10]
+        date_date = datetime.strptime(date_string, "%Y-%m-%d")
+        eod_date = date_date + timedelta(days=1)
+        eod_line = eod_date.strftime("%Y-%m-%d ") + \
+            "00:00:00" + prev_line[19:]
+        last_split = eod_line.split(',')
+        debug(f"prev_line: {prev_line}\n eod_line: {eod_line}")
+        totals = handle_line(last_split, prev_split, totals, False)
+        # and show summaries
         handle_line(
-            prev_split,
-            prev_split,
+            last_split,
+            last_split,
             totals,
             True
         )
@@ -749,7 +780,7 @@ if SHEETUPDATE:
     while RETRIES > 0:
         try:
             gc = gspread.service_account()
-            spreadsheet = gc.open("hyundai-kia-connect-monitor")
+            spreadsheet = gc.open(OUTPUT_SPREADSHEET_NAME)
             SHEET = spreadsheet.sheet1
             RETRIES = 0
         except Exception as ex:  # pylint: disable=broad-except

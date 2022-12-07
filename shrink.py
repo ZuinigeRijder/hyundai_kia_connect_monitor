@@ -1,20 +1,45 @@
-# == shrink_monitor_csv.py Author: Zuinige Rijder ===================
+# == shrink.py Author: Zuinige Rijder ========================================
 """
 Simple Python3 script to shrink monitor.csv
 identical lines removed (first column excluded)
-"""
 
+INPUTFILE: monitor.csv or monitor.VIN.csv (latter if vin=VIN parameter)
+OUTPUTFILE: shrinked_monitor.csv or shrinked_monitor.VIN.csv
+            (latter if vin=VIN parameter)
+standard output: summary per kml placemark
+
+Usage:
+python shrink.py [vin=VIN]
+
+"""
+import sys
 from pathlib import Path
 
 
-INPUT = Path("monitor.csv")
-OUTPUT = Path("shrinked_monitor.csv")
+def get_vin():
+    """ get vin """
+    for i in range(1, len(sys.argv)):
+        if "vin=" in sys.argv[i].lower():
+            vin = sys.argv[i]
+            vin = vin.replace("vin=", "")
+            vin = vin.replace("VIN=", "")
+            return vin
+
+    return ''
+
+
+INPUT_CSV_FILE = Path("monitor.csv")
+OUTPUT_CSV_FILE = Path("shrinked_monitor.csv")
+VIN = get_vin()
+if VIN != '':
+    INPUT_CSV_FILE = Path(f"monitor.{VIN}.csv")
+    OUTPUT_CSV_FILE = Path(f"shrinked_monitor.{VIN}.csv")
 
 
 def shrink():
     """ shrink csv file """
-    with INPUT.open("r", encoding="utf-8") as inputfile:
-        with OUTPUT.open("w", encoding="utf-8") as outputfile:
+    with INPUT_CSV_FILE.open("r", encoding="utf-8") as inputfile:
+        with OUTPUT_CSV_FILE.open("w", encoding="utf-8") as outputfile:
             prevline = ''
             previndex = -1
             for line in inputfile:
