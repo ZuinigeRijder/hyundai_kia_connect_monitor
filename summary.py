@@ -67,7 +67,7 @@ KEYWORD_ERROR = False
 for kindex in range(1, len(sys.argv)):
     if not sys.argv[kindex].lower() in KEYWORD_LIST:
         arg = sys.argv[kindex]
-        if "vin=" in arg.tolower():
+        if "vin=" in arg.lower():
             debug("vin parameter: " + arg)
         else:
             print("Unknown keyword: " + arg)

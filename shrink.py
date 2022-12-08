@@ -16,8 +16,8 @@ import sys
 from pathlib import Path
 
 
-def get_vin():
-    """ get vin """
+def get_vin_arg():
+    """ get vin arg"""
     for i in range(1, len(sys.argv)):
         if "vin=" in sys.argv[i].lower():
             vin = sys.argv[i]
@@ -30,7 +30,7 @@ def get_vin():
 
 INPUT_CSV_FILE = Path("monitor.csv")
 OUTPUT_CSV_FILE = Path("shrinked_monitor.csv")
-VIN = get_vin()
+VIN = get_vin_arg()
 if VIN != '':
     INPUT_CSV_FILE = Path(f"monitor.{VIN}.csv")
     OUTPUT_CSV_FILE = Path(f"shrinked_monitor.{VIN}.csv")
