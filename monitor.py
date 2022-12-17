@@ -144,7 +144,9 @@ def get_append_data():
                 if USE_GEOCODE:
                     if len(vehicle.geocode) > 0:
                         # replace comma by semicolon for easier splitting
-                        geocode = ', ' + vehicle.geocode[0].replace(',', ';')
+                        geocode_name = vehicle.geocode[0]
+                        if geocode_name != '':
+                            geocode = ', ' + geocode_name.replace(',', ';')
 
                 line = (
                     str(vehicle.last_updated_at) +

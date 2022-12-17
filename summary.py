@@ -48,6 +48,13 @@ def get_vin_arg():
     return ''
 
 
+def safe_divide(numerator, denumerator):
+    """ safe_divide """
+    if denumerator == 0.0:
+        return 1.0
+    return numerator/denumerator
+
+
 def to_int(string):
     """ convert to int """
     if "None" in string:
@@ -100,6 +107,7 @@ if SHEETUPDATE:
     MONTH = True
     YEAR = True
 
+HIGHEST_ODO = 0.0
 
 # == read monitor in monitor.cfg ===========================
 config_parser = configparser.ConfigParser()
@@ -296,12 +304,12 @@ def print_summary(prefix, current, values, split, factor):
 
     t_elapsed_minutes = max(values[T_ELAPSED_MINUTES], 1)
     t_soc_cur = values[T_SOC_CUR]
-    t_soc_avg = round(values[T_SOC_AVG] / t_elapsed_minutes)
+    t_soc_avg = round(safe_divide(values[T_SOC_AVG], t_elapsed_minutes))
     t_soc_min = values[T_SOC_MIN]
     t_soc_max = values[T_SOC_MAX]
 
     t_volt12_cur = values[T_VOLT12_CUR]
-    t_volt12_avg = round(values[T_VOLT12_AVG] / t_elapsed_minutes)
+    t_volt12_avg = round(safe_divide(values[T_VOLT12_AVG], t_elapsed_minutes))
     t_volt12_min = values[T_VOLT12_MIN]
     t_volt12_max = values[T_VOLT12_MAX]
 
@@ -318,10 +326,10 @@ def print_summary(prefix, current, values, split, factor):
         if discharged_kwh < -MIN_CONSUMPTION_DISCHARGE_KWH:  # skip inaccurate
             cost = discharged_kwh * -AVERAGE_COST_PER_KWH
             cost_str = f"{cost:10.2f}"
-            km_mi_per_kwh = delta_odo / -discharged_kwh
+            km_mi_per_kwh = safe_divide(delta_odo, -discharged_kwh)
             km_mi_per_kwh_str = f"{km_mi_per_kwh:7.1f}"
             if km_mi_per_kwh > 0.0:
-                kwh_per_km_mi = 100 / km_mi_per_kwh
+                kwh_per_km_mi = safe_divide(100, km_mi_per_kwh)
                 kwh_per_km_mi_str = f"{kwh_per_km_mi:10.1f}"
     else:
         # do not show positive discharges
@@ -483,35 +491,35 @@ def print_summaries(current_day_values, totals, split, last):
             current_day_values,
             t_year,
             split,
-            1/trips
+            safe_divide(1, trips)
         )
         print_summary(
             f"DAYAVG  , {day_str:10}, {DAY_COUNTER:3}d ",
             current_day_values,
             t_year,
             split,
-            1/DAY_COUNTER
+            safe_divide(1, DAY_COUNTER)
         )
         print_summary(
             f"WEEKAVG , {day_str:10}, {DAY_COUNTER:3}d ",
             current_day_values,
             t_year,
             split,
-            1/DAY_COUNTER*7
+            safe_divide(7, DAY_COUNTER)
         )
         print_summary(
             f"MONTHAVG, {day_str:10}, {DAY_COUNTER:3}d ",
             current_day_values,
             t_year,
             split,
-            365/DAY_COUNTER/12
+            safe_divide(365/12, DAY_COUNTER)
         )
         print_summary(
             f"YEARLY  , {day_str:10}, {DAY_COUNTER:3}d ",
             current_day_values,
             t_year,
             split,
-            365/DAY_COUNTER
+            safe_divide(365, DAY_COUNTER)
         )
         if SHEETUPDATE and last:
             day_info = current_day.strftime("%a %H:%M")
@@ -655,12 +663,20 @@ def keep_track_of_totals(values, split, prev_split):
     return values
 
 
-def handle_line(split, prev_split, totals, last):
+def handle_line(linecount, split, prev_split, totals, last):
     """ handle_line """
     debug(f"handle_line: {split}, {prev_split}")
+    global HIGHEST_ODO  # pylint:disable=global-statement
     odo = to_float(split[ODO].strip())
     if odo == 0.0:
+        debug(f"bad odo: {odo}")
         return totals  # bad line
+    if odo < HIGHEST_ODO:
+        debug(f"taking over highest ODO: {HIGHEST_ODO} odo={odo}")
+        odo = HIGHEST_ODO
+    else:
+        HIGHEST_ODO = odo
+
     current_day = parser.parse(split[DT])
     current_day_values = init(
         current_day,
@@ -678,6 +694,11 @@ def handle_line(split, prev_split, totals, last):
             current_day_values
         )
         return totals
+
+    if (split[DT] == prev_split[DT]) and (
+        (split[LAT] != prev_split[LAT]) or (split[LON] != prev_split[LON])
+    ):
+        print(f"Warning: timestamp wrong line {linecount}\nSPLIT: {split}\nPREV : {prev_split}")  # noqa pylint:disable=line-too-long
 
     t_trip = totals[T_TRIP]
     t_week = totals[T_WEEK]
@@ -742,8 +763,14 @@ def summary():
                     eod_line = line[0:11] + "00:00:00" + prev_line[19:]
                     debug(f"prev_line: {prev_line}\n eod_line: {eod_line}")
                     last_split = eod_line.split(',')
-                    totals = handle_line(last_split, prev_split, totals, False)
+                    totals = handle_line(
+                        linecount,
+                        last_split,
+                        prev_split,
+                        totals,
+                        False)
                 totals = handle_line(
+                    linecount,
                     split,
                     prev_split,
                     totals,
@@ -764,9 +791,10 @@ def summary():
             "00:00:00" + prev_line[19:]
         last_split = eod_line.split(',')
         debug(f"prev_line: {prev_line}\n eod_line: {eod_line}")
-        totals = handle_line(last_split, prev_split, totals, False)
+        totals = handle_line(linecount, last_split, prev_split, totals, False)
         # and show summaries
         handle_line(
+            linecount,
             last_split,
             last_split,
             totals,
