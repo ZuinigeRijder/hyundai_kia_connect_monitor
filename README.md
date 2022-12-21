@@ -55,9 +55,9 @@ For this you need to install Python. I have installed Python 3.9.13.
 [Here is more information about installing Python](https://realpython.com/installing-python/)
 
 Steps:
-- Download the source code of [hyundai_kia_connect_api v1.47.1 here](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases/tag/v1.47.1)
+- Download the source code of [hyundai_kia_connect_api v1.49.0 here](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases/tag/v1.49.0)
 - Download the [latest hyundai_kia_connect_monitor release here](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases)
-- Extract both and move the hyundai_kia_connect_api subfolder of hyundai_kia_connect_api-1.40.11 under hyundai_kia_connect_monitor.
+- Extract both and move the hyundai_kia_connect_api subfolder of hyundai_kia_connect_api-1.49.0 under hyundai_kia_connect_monitor.
 - Then configure monitor.cfg
 - Then run: python monitor.py
 
@@ -102,6 +102,7 @@ pin =
 force_update_seconds = 604800
 use_geocode = True
 use_geocode_email = True
+language = en
 ```
 
 Explanation of the configuration items:
@@ -112,7 +113,26 @@ Explanation of the configuration items:
 - pin: pincode of your bluelink account, required for CANADA, and potentially USA, otherwise pass a blank string
 - force_update_seconds: do a forceupdate when the latest cached server information is older than the specified seconds (604800 seconds = 7 days)
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
-- use_geocode_email: (default: True) use email to avoid abuse of address lookup  
+- use_geocode_email: (default: True) use email to avoid abuse of address lookup
+- language: (default: en) the Bluelink App is reset to English for users who have set another language in the Bluelink App in Europe when using hyundai_kia_connect_api, you can configure another language as workaround
+
+Note: language is only implemented for Europe currently.
+[For a list of language codes, see here.](https://www.science.co.il/language/Codes.php). Currently in Europe the Bluelink App shows the following languages:
+- "en" English
+- "de" German 
+- "fr" French
+- "it" Italian
+- "es" Spanish
+- "sv" Swedish
+- "nl" Dutch
+- "no" Norwegian
+- "cs" Czech
+- "sk" Slovak
+- "hu" Hungarian
+- "da" Danish
+- "pl" Polish
+- "fi" Finnish
+- "pt" Portuguese
 
 Following information from hyundai_kia_connect_api is added to the monitor.csv file:
 - datetime

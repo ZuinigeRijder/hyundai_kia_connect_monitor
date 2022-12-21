@@ -52,7 +52,7 @@ def arg_has(string):
 KEYWORD_LIST = ['forceupdate', 'cacheupdate', 'debug']
 KEYWORD_ERROR = False
 for kindex in range(1, len(sys.argv)):
-    if not sys.argv[kindex].lower() in KEYWORD_LIST:
+    if sys.argv[kindex].lower() not in KEYWORD_LIST:
         print("Unknown keyword: " + sys.argv[kindex])
         KEYWORD_ERROR = True
 
@@ -78,6 +78,7 @@ PIN = monitor_settings['pin']
 FORCE_SECONDS = int(monitor_settings['force_update_seconds'])
 USE_GEOCODE = monitor_settings['use_geocode'].lower() == 'true'
 USE_GEOCODE_EMAIL = monitor_settings['use_geocode_email'].lower() == 'true'
+LANGUAGE = monitor_settings['language']
 
 
 # == subroutines =============================================================
@@ -124,7 +125,8 @@ def get_append_data():
                 password=PASSWORD,
                 pin=PIN,
                 geocode_api_enable=USE_GEOCODE,
-                geocode_api_use_email=USE_GEOCODE_EMAIL
+                geocode_api_use_email=USE_GEOCODE_EMAIL,
+                language=LANGUAGE
             )
             manager.check_and_refresh_token()
             if CACHEUPDATE:

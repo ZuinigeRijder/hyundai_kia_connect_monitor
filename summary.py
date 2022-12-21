@@ -72,7 +72,7 @@ def to_float(string):
 KEYWORD_LIST = ['trip', 'day', 'week', 'month', 'year', 'sheetupdate', '-trip', 'help', 'debug'] # noqa pylint:disable=line-too-long
 KEYWORD_ERROR = False
 for kindex in range(1, len(sys.argv)):
-    if not sys.argv[kindex].lower() in KEYWORD_LIST:
+    if sys.argv[kindex].lower() not in KEYWORD_LIST:
         arg = sys.argv[kindex]
         if "vin=" in arg.lower():
             debug("vin parameter: " + arg)
