@@ -88,8 +88,13 @@ python monitor.py cacheupdate
 or
 python monitor.py forceupdate
 ```
-- INPUTFILE: monitor.cfg (configuration of input to hyundai_kia_connect_api)
-- OUTPUTFILE: monitor.csv (appended) or monitor.VIN.csv (latter when multiple vehicles found)
+INPUTFILE: 
+- monitor.cfg (configuration of input to hyundai_kia_connect_api)
+
+OUTPUTFILES:
+- monitor.csv (appended when the last line is different) or monitor.VIN.csv (latter when multiple vehicles found)
+- monitor.dailystats.csv (appended with daily stats after last written daily stats date and not today) or monitor.dailystats.VIN.csv (latter when multiple vehicles found)
+- monitor.lastrun (rewritten with last run date/time of monitor.py) 
 
 Make sure to configure monitor.cfg once:
 ```
@@ -145,6 +150,17 @@ Following information from hyundai_kia_connect_api is added to the monitor.csv f
 - charging
 - plugged
 - address (dependent on use_geocode configuration)
+
+Following information from hyundai_kia_connect_api is added to the monitor.dailystats.csv file (gathered by the car, so not computed by summary.py), with per day the following information:
+- date
+- distance
+- distance_unit
+- total_consumed Wh
+- regenerated_energy Wh
+- engine_consumption Wh
+- climate_consumption Wh
+- onboard_electronics_consumption Wh
+- battery_care_consumption Wh
 
 This information is used by the other tools:
 - summary.py
@@ -413,13 +429,17 @@ python debug.py
 # Examples
 ## monitor.csv
 
-Here a csv file from 2022-09-17 till 2022-09-25 (about one week). I started with capturing once per hour. At 2022-09-20 I changed into once each half hour between 6:00 and 19:30, because I barely drive in the evening and still not too many captures per day. My crontab for this:
+Here a csv file from 2022-09-17 till 2022-09-25 (about one week). I started with capturing once per hour. At 2022-09-20 I changed into once each half hour between 6:00 and 19:30, because I barely drive in the evening and still not too many captures per day. 
+
+Example output file [monitor.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/monitor.csv)
+
+My crontab for this:
 
 ```
 */30 6-19 * * * ~/hyundai_kia_connect_monitor/run_monitor_once.sh >> ~/hyundai_kia_connect_monitor/run_monitor_once.log 2>&1
 ```
 
-Example output file [monitor.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/monitor.csv)
+Example output file [monitor.dailystats.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/monitor.dailystats.csv)
 
 ## python summary.py
 

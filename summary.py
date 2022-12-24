@@ -3,6 +3,7 @@
 Simple Python3 script to make a summary of monitor.csv
 """
 import sys
+import os
 import configparser
 import traceback
 import time
@@ -86,6 +87,7 @@ if KEYWORD_ERROR or arg_has('help'):
 
 
 INPUT_CSV_FILE = Path("monitor.csv")
+INPUT_LASTRUN_FILE = Path("monitor.lastrun")
 OUTPUT_SPREADSHEET_NAME = "hyundai-kia-connect-monitor"
 LENCHECK = 1
 VIN = get_vin_arg()
@@ -359,14 +361,15 @@ def print_summary(prefix, current, values, split, factor):
         cost_str = cost_str.strip()
         prefix = prefix.replace("SHEET ", "")
         last_update_datetime = datetime.fromtimestamp(
-            INPUT_CSV_FILE.stat().st_mtime)
+            INPUT_LASTRUN_FILE.stat().st_mtime)
+        last_line = get_last_line(INPUT_CSV_FILE)
         day_info = last_update_datetime.strftime("%Y-%m-%d %H:%M %a")
         SHEET.batch_update([{
             'range': 'A1:B1',
             'values': [["Last update", f"{day_info}"]],
         }, {
             'range': 'A2:B2',
-            'values': [["Last entry", f"{prefix}"]],
+            'values': [["Last entry", f"{last_line}"]],
         }, {
             'range': 'A3:B3',
             'values': [["Last address", f"{location_str}"]],
@@ -736,6 +739,20 @@ def handle_line(linecount, split, prev_split, totals, last):
         totals = print_summaries(current_day_values, totals, split, last)
 
     return totals
+
+
+def get_last_line(filename):
+    """ get last line of filename """
+    with open(filename, "rb") as file:
+        try:
+            file.seek(-2, os.SEEK_END)
+            while file.read(1) != b'\n':
+                file.seek(-2, os.SEEK_CUR)
+        except OSError:
+            file.seek(0)
+        last_line = file.readline().decode().strip()
+        debug(f"{filename} last_line: [{last_line}]")
+        return last_line
 
 
 def summary():

@@ -31,6 +31,7 @@ e.g. with Excel:
 - visited places
 """
 import sys
+import os
 import configparser
 import traceback
 import time
@@ -112,6 +113,77 @@ def writeln(filename, string):
         file.write('\n')
 
 
+def get_last_line(filename):
+    """ get last line of filename """
+    with open(filename, "rb") as file:
+        try:
+            file.seek(-2, os.SEEK_END)
+            while file.read(1) != b'\n':
+                file.seek(-2, os.SEEK_CUR)
+        except OSError:
+            file.seek(0)
+        last_line = file.readline().decode().strip()
+        debug(f"{filename} last_line: [{last_line}]")
+        return last_line
+
+
+def get_last_date(last_line):
+    """ get last date of last_line """
+    last_date = '20000101'  # millenium
+    if last_line.startswith("20"):  # year starts with 20
+        last_date = last_line.split(',')[0].strip()
+    debug(f"{last_line} last_date: [{last_date}]")
+    return last_date
+
+
+def handle_daily_stats(vehicle, number_of_vehicles):
+    """ handle daily stats """
+    daily_stats = vehicle.daily_stats
+    if len(daily_stats) == 0:
+        debug("No daily stats")
+        return
+
+    filename = "monitor.dailystats.csv"
+    if number_of_vehicles > 1:
+        filename = "monitor.dailystats." + vehicle.VIN + ".csv"
+    dailystats_file = Path(filename)
+    write_header = False
+    # create header if file does not exists
+    if not dailystats_file.is_file():
+        dailystats_file.touch()
+        write_header = True
+    with dailystats_file.open("a", encoding="utf-8") as file:
+        if write_header:
+            file.write("date, distance, distance_unit, total_consumed, regenerated_energy, engine_consumption, climate_consumption, onboard_electronics_consumption, battery_care_consumption\n")  # noqa pylint:disable=line-too-long
+        today = datetime.now().strftime("%Y%m%d")
+        last_line = get_last_line(filename)
+        last_date = get_last_date(last_line)
+        i = len(daily_stats)
+        while i > 0:
+            i = i - 1
+            stat = daily_stats[i]
+            dailystats_date = stat.date.strftime("%Y%m%d")
+            if today != dailystats_date and dailystats_date >= last_date:
+                # only append not already written daily stats and not today
+                line = f"{dailystats_date}, {stat.distance}, {stat.distance_unit}, {stat.total_consumed}, {stat.regenerated_energy},  {stat.engine_consumption}, {stat.climate_consumption}, {stat.onboard_electronics_consumption}, {stat.battery_care_consumption}"  # noqa pylint:disable=line-too-long
+                if last_line != line:
+                    debug(f"Writing dailystats:\nline=[{line}]\nlast=[{last_line}]")  # noqa pylint:disable=line-too-long
+                    file.write(line)
+                    file.write("\n")
+                else:
+                    debug(f"Skipping dailystats: date=[{dailystats_date}]\nlast=[{last_line}]\nline=[{line}]")  # noqa pylint:disable=line-too-long
+            else:
+                debug(f"Skipping dailystats: [{dailystats_date}] [{last_line}]")  # noqa pylint:disable=line-too-long
+
+
+def write_last_run():
+    """ write last run """
+    filename = "monitor.lastrun"
+    lastrun_file = Path(filename)
+    with lastrun_file.open("w", encoding="utf-8") as file:
+        file.write(datetime.now().strftime("%Y%m%d %H:%M:%S\n"))
+
+
 def get_append_data():
     """ get_append_data """
     retries = 2
@@ -168,7 +240,20 @@ def get_append_data():
                     filename = "monitor.csv"
                     if number_of_vehicles > 1:
                         filename = "monitor." + vehicle.VIN + ".csv"
-                    writeln(filename, line)
+                    last_line = get_last_line(filename)
+                    last_date = get_last_date(last_line)
+                    current_date = line.split(",")[0].strip()
+                    debug(f"Current date:          [{current_date}]")
+                    if current_date == last_date:
+                        if line != last_line:
+                            debug(f"Writing1:\nline=[{line}]\nlast=[{last_line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]")  # noqa pylint:disable=line-too-long
+                            writeln(filename, line)
+                        else:
+                            debug(f"Skipping1:\nline=[{line}]\nlast=[{last_line}]")  # noqa pylint:disable=line-too-long
+                    else:
+                        debug(f"Writing2:\nline=[{line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]")   # noqa pylint:disable=line-too-long
+                        writeln(filename, line)
+                    handle_daily_stats(vehicle, number_of_vehicles)
 
             if 'None, None' in line:  # something gone wrong, retry
                 retries -= 1
@@ -176,6 +261,7 @@ def get_append_data():
                 time.sleep(60)
             else:
                 retries = 0  # successfully end while loop
+                write_last_run()
         except Exception as ex:  # pylint: disable=broad-except
             log('Exception: ' + str(ex))
             traceback.print_exc()
