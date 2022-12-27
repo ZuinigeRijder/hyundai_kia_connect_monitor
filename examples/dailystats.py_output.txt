@@ -1,0 +1,115 @@
+  Totals   Regen     Consumption    Engine   Climate  Electronics BatteryCare
+ 313.6kWh 47.4kWh     5.6km/kWh    268.5kWh  12.8kWh    32.3kWh      0.0kWh
+  1756km   15.1%    17.9kWh/100km    86%       4.1%      10.3%        0.0%
+
+ 20221225  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+ 26.8kWh   4.1kWh     5.9km/kWh    24.3kWh    0.5kWh     1.9kWh      0.0kWh
+  159km    15.4%    16.8kWh/100km    91%       2.0%       7.1%        0.0%
+
+ 20221224  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+ 69.2kWh   3.6kWh     5.9km/kWh    64.6kWh    1.4kWh     3.2kWh      0.0kWh
+  407km     5.3%    17.0kWh/100km    93%       2.0%       4.7%        0.0%
+
+ 20221223  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+ 23.8kWh   4.3kWh     6.5km/kWh    21.7kWh    0.3kWh     1.9kWh      0.0kWh
+  154km    18.1%    15.5kWh/100km    91%       1.2%       7.9%        0.0%
+
+ 20221222  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  3.2kWh   0.7kWh     5.0km/kWh     2.4kWh    0.1kWh     0.7kWh      0.0kWh
+   16km    22.2%    20.1kWh/100km    75%       4.3%      20.9%        0.0%
+
+ 20221221  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  3.6kWh   1.1kWh     4.4km/kWh     2.3kWh    0.3kWh     1.0kWh      0.0kWh
+   16km    29.9%    22.6kWh/100km    63%       8.7%      28.7%        0.0%
+
+ 20221220  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  1.2kWh   0.3kWh     4.3km/kWh     0.7kWh    0.1kWh     0.4kWh      0.0kWh
+   5km     29.1%    23.3kWh/100km    59%      10.0%      30.9%        0.0%
+
+ 20221216  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  4.1kWh   0.8kWh     2.9km/kWh     1.8kWh    1.1kWh     1.2kWh      0.0kWh
+   12km    19.9%    34.1kWh/100km    44%      25.8%      30.3%        0.0%
+
+ 20221214  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  2.4kWh   1.0kWh     3.7km/kWh     1.3kWh    0.4kWh     0.7kWh      0.0kWh
+   9km     40.5%    26.9kWh/100km    56%      17.5%      26.8%        0.0%
+
+ 20221213  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  4.9kWh   1.4kWh     4.3km/kWh     2.9kWh    0.9kWh     1.1kWh      0.0kWh
+   21km    28.5%    23.3kWh/100km    59%      19.3%      21.8%        0.0%
+
+ 20221212  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  9.1kWh   1.8kWh     5.0km/kWh     6.9kWh    1.1kWh     1.0kWh      0.0kWh
+   45km    19.5%    20.2kWh/100km    76%      12.2%      11.3%        0.0%
+
+ 20221211  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  1.2kWh   0.4kWh     4.0km/kWh     0.8kWh    0.1kWh     0.3kWh      0.0kWh
+   5km     35.7%    25.0kWh/100km    63%       9.2%      28.0%        0.0%
+
+ 20221210  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  1.9kWh   0.7kWh     3.7km/kWh     1.2kWh    0.2kWh     0.5kWh      0.0kWh
+   7km     34.7%    27.3kWh/100km    63%       8.5%      28.3%        0.0%
+
+ 20221209  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  6.9kWh   1.7kWh     4.9km/kWh     5.1kWh    0.5kWh     1.3kWh      0.0kWh
+   34km    25.2%    20.3kWh/100km    74%       7.6%      18.8%        0.0%
+
+ 20221208  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  1.9kWh   0.6kWh     4.2km/kWh     1.0kWh    0.0kWh     0.9kWh      0.0kWh
+   8km     33.1%    24.0kWh/100km    54%       0.6%      45.8%        0.0%
+
+ 20221207  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  1.8kWh   0.4kWh     4.4km/kWh     1.1kWh    0.1kWh     0.6kWh      0.0kWh
+   8km     22.0%    23.0kWh/100km    61%       8.0%      31.0%        0.0%
+
+ 20221206  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  2.7kWh   0.9kWh     4.8km/kWh     1.7kWh    0.2kWh     0.8kWh      0.0kWh
+   13km    33.2%    20.7kWh/100km    62%       7.0%      30.8%        0.0%
+
+ 20221205  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  3.2kWh   1.1kWh     4.4km/kWh     2.0kWh    0.3kWh     0.9kWh      0.0kWh
+   14km    34.5%    22.9kWh/100km    62%      10.3%      27.8%        0.0%
+
+ 20221204  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+ 25.7kWh   2.5kWh     6.0km/kWh    23.2kWh    0.9kWh     1.5kWh      0.0kWh
+  154km     9.9%    16.7kWh/100km    91%       3.6%       5.8%        0.0%
+
+ 20221203  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  7.0kWh   2.4kWh     5.5km/kWh     5.5kWh    0.6kWh     0.9kWh      0.0kWh
+   38km    34.1%    18.3kWh/100km    79%       8.0%      13.1%        0.0%
+
+ 20221202  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+ 10.3kWh   3.4kWh     5.3km/kWh     7.8kWh    0.7kWh     1.8kWh      0.0kWh
+   54km    33.4%    19.0kWh/100km    76%       6.5%      17.6%        0.0%
+
+ 20221201  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  9.5kWh   3.1kWh     6.0km/kWh     7.8kWh    0.4kWh     1.4kWh      0.0kWh
+   57km    32.4%    16.7kWh/100km    82%       3.7%      14.5%        0.0%
+
+ 20221130  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  1.0kWh   0.5kWh     4.0km/kWh     0.6kWh    0.1kWh     0.3kWh      0.0kWh
+   4km     46.2%    25.2kWh/100km    61%       9.2%      29.8%        0.0%
+
+ 20221129  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  3.2kWh   1.3kWh     5.6km/kWh     2.3kWh    0.2kWh     0.7kWh      0.0kWh
+   18km    39.5%    18.0kWh/100km    70%       7.7%      22.3%        0.0%
+
+ 20221128  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  3.0kWh   1.1kWh     4.7km/kWh     1.9kWh    0.2kWh     0.9kWh      0.0kWh
+   14km    37.6%    21.4kWh/100km    63%       5.3%      31.4%        0.0%
+
+ 20221127  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+ 74.0kWh   4.0kWh     5.6km/kWh    68.6kWh    1.4kWh     3.9kWh      0.0kWh
+  418km     5.4%    17.7kWh/100km    93%       1.9%       5.3%        0.0%
+
+ 20221126  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  1.9kWh   0.6kWh     3.7km/kWh     1.1kWh    0.2kWh     0.6kWh      0.0kWh
+   7km     33.7%    26.9kWh/100km    60%       9.0%      31.4%        0.0%
+
+ 20221124  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  2.8kWh   1.3kWh     6.5km/kWh     2.2kWh    0.1kWh     0.4kWh      0.0kWh
+   18km    47.9%    15.5kWh/100km    80%       4.1%      15.8%        0.0%
+
+ 20221123  Regen     Consumption    Engine   Climate  Electronics BatteryCare
+  7.2kWh   2.1kWh     5.7km/kWh     5.6kWh    0.3kWh     1.3kWh      0.0kWh
+   41km    28.5%    17.6kWh/100km    77%       4.5%      18.4%        0.0%
