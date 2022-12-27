@@ -53,7 +53,7 @@ The following tools are available as pure Python3 scripts:
 
 # How to install python, packages and hyundai_connect_monitor
 Explanation for someone with no knowledge of python. I don't know what computer you have. Part of the tools is the regular retrieval of the data with the Python script monitor.py.
-For this you need to install Python. I have installed Python 3.9.13.
+For this you need to install Python 3.9 or higher. I have installed Python 3.9.13.
 [Here is more information about installing Python](https://realpython.com/installing-python/)
 
 Steps:
