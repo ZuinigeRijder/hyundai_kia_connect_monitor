@@ -15,6 +15,7 @@
 - [Examples](#examples)
 - - [monitor.csv](#monitorcsv)
 - - [python dailystats.py](#python-dailystatspy)
+- - [python dailystats.py sheetupdate](#python-dailystatspy-sheetupdate)
 - - [python summary.py](#python-summarypy)
 - - [python summary.py sheetupdate](#python-summarypy-sheetupdate)
 - - [python kml.py](#python-kmlpy)
@@ -36,6 +37,7 @@ Run monitor.py e.g. once per hour (I use it on a Raspberry Pi and on Windows 10 
 - where you have been at a specific day/hour
 - when you have charged and how much
 - see your 12 volt battery percentage fluctuation
+- EV range
 
 You can analyze the information over time with other scripts or e.g. with Excel:
 - summaries (see summary.py script)
@@ -45,6 +47,7 @@ You can analyze the information over time with other scripts or e.g. with Excel:
 
 The following tools are available as pure Python3 scripts:
 - monitor.py: Simple Python3 script to monitor values using [hyundai_kia_connect_api](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api)
+- dailystats.py: represent the gathered daily statistics by the car in a nice formatted text, including computed totals.
 - kml.py: transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations
 - summary.py: make summary per TRIP, DAY, WEEK, MONTH, YEAR with monitor.csv as input
 - shrink.py: Simple Python3 script to shrink monitor.csv, identical lines removed (first date/time column excluded)
@@ -97,6 +100,8 @@ OUTPUTFILES:
 - monitor.csv (appended when the last line is different) or monitor.VIN.csv (latter when multiple vehicles found)
 - monitor.dailystats.csv (appended with daily stats after last written daily stats date and not today) or monitor.dailystats.VIN.csv (latter when multiple vehicles found)
 - monitor.lastrun (rewritten with last run date/time of monitor.py) 
+
+Note: dailystats are only available in Europe.
 
 Make sure to configure monitor.cfg once:
 ```
@@ -152,19 +157,21 @@ Following information from hyundai_kia_connect_api is added to the monitor.csv f
 - charging
 - plugged
 - address (dependent on use_geocode configuration)
+- EV range
 
-Following information from hyundai_kia_connect_api is added to the monitor.dailystats.csv file (gathered by the car, so not computed by summary.py), with per day the following information:
+Following information from hyundai_kia_connect_api is added to the monitor.dailystats.csv file (gathered by the car, so not computed by summary.py), with per day the following information (only available for Europe):
 - date
 - distance
-- distance_unit
-- total_consumed Wh
-- regenerated_energy Wh
-- engine_consumption Wh
-- climate_consumption Wh
-- onboard_electronics_consumption Wh
-- battery_care_consumption Wh
+- distance unit
+- total consumed Wh
+- regenerated energy Wh
+- engine consumption Wh
+- climate consumption Wh
+- onboard electronics consumption Wh
+- battery care consumption Wh
 
 This information is used by the other tools:
+- dailystats.py (dailystats from hyundai_kia_connect_api only available for Europe)
 - summary.py
 - kml.py
 - shrink.py
@@ -227,16 +234,27 @@ With 60-minute forced updates:
 ```
 
 # dailystats.py
-Read the monitor.dailystats.csv file and represent the totals and statistics per day in a nice formatted text to standard output.
+Read the monitor.dailystats.csv file and represent the daily statistics by the car in a nice formatted text, including computed totals.
+- Note 1: dailystats from hyundai_kia_connect_api is only available for Europe
+- Note 2: you only need to run dailystats.py once a day, e.g. early in the morning, because only days before today are added to monitor.dailystats.csv
+- Note 3: For sheetupdate configure once gspread and a specific Google Spreadsheet: 
+- - [See configuration of gspread here](#configuration-of-gspread-for-python-summarypy-sheetupdate)
+- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if if vin=VIN is given as parameter)
+- - Go to your spreadsheet and share it with the client_email inside service_account.json created above
 
 Usage: 
 ```
 python dailystats.py
 or 
+python dailystats.py sheetupdate
+or 
 python dailystats.py vin=VIN
+or 
+python dailystats.py vin=VIN sheetupdate
 ```
 - INPUTFILE: monitor.dailystats.csv or monitor.dailystats.VIN.csv (latter if vin=VIN is given as parameter)
-- standard output: totals and per day in a nice formatted text to standard output
+- standard output: totals and daily statistics in a nice formatted text
+- Google spreadsheet update with name: monitor.dailystats or monitor.dailystats.VIN or (latter if vin=VIN is given as parameter)
 
 # summary.py
 make summary per TRIP, DAY, WEEK, MONTH, YEAR or a combination with monitor.csv as input or monitor.VIN.csv (latter if vin=VIN is given as parameter)
@@ -306,14 +324,14 @@ python summary.py sheetupdate vin=VIN
 - standard output: summary per DAY, WEEK, MONTH, YEAR in csv format
 - Google spreadsheet update with name: hyundai-kia-connect-monitor or monitor.VIN or (latter if vin=VIN is given as parameter)
 
-For easier use on a mobile phone, the spreadsheet will contain first the overall information in row 1 till 20:
+For easier use on a mobile phone, the spreadsheet will contain first the overall information in row 1 till 21:
 - Last update
 - Last entry
 - Odometer km
 - Driven km
 - +kWh
 - -kWh
--  km/kWh
+- km/kWh
 - kWh/100km
 - Cost Euro
 - Current SOC%
@@ -326,10 +344,11 @@ For easier use on a mobile phone, the spreadsheet will contain first the overall
 - Max 12V%
 - #Charges
 - #Trips
+- EV range
 
 And thereafter the last 50 lines of the summary in reverse order, so you do not need to scroll to the bottom for the latest values. The following columns per row:
 ```
-  Period     date        info    odometer    delta km       +kWh         -kWh    km/kWh  kWh/100km   cost Euro   SOC%CUR    AVG MIN MAX  12V%CUR    AVG MIN MAX  #charges      #trips      address
+  Period     date        info    odometer    delta km       +kWh         -kWh    km/kWh  kWh/100km   cost Euro   SOC%CUR    AVG MIN MAX  12V%CUR    AVG MIN MAX  #charges      #trips      address      EV range
 ```
   
 ## configuration of gspread for "python summary.py sheetupdate"
@@ -345,14 +364,14 @@ Follow the steps in this link above, here is the summary of these steps:
 - - Fill out the form
 - - Click "Create" and "Done".
 - - Press "Manage service accounts" above Service Accounts.
-- - Press on : near recently created service account and select Manage keys and then click on "ADD KEY > Create new key".
+- - Press on : near recently created service account and select "Manage keys" and then click on "ADD KEY > Create new key".
 - - Select JSON key type and press "Create".
 - - You will automatically download a JSON file with credentials
 - - Remember the path to the downloaded credentials json file. Also, in the next step you will need the value of client_email from this file.
 - - Move the downloaded json file to ~/.config/gspread/service_account.json. Windows users should put this file to %APPDATA%\gspread\service_account.json.
 - Setup a Google Spreasheet to be updated by sheetupdate
 - - In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai-kia-connect-monitor or monitor.VIN (latter if if vin=VIN is given as parameter)
-- - Go to your spreadsheet and share it with a client_email from the step above
+- - Go to your spreadsheet and share it with a client_email from the step above (inside service_account.json)
 - run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor or monitor.VIN spreadheet will be updated with a summary and the last 50 lines of standard output
 - configure to run "python summary.py sheetupdate" regularly, after having run "python monitor.py"
 
@@ -578,6 +597,12 @@ C:\Users\Rick\git\monitor>python dailystats.py
    41km    28.5%    17.6kWh/100km    77%       4.5%      18.4%        0.0%
 
 ```
+
+## python dailystats.py sheetupdate
+
+Screenshot of spreadsheet:
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/monitor.dailystats.GoogleSpreadsheet.png)
+
 
 ## python summary.py
 

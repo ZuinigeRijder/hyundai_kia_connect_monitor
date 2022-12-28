@@ -105,10 +105,7 @@ def writeln(filename, string):
         write_header = True
     with monitor_csv_file.open("a", encoding="utf-8") as file:
         if write_header:
-            file.write(
-                "datetime, longitude, latitude, engineOn" +
-                ", 12V%, odometer, SOC%, charging, plugged, address\n"
-            )
+            file.write("datetime, longitude, latitude, engineOn, 12V%, odometer, SOC%, charging, plugged, address, EV range\n")  # noqa pylint:disable=line-too-long
         file.write(string)
         file.write('\n')
 
@@ -220,20 +217,9 @@ def get_append_data():
                         # replace comma by semicolon for easier splitting
                         geocode_name = vehicle.geocode[0]
                         if geocode_name != '':
-                            geocode = ', ' + geocode_name.replace(',', ';')
+                            geocode = geocode_name.replace(',', ';')
 
-                line = (
-                    str(vehicle.last_updated_at) +
-                    ', ' + str(vehicle.location_longitude) +
-                    ', ' + str(vehicle.location_latitude) +
-                    ', ' + str(vehicle.engine_is_running) +
-                    ', ' + str(vehicle.car_battery_percentage) +
-                    ', ' + str(vehicle.odometer) +
-                    ', ' + str(vehicle.ev_battery_percentage) +
-                    ', ' + str(vehicle.ev_battery_is_charging) +
-                    ', ' + str(vehicle.ev_battery_is_plugged_in) +
-                    geocode
-                )
+                line = f"{vehicle.last_updated_at}, {vehicle.location_longitude}, {vehicle.location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {vehicle.odometer}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {vehicle.ev_driving_range}"   # noqa pylint:disable=line-too-long
                 if 'None, None' in line:  # something gone wrong, retry
                     log(f"Skipping Unexpected line: {line}")
                 else:

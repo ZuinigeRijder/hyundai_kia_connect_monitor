@@ -1,4 +1,4 @@
-datetime, longitude, latitude, engineOn, 12V%, odometer, SOC%, charging, plugged
+datetime, longitude, latitude, engineOn, 12V%, odometer, SOC%, charging, plugged, address, EV range
 2022-09-17 15:00:55+02:00, 5.124957, 51.68260, False, 90, 17324.2, 54, False, 0
 2022-09-17 16:00:51+02:00, 5.124957, 51.68260, False, 90, 17324.2, 54, False, 0
 2022-09-17 17:00:52+02:00, 5.124957, 51.68260, False, 90, 17324.2, 54, False, 0

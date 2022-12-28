@@ -4,8 +4,11 @@ Simple Python3 script to make a dailystats overview
 """
 import sys
 import os
+import traceback
+import time
 from datetime import datetime
 from pathlib import Path
+import gspread
 
 
 def log(msg):
@@ -64,7 +67,7 @@ def to_float(string):
     return float(string)
 
 
-KEYWORD_LIST = ['help', 'debug']
+KEYWORD_LIST = ['help', 'sheetupdate', 'debug']
 KEYWORD_ERROR = False
 for kindex in range(1, len(sys.argv)):
     if sys.argv[kindex].lower() not in KEYWORD_LIST:
@@ -76,9 +79,12 @@ for kindex in range(1, len(sys.argv)):
             KEYWORD_ERROR = True
 
 if KEYWORD_ERROR or arg_has('help'):
-    print('Usage: python dailystats.py [vin=VIN]')
+    print('Usage: python dailystats.py [sheetupdate] [vin=VIN]')
     exit()
 
+SHEETUPDATE = arg_has('sheetupdate')
+OUTPUT_SPREADSHEET_NAME = "monitor.dailystats"
+SHEET_CURRENT_ROW = 1
 
 INPUT_CSV_FILE = Path("monitor.dailystats.csv")
 INPUT_LASTRUN_FILE = Path("monitor.lastrun")
@@ -86,6 +92,7 @@ LENCHECK = 1
 VIN = get_vin_arg()
 if VIN != '':
     INPUT_CSV_FILE = Path(f"monitor.dailystats.{VIN}.csv")
+    OUTPUT_SPREADSHEET_NAME = f"monitor.dailystats.{VIN}"
     LENCHECK = 2
 debug(f"INPUT_CSV_FILE: {INPUT_CSV_FILE.name}")
 
@@ -174,6 +181,12 @@ def read_reverse_order(file_name):
             yield buffer.decode()[::-1]
 
 
+def split_output_to_sheet_list(string):
+    """ split output to sheet list """
+    split = string.split(',')
+    return [split]
+
+
 def increment_totals(line):
     """ handle line """
     debug(f"handle_line: {line}")
@@ -203,13 +216,22 @@ def increment_totals(line):
 COLUMN_WIDTHS = [9, 10, 15, 10, 10, 12, 11]
 
 
-def print_output(output):
+def print_output(sheet_array, output):
     """print output"""
+    global SHEET_CURRENT_ROW  # pylint:disable=global-statement
     split = output.split(',')
     for i in range(len(split)):  # pylint:disable=consider-using-enumerate
         text = split[i].center(COLUMN_WIDTHS[i])
         print(text, end='')
     print('')
+
+    if SHEETUPDATE:
+        list_output = split_output_to_sheet_list(output)
+        sheet_array.append({
+            'range': f"A{SHEET_CURRENT_ROW}:G{SHEET_CURRENT_ROW}",
+            'values': list_output,
+        })
+        SHEET_CURRENT_ROW += 1
 
 
 def print_stats(
@@ -238,13 +260,27 @@ def print_stats(
     electronics_kwh = electronics / 1000
     battery_care_kwh = batterycare / 1000
 
-    print_output(
-        f"{date},Regen,Consumption,Engine,Climate,Electronics,BatteryCare")  # noqa pylint:disable=line-too-long
-    print_output(
-        f"{consumed_kwh:.1f}kWh,{regenerated_kwh:.1f}kWh,{km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh,{engine_kwh:.1f}kWh,{climate_kwh:.1f}kWh,{electronics_kwh:.1f}kWh,{battery_care_kwh:.1f}kWh")  # noqa pylint:disable=line-too-long
-    print_output(
-        f"{distance}{TOTAL_UNIT},{regenerated_perc:.1f}%,{kwh_per_km_mi:.1f}kWh/100{TOTAL_UNIT},{engine_perc:.0f}%,{climate_perc:.1f}%,{electronics_perc:.1f}%,{battery_care_perc:.1f}%")  # noqa pylint:disable=line-too-long
-    print('')
+    sheet_array = []
+    if date == 'Totals':
+        lastrun = datetime.now().strftime("%Y%m%d %H:%M:%S")
+        print_output(sheet_array, f"Last run:,{lastrun},,,,,")
+        print_output(sheet_array, ",,,,,,")  # empty line/row
+    print_output(sheet_array, f"{date},Regen,Consumption,Engine,Climate,Electronics,BatteryCare")  # noqa pylint:disable=line-too-long
+    print_output(sheet_array, f"{consumed_kwh:.1f}kWh,{regenerated_kwh:.1f}kWh,{km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh,{engine_kwh:.1f}kWh,{climate_kwh:.1f}kWh,{electronics_kwh:.1f}kWh,{battery_care_kwh:.1f}kWh")  # noqa pylint:disable=line-too-long
+    print_output(sheet_array, f"{distance}{TOTAL_UNIT},{regenerated_perc:.1f}%,{kwh_per_km_mi:.1f}kWh/100{TOTAL_UNIT},{engine_perc:.0f}%,{climate_perc:.1f}%,{electronics_perc:.1f}%,{battery_care_perc:.1f}%")  # noqa pylint:disable=line-too-long
+    print_output(sheet_array, ',,,,,,')  # empty line/row
+    if SHEETUPDATE:
+        retries = 2
+        while retries > 0:
+            try:
+                SHEET.batch_update(sheet_array)
+                retries = 0
+            except Exception as exep:  # pylint: disable=broad-except
+                log('Exception: ' + str(exep))
+                traceback.print_exc()
+                retries -= 1
+                log("Sleeping a minute")
+                time.sleep(60)
 
 
 def summary():
@@ -292,6 +328,22 @@ def reverse_print_dailystats():
             to_int(val[BATTERY_CARE])
         )
 
+
+if SHEETUPDATE:
+    RETRIES = 2
+    while RETRIES > 0:
+        try:
+            gc = gspread.service_account()
+            spreadsheet = gc.open(OUTPUT_SPREADSHEET_NAME)
+            SHEET = spreadsheet.sheet1
+            SHEET.clear()
+            RETRIES = 0
+        except Exception as ex:  # pylint: disable=broad-except
+            log('Exception: ' + str(ex))
+            traceback.print_exc()
+            RETRIES -= 1
+            log("Sleeping a minute")
+            time.sleep(60)
 
 summary()  # do the total summary first
 reverse_print_dailystats()  # and then dailystats

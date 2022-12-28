@@ -139,6 +139,7 @@ SOC = 6  # SOC%
 CHARGING = 7  # charging
 PLUGGED = 8  # plugged
 LOCATION = 9  # location address (optional field)
+EV_RANGE = 10  # EV range (optional field)
 
 # indexes to total tuples
 T_CURRENT_DAY = 0
@@ -228,31 +229,18 @@ def split_output_to_sheet_list(queue_output):
 
 def print_output_queue():
     """ print output queue """
-    first_row = 21
     last_row = 73
     array = []
-
-    # clean rows first
-    list_output = split_output_to_sheet_list(",,,,,,,,,,,,,,,,,,,,,,")
     qlen = len(LAST_OUTPUT_QUEUE)
-    current_row = first_row
-    debug(f"current_row={current_row} last_row={last_row} queue_len={qlen}")
-    for _ in range(current_row, last_row):
-        debug(f"clear row: {current_row}")
-        array.append({
-                'range': f"A{current_row}:W{current_row}",
-                'values': list_output,
-            })
-        current_row += 1
+    current_row = last_row - (50 - qlen)
 
     # print queue entries in reverse order, so in spreadsheet latest is first
-    current_row = last_row - (50 - qlen)
     for queue_output in LAST_OUTPUT_QUEUE:
         current_row -= 1
         debug(f"write row: {current_row} {queue_output}")
         list_output = split_output_to_sheet_list(queue_output)
         array.append({
-            'range': f"A{current_row}:V{current_row}",
+            'range': f"A{current_row}:W{current_row}",
             'values': list_output,
         })
     SHEET.batch_update(array)
@@ -260,7 +248,7 @@ def print_output_queue():
 
 def print_header_and_update_queue():
     """print header and update queue"""
-    output=f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips, Address"  # noqa pylint:disable=line-too-long
+    output=f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips, Address, EV range"  # noqa pylint:disable=line-too-long
     print_output_and_update_queue(output)
 
 
@@ -273,7 +261,7 @@ def get_address(split):
     """ get address """
     debug(f"get_address: str{split}")
     location_str = ""
-    if len(split) > 9:
+    if len(split) > LOCATION:
         location_str = split[LOCATION].strip()
         if len(location_str) > 0:
             location_str = ' "' + location_str + '"'
@@ -355,6 +343,10 @@ def print_summary(prefix, current, values, split, factor):
 
     location_str = get_address(split)
 
+    ev_range = -1
+    if len(split) > EV_RANGE:
+        ev_range = to_int(split[EV_RANGE].strip())
+
     if SHEETUPDATE and prefix.startswith('SHEET'):
         km_mi_per_kwh_str = km_mi_per_kwh_str.strip()
         kwh_per_km_mi_str = kwh_per_km_mi_str.strip()
@@ -424,9 +416,12 @@ def print_summary(prefix, current, values, split, factor):
         }, {
             'range': 'A20:B20',
             'values': [["#Trips", f"{t_trips}"]],
+        }, {
+            'range': 'A21:B21',
+            'values': [["EV range", f"{ev_range}"]],
         }])
     else:
-        output=f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{location_str}"  # noqa pylint:disable=line-too-long
+        output=f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{location_str},{ev_range}"  # noqa pylint:disable=line-too-long
         print_output_and_update_queue(output)
 
 
@@ -827,6 +822,7 @@ if SHEETUPDATE:
             gc = gspread.service_account()
             spreadsheet = gc.open(OUTPUT_SPREADSHEET_NAME)
             SHEET = spreadsheet.sheet1
+            SHEET.clear()
             RETRIES = 0
         except Exception as ex:  # pylint: disable=broad-except
             log('Exception: ' + str(ex))
