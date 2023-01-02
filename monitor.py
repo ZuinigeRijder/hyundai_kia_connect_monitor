@@ -110,16 +110,19 @@ def writeln(filename, string):
 
 def get_last_line(filename):
     """ get last line of filename """
-    with open(filename, "rb") as file:
-        try:
-            file.seek(-2, os.SEEK_END)
-            while file.read(1) != b'\n':
-                file.seek(-2, os.SEEK_CUR)
-        except OSError:
-            file.seek(0)
-        last_line = file.readline().decode().strip()
-        debug(f"{filename} last_line: [{last_line}]")
-        return last_line
+    last_line = ''
+    filename_file = Path(filename)
+    if filename_file.is_file():
+        with open(filename, "rb") as file:
+            try:
+                file.seek(-2, os.SEEK_END)
+                while file.read(1) != b'\n':
+                    file.seek(-2, os.SEEK_CUR)
+            except OSError:
+                file.seek(0)
+            last_line = file.readline().decode().strip()
+            debug(f"{filename} last_line: [{last_line}]")
+    return last_line
 
 
 def get_last_date(last_line):

@@ -69,7 +69,7 @@ def to_float(string):
     """ convert to float """
     if "None" in string:
         return 0.0
-    return float(string)
+    return float(string.strip())
 
 
 def write(outputfile, line):
@@ -120,7 +120,7 @@ def write_kml(outputfile, count, items, prev_items):
     voltage_12 = items[V12].strip()
     if voltage_12 == 'None':
         voltage_12 = '-1'
-    odometer = to_float(items[ODO].strip())
+    odometer = to_float(items[ODO])
     if odometer == 0.0:
         return  # bad line
     soc = items[SOC].strip()
@@ -147,8 +147,7 @@ def write_kml(outputfile, count, items, prev_items):
 
     delta_odometer = 0
     if len(prev_items) > 8:
-        delta_odometer = round(
-            odometer - to_float(prev_items[ODO].strip()), 1)
+        delta_odometer = round(odometer - to_float(prev_items[ODO]), 1)
         if delta_odometer != 0.0:
             if delta_odometer > 0.0:
                 description += ' (+' + str(delta_odometer)

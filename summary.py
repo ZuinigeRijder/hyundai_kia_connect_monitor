@@ -60,14 +60,15 @@ def to_int(string):
     """ convert to int """
     if "None" in string:
         return -1
-    return int(string)
+    split = string.split('.')  # get rid of decimal part
+    return int(split[0].strip())
 
 
 def to_float(string):
     """ convert to float """
     if "None" in string:
         return 0.0
-    return float(string)
+    return float(string.strip())
 
 
 KEYWORD_LIST = ['trip', 'day', 'week', 'month', 'year', 'sheetupdate', '-trip', 'help', 'debug'] # noqa pylint:disable=line-too-long
@@ -345,7 +346,7 @@ def print_summary(prefix, current, values, split, factor):
 
     ev_range = -1
     if len(split) > EV_RANGE:
-        ev_range = to_int(split[EV_RANGE].strip())
+        ev_range = to_int(split[EV_RANGE])
 
     if SHEETUPDATE and prefix.startswith('SHEET'):
         km_mi_per_kwh_str = km_mi_per_kwh_str.strip()
@@ -543,10 +544,10 @@ def keep_track_of_totals(values, split, prev_split):
     debug("prev_split: " + str(prev_split))
     debug("     split: " + str(split))
 
-    odo = to_float(split[ODO].strip())
+    odo = to_float(split[ODO])
     if odo == 0.0:
         return values  # bad line
-    prev_odo = to_float(prev_split[ODO].strip())
+    prev_odo = to_float(prev_split[ODO])
     if prev_odo == 0.0:
         return values  # bad line
 
@@ -569,13 +570,13 @@ def keep_track_of_totals(values, split, prev_split):
         delta_odo = 0.0
 
     coord_changed = (
-        to_float(split[LAT].strip()) != to_float(prev_split[LAT].strip()) or
-        to_float(split[LON].strip()) != to_float(prev_split[LON].strip())
+        to_float(split[LAT]) != to_float(prev_split[LAT]) or
+        to_float(split[LON]) != to_float(prev_split[LON])
     )
     moved = coord_changed or delta_odo != 0.0
 
-    soc = to_int(split[SOC].strip())
-    prev_soc = to_int(prev_split[SOC].strip())
+    soc = to_int(split[SOC])
+    prev_soc = to_int(prev_split[SOC])
     delta_soc = soc - prev_soc
     if (soc == 0 or prev_soc == 0) and abs(delta_soc) > 5:
         # possibly wrong readout, take largest
@@ -596,8 +597,8 @@ def keep_track_of_totals(values, split, prev_split):
     t_soc_max = max(soc, t_soc_max)
 
     # keep track of average 12V over time
-    volt12 = to_int(split[V12].strip())
-    prev_volt12 = to_int(prev_split[V12].strip())
+    volt12 = to_int(split[V12])
+    prev_volt12 = to_int(prev_split[V12])
     average_volt12 = (volt12 + prev_volt12) / 2
     t_volt12_avg += (average_volt12 * elapsed_minutes)
     t_volt12_min = min(volt12, t_volt12_min)
@@ -665,7 +666,7 @@ def handle_line(linecount, split, prev_split, totals, last):
     """ handle_line """
     debug(f"handle_line: {split}, {prev_split}")
     global HIGHEST_ODO  # pylint:disable=global-statement
-    odo = to_float(split[ODO].strip())
+    odo = to_float(split[ODO])
     if odo == 0.0:
         debug(f"bad odo: {odo}")
         return totals  # bad line
@@ -738,16 +739,19 @@ def handle_line(linecount, split, prev_split, totals, last):
 
 def get_last_line(filename):
     """ get last line of filename """
-    with open(filename, "rb") as file:
-        try:
-            file.seek(-2, os.SEEK_END)
-            while file.read(1) != b'\n':
-                file.seek(-2, os.SEEK_CUR)
-        except OSError:
-            file.seek(0)
-        last_line = file.readline().decode().strip()
-        debug(f"{filename} last_line: [{last_line}]")
-        return last_line
+    last_line = ''
+    filename_file = Path(filename)
+    if filename_file.is_file():
+        with open(filename, "rb") as file:
+            try:
+                file.seek(-2, os.SEEK_END)
+                while file.read(1) != b'\n':
+                    file.seek(-2, os.SEEK_CUR)
+            except OSError:
+                file.seek(0)
+            last_line = file.readline().decode().strip()
+            debug(f"{filename} last_line: [{last_line}]")
+    return last_line
 
 
 def summary():

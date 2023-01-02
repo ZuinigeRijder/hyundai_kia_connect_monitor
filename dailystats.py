@@ -57,14 +57,15 @@ def to_int(string):
     """ convert to int """
     if "None" in string:
         return -1
-    return int(string.strip())
+    split = string.split('.')  # get rid of decimal part
+    return int(split[0].strip())
 
 
 def to_float(string):
     """ convert to float """
     if "None" in string:
         return 0.0
-    return float(string)
+    return float(string.strip())
 
 
 KEYWORD_LIST = ['help', 'sheetupdate', 'debug']
@@ -126,16 +127,19 @@ def float_to_string(input_value):
 
 def get_last_line(filename):
     """ get last line of filename """
-    with open(filename, "rb") as file:
-        try:
-            file.seek(-2, os.SEEK_END)
-            while file.read(1) != b'\n':
-                file.seek(-2, os.SEEK_CUR)
-        except OSError:
-            file.seek(0)
-        last_line = file.readline().decode()
-        debug(f"{filename} last_line: [{last_line}]")
-        return last_line
+    last_line = ''
+    filename_file = Path(filename)
+    if filename_file.is_file():
+        with open(filename, "rb") as file:
+            try:
+                file.seek(-2, os.SEEK_END)
+                while file.read(1) != b'\n':
+                    file.seek(-2, os.SEEK_CUR)
+            except OSError:
+                file.seek(0)
+            last_line = file.readline().decode()
+            debug(f"{filename} last_line: [{last_line}]")
+    return last_line
 
 
 def get_last_date(filename):
