@@ -50,6 +50,7 @@ def arg_has(string):
     return False
 
 
+# keep forceupdate and cacheupdate as keyword, but do nothing with them
 KEYWORD_LIST = ['forceupdate', 'cacheupdate', 'debug']
 KEYWORD_ERROR = False
 for kindex in range(1, len(sys.argv)):
@@ -58,12 +59,10 @@ for kindex in range(1, len(sys.argv)):
         KEYWORD_ERROR = True
 
 if KEYWORD_ERROR or arg_has('help'):
-    print('Usage: python monitor.py [forceupdate|cacheupdate]')
+    print('Usage: python monitor.py')
     exit()
 
 DEBUG = arg_has('debug')
-FORCEUPDATE = arg_has('forceupdate')
-CACHEUPDATE = arg_has('cacheupdate')
 
 
 # == read monitor in monitor.cfg ===========================
@@ -76,7 +75,6 @@ BRAND = monitor_settings['brand']
 USERNAME = monitor_settings['username']
 PASSWORD = monitor_settings['password']
 PIN = monitor_settings['pin']
-FORCE_SECONDS = int(monitor_settings['force_update_seconds'])
 USE_GEOCODE = monitor_settings['use_geocode'].lower() == 'true'
 USE_GEOCODE_EMAIL = monitor_settings['use_geocode_email'].lower() == 'true'
 LANGUAGE = monitor_settings['language']
@@ -198,15 +196,6 @@ def get_append_data():
                 language=LANGUAGE
             )
             manager.check_and_refresh_token()
-            if CACHEUPDATE:
-                debug("CACHEUPDATE")
-                manager.update_all_vehicles_with_cached_state()
-            elif FORCEUPDATE:
-                debug("FORCEUPDATE")
-                manager.check_and_force_update_vehicles(600)
-            else:
-                debug(f"check_and_force_update_vehicles: {FORCE_SECONDS}")
-                manager.check_and_force_update_vehicles(FORCE_SECONDS)
 
             line = ''
             number_of_vehicles = len(manager.vehicles)

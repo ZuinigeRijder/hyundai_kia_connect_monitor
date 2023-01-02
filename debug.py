@@ -113,8 +113,6 @@ vm = VehicleManager(
     pin=PIN
 )
 vm.check_and_refresh_token()
-# vm.check_and_force_update_vehicles(600)
-vm.update_all_vehicles_with_cached_state()
 print(type(vm.vehicles))
 print(vm.vehicles)
 print("Pretty print vm.vehicles:")

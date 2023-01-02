@@ -2,8 +2,6 @@
 - [Introduction](#introduction-hyundai_kia_connect_monitor)
 - [How to install python, packages and hyundai_connect_monitor](#how-to-install-python-packages-and-hyundai_connect_monitor)
 - [monitor.py](#monitorpy)
-- [python monitor.py cacheupdate](#python-monitorpy-cacheupdate)
-- [python monitor.py forceupdate](#python-monitorpy-forceupdate)
 - [dailystats.py](#dailystatspy)
 - [summary.py](#summarypy)
 - [summary.py sheetupdate](#summarypy-sheetupdate)
@@ -25,9 +23,9 @@
 # Introduction hyundai_kia_connect_monitor
 Automatic trip administration tools for Hyundai Bluelink or Kia UVO Connect users.
 Determining afterwards your private and/or business trips and information about those trips and usage of the car.
-Best of all is the fact that it does NOT drain your 12 volt battery of the car, because it default uses the cached server information!
+Best of all is the fact that it does NOT drain your 12 volt battery of the car, because it only uses the cached server information!
 
-[This video shows why it is important to avoid awakening the car for actual values.](https://youtu.be/rpLWEe-2aUU?t=121) 30 nov 6:10 a forceupdate has been done and you see a dip from 12.92 Volt to 12.42 Volt for a moment and then back to 12.83 Volt. Note by default the tool asks only for server cache updates and the car decides when to send push notifications with actual values to the server.
+[This video shows why it is important to avoid awakening the car for actual values.](https://youtu.be/rpLWEe-2aUU?t=121) 30 nov 6:10 a refresh via the Bluelink App has been done and you see a dip from 12.92 Volt to 12.42 Volt for a moment and then back to 12.83 Volt. Note the tool asks only for server cache updates and the car decides when to send push notifications with actual values to the server.
 
 Run monitor.py e.g. once per hour (I use it on a Raspberry Pi and on Windows 10 with pure Python, buit it will also run on Mac or a linux Operating System) and you can always check afterwards:
 - captured locations
@@ -88,10 +86,6 @@ Simple Python3 script to monitor values using [hyundai_kia_connect_api](https://
 Usage:
 ```
 python monitor.py
-or
-python monitor.py cacheupdate
-or
-python monitor.py forceupdate
 ```
 INPUTFILE: 
 - monitor.cfg (configuration of input to hyundai_kia_connect_api)
@@ -111,7 +105,6 @@ brand = 2
 username = your_email
 password = your_password
 pin =
-force_update_seconds = 604800
 use_geocode = True
 use_geocode_email = True
 language = en
@@ -123,7 +116,6 @@ Explanation of the configuration items:
 - username: your bluelink account email address
 - password: password of your bluelink account
 - pin: pincode of your bluelink account, required for CANADA, and potentially USA, otherwise pass a blank string
-- force_update_seconds: do a forceupdate when the latest cached server information is older than the specified seconds (604800 seconds = 7 days)
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
 - use_geocode_email: (default: True) use email to avoid abuse of address lookup
 - language: (default: en) the Bluelink App is reset to English for users who have set another language in the Bluelink App in Europe when using hyundai_kia_connect_api, you can configure another language as workaround
@@ -176,11 +168,17 @@ This information is used by the other tools:
 - kml.py
 - shrink.py
 
-The monitor tool will by default only do a forced update when the last server update is more than 7 days ago, so the 12 volt battery is NOT drained by the tool. 
-This time difference is configurable, so you can decide to do it more often, e.g. once a day.
-But you have also the option to only use cacheupdate as parameter to monitor.py, so never the car is asked for actual values by the tool.
-And you can also run a forceupdate as parameter to monitor.py, or e.g. once a day.
-Choose the options you like the most.
+The monitor.py tool will by never do a forced update and only asks for cached server values, so the 12 volt battery is NOT drained by the tool. 
+Note that if you do a lot of refresh calls by Hyundai Bluelink or Kia Connect App, than definitely the car 12 volt battery can be drained.
+See [here some results of someone with an IONIQ 5 using refresh](https://community.home-assistant.io/t/hyundai-bluelink-integration/319129/132), so use refresh carefully:
+```
+With 15-minute refreshed:
+95% to 80% in 8 hours, approx. 1.8%/hour
+
+With 60-minute refreshed:
+93% to 82% in 14 hours, approx. 0.78%/hour
+```
+Therefor it is chosen to make it not possible to do a forcerefresh via the monitor tools (earlier versions of monitor had this non-default possibility).
 
 Note that the number of API calls is restricted for Hyundai Bluelink or Kia UVO Connect users, see [this page for API Rate Limits](https://github.com/Hacksore/bluelinky/wiki/API-Rate-Limits)
 ```
@@ -204,34 +202,7 @@ You also can consider only to monitor between e.g. 6:00 and 22:00 (saves 1/3 of 
 - each quarter hour between 6:00 and 19:00 means 52 requests per day
 - each quarter hour between 6:00 and 22:00 means 64 requests per day
 
-## python monitor.py cacheupdate
-If you only ask for cached values, the car will not be woken up, the 12 volt battery of the car will not be drained by the tool and you will only get the cached values from the server.
 
-The car sends the updates (push messages) to the server when something happens on the car side. This is the case when the car is started or switched off, when charging is complete and possibly in other situations.
-So no extra drain of the 12 volt battery because of the hyundai_kia_connect_monitor tool!
-
-And of course when you run an update or command through the Bluelink app, but that is on purpose.
-
-I do not know if the cacheupdate calls are part of the daily limits or if this is only related to forceupdate.
-Because in Europe the limit is 200, I did choose to run once per 15 minutes, so more accurate trips and charging sessions are recorded.
-No 12 volt battery drain, because of server calls using cached values only.
-- python monitor.py cacheupdate
-
-See also [Raspberry Pi Configuration](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor#raspberry-pi-configuration)
-
-## python monitor.py forceupdate
-I did choose to run forceupdate once per day at 6:10 in the morning:
-- python monitor.py forceupdate
-
-Note that if you do a lot of forceupdate calls, than definitely the car 12 volt battery can be drained.
-See [here some results of someone with an IONIQ 5 using forceupdate](https://community.home-assistant.io/t/hyundai-bluelink-integration/319129/132), so use this forceupdate option carefully:
-```
-With 15-minute forced updates:
-95% to 80% in 8 hours, approx. 1.8%/hour
-
-With 60-minute forced updates:
-93% to 82% in 14 hours, approx. 0.78%/hour
-```
 
 # dailystats.py
 Read the monitor.dailystats.csv file and represent the daily statistics by the car in a nice formatted text, including computed totals.
@@ -435,17 +406,11 @@ crontab -e:
 Note: 
 - there is a limit in the number of request per country, but 1 request per hour should not hamper using the Bluelink or UVO Connect App at the same time
 
-I also want to update the google spreadsheet, so I adapted [run_monitor_once.sh](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/run_monitor_once.sh) to run a summary after running cacheupdate.
+I also want to update the google spreadsheet, so I adapted [run_monitor_once.sh](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/run_monitor_once.sh) to run a summary after running monitor.py.
 The last line of run_monitor_once.sh is changed into:
 ```
-/usr/bin/python -u ~/hyundai_kia_connect_monitor/monitor.py cacheupdate >> run_monitor_once.log 2>&1
+/usr/bin/python -u ~/hyundai_kia_connect_monitor/monitor.py >> run_monitor_once.log 2>&1
 /usr/bin/python -u ~/hyundai_kia_connect_monitor/summary.py trip sheetupdate > run_monitor_once.summary.log 2>&1
-```
-
-And I did configure to run cacheupdate every 15 minutes (I have a 200 API calls limit in Europe and cacheupdate does not drain 12 volt battery).
-crontab -e:
-```
-*/15 * * * * ~/hyundai_kia_connect_monitor/run_monitor_once.sh >> ~/hyundai_kia_connect_monitor/run_monitor_once.log 2>&1
 ```
 
 # debug.py
