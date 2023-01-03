@@ -92,6 +92,14 @@ def log(msg):
     print(datetime.now().strftime("%Y%m%d %H:%M:%S") + ': ' + msg)
 
 
+def to_int(string):
+    """ convert to int """
+    if "None" in string:
+        return -1
+    split = string.split('.')  # get rid of decimal part
+    return int(split[0].strip())
+
+
 def writeln(filename, string):
     """ append line at monitor text file with end of line character """
     debug(string)
@@ -211,7 +219,14 @@ def get_append_data():
                         if geocode_name != '':
                             geocode = geocode_name.replace(',', ';')
 
-                line = f"{vehicle.last_updated_at}, {vehicle.location_longitude}, {vehicle.location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {vehicle.odometer}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {vehicle.ev_driving_range}"   # noqa pylint:disable=line-too-long
+                dates = [
+                    vehicle.last_updated_at,
+                    vehicle._location_last_set_time   # noqa pylint:disable=protected-access
+                ]
+                newest_datetime = max(dates)
+                debug(f"newest: {newest_datetime} from {dates}")
+                ev_driving_range = to_int(f"{vehicle.ev_driving_range}")
+                line = f"{newest_datetime}, {vehicle.location_longitude}, {vehicle.location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {vehicle.odometer}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"   # noqa pylint:disable=line-too-long
                 if 'None, None' in line:  # something gone wrong, retry
                     log(f"Skipping Unexpected line: {line}")
                 else:
