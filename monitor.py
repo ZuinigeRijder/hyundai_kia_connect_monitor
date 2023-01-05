@@ -35,6 +35,7 @@ import os
 import configparser
 import traceback
 import time
+import logging
 from datetime import datetime
 from pathlib import Path
 from hyundai_kia_connect_api import VehicleManager
@@ -63,6 +64,8 @@ if KEYWORD_ERROR or arg_has('help'):
     exit()
 
 DEBUG = arg_has('debug')
+if DEBUG:
+    logging.basicConfig(level=logging.DEBUG)
 
 
 # == read monitor in monitor.cfg ===========================
@@ -84,12 +87,12 @@ LANGUAGE = monitor_settings['language']
 def debug(line):
     """ print line if debugging """
     if DEBUG:
-        print(datetime.now().strftime("%Y%m%d %H:%M:%S") + ': ' + line)
+        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ': ' + line)
 
 
 def log(msg):
     """log a message prefixed with a date/time format yyyymmdd hh:mm:ss"""
-    print(datetime.now().strftime("%Y%m%d %H:%M:%S") + ': ' + msg)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ': ' + msg)
 
 
 def to_int(string):
@@ -182,16 +185,86 @@ def handle_daily_stats(vehicle, number_of_vehicles):
                 debug(f"Skipping dailystats: [{dailystats_date}] [{last_line}]")  # noqa pylint:disable=line-too-long
 
 
-def write_last_run():
+def write_last_run(vehicle, number_of_vehicles, vehicle_stats):
     """ write last run """
     filename = "monitor.lastrun"
+    vin = vehicle.VIN
+    if number_of_vehicles > 1:
+        filename = "monitor." + vin + ".lastrun"
     lastrun_file = Path(filename)
     with lastrun_file.open("w", encoding="utf-8") as file:
-        file.write(datetime.now().strftime("%Y%m%d %H:%M:%S\n"))
+        now_string = datetime.now().strftime("%Y-%m-%d %H:%M %a")
+        newest_updated_at = vehicle_stats[0].split("+")[0]
+        last_updated_at = vehicle_stats[1].split("+")[0]
+        location_last_updated_at = vehicle_stats[2].split("+")[0]
+        last_line = vehicle_stats[3]
+        file.write(f"last run   ; {now_string}\n")
+        file.write(f"vin        ; {vin}\n")
+        file.write(f"newest dt  ; {newest_updated_at}\n")
+        file.write(f"last dt    ; {last_updated_at}\n")
+        file.write(f"location dt; {location_last_updated_at}\n")
+        file.write("last line   ;\n")
+        file.write(f"{last_line}\n")
 
 
-def get_append_data():
-    """ get_append_data """
+def handle_one_vehicle(vehicle, number_of_vehicles):
+    """ handle one vehicle and return if error occurred"""
+    geocode = ''
+    if USE_GEOCODE:
+        if len(vehicle.geocode) > 0:
+            # replace comma by semicolon for easier splitting
+            geocode_name = vehicle.geocode[0]
+            if geocode_name != '':
+                geocode = geocode_name.replace(',', ';')
+
+    last_updated_at = vehicle.last_updated_at
+    location_last_updated_at = vehicle._location_last_set_time   # noqa pylint:disable=protected-access
+    # vehicle.location_last_updated_at  # api 2.1.2 onwards
+    dates = [last_updated_at, location_last_updated_at]
+    newest_updated_at = max(dates)
+    debug(f"newest: {newest_updated_at} from {dates}")
+    ev_driving_range = to_int(f"{vehicle.ev_driving_range}")
+    line = f"{newest_updated_at}, {vehicle.location_longitude}, {vehicle.location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {vehicle.odometer}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"   # noqa pylint:disable=line-too-long
+    if 'None, None' in line:  # something gone wrong, retry
+        log(f"Skipping Unexpected line: {line}")
+        return True  # exit subroutine with error
+
+    filename = "monitor.csv"
+    if number_of_vehicles > 1:
+        filename = "monitor." + vehicle.VIN + ".csv"
+    last_line = get_last_line(filename)
+    last_date = get_last_date(last_line)
+    current_date = line.split(",")[0].strip()
+    debug(f"Current date:          [{current_date}]")
+    if current_date == last_date:
+        if line != last_line:
+            debug(f"Writing1:\nline=[{line}]\nlast=[{last_line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]")  # noqa pylint:disable=line-too-long
+            writeln(filename, line)
+        else:
+            debug(f"Skipping1:\nline=[{line}]\nlast=[{last_line}]")  # noqa pylint:disable=line-too-long
+    else:
+        debug(f"Writing2:\nline=[{line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]")   # noqa pylint:disable=line-too-long
+        writeln(filename, line)
+    handle_daily_stats(vehicle, number_of_vehicles)
+    vehicle_stats = [
+        str(newest_updated_at),
+        str(last_updated_at),
+        str(location_last_updated_at),
+        line
+    ]
+    write_last_run(vehicle, number_of_vehicles, vehicle_stats)
+    return False
+
+
+def sleep(retries):
+    """ sleep when retries > 0 """
+    if retries > 0:
+        log("Sleeping a minute")
+        time.sleep(60)
+
+
+def handle_vehicles():
+    """ handle vehicles """
     retries = 2
     while retries > 0:
         try:
@@ -207,60 +280,25 @@ def get_append_data():
                 language=LANGUAGE
             )
             manager.check_and_refresh_token()
+            manager.update_all_vehicles_with_cached_state()  # needed >= 2.0.0
 
-            line = ''
             number_of_vehicles = len(manager.vehicles)
+            error = False
             for _, vehicle in manager.vehicles.items():
-                geocode = ''
-                if USE_GEOCODE:
-                    if len(vehicle.geocode) > 0:
-                        # replace comma by semicolon for easier splitting
-                        geocode_name = vehicle.geocode[0]
-                        if geocode_name != '':
-                            geocode = geocode_name.replace(',', ';')
+                error = handle_one_vehicle(vehicle, number_of_vehicles)
+                if error:  # something gone wrong, exit loop
+                    break
 
-                dates = [
-                    vehicle.last_updated_at,
-                    vehicle._location_last_set_time   # noqa pylint:disable=protected-access
-                ]
-                newest_datetime = max(dates)
-                debug(f"newest: {newest_datetime} from {dates}")
-                ev_driving_range = to_int(f"{vehicle.ev_driving_range}")
-                line = f"{newest_datetime}, {vehicle.location_longitude}, {vehicle.location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {vehicle.odometer}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"   # noqa pylint:disable=line-too-long
-                if 'None, None' in line:  # something gone wrong, retry
-                    log(f"Skipping Unexpected line: {line}")
-                else:
-                    filename = "monitor.csv"
-                    if number_of_vehicles > 1:
-                        filename = "monitor." + vehicle.VIN + ".csv"
-                    last_line = get_last_line(filename)
-                    last_date = get_last_date(last_line)
-                    current_date = line.split(",")[0].strip()
-                    debug(f"Current date:          [{current_date}]")
-                    if current_date == last_date:
-                        if line != last_line:
-                            debug(f"Writing1:\nline=[{line}]\nlast=[{last_line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]")  # noqa pylint:disable=line-too-long
-                            writeln(filename, line)
-                        else:
-                            debug(f"Skipping1:\nline=[{line}]\nlast=[{last_line}]")  # noqa pylint:disable=line-too-long
-                    else:
-                        debug(f"Writing2:\nline=[{line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]")   # noqa pylint:disable=line-too-long
-                        writeln(filename, line)
-                    handle_daily_stats(vehicle, number_of_vehicles)
-
-            if 'None, None' in line:  # something gone wrong, retry
+            if error:  # something gone wrong, retry
                 retries -= 1
-                log("Sleeping a minute")
-                time.sleep(60)
+                sleep(retries)
             else:
                 retries = 0  # successfully end while loop
-                write_last_run()
         except Exception as ex:  # pylint: disable=broad-except
             log('Exception: ' + str(ex))
             traceback.print_exc()
             retries -= 1
-            log("Sleeping a minute")
-            time.sleep(60)
+            sleep(retries)
 
 
-get_append_data()  # do the work
+handle_vehicles()  # do the work

@@ -93,6 +93,7 @@ LENCHECK = 1
 VIN = get_vin_arg()
 if VIN != '':
     INPUT_CSV_FILE = Path(f"monitor.dailystats.{VIN}.csv")
+    INPUT_LASTRUN_FILE = Path(f"monitor.{VIN}.lastrun")
     OUTPUT_SPREADSHEET_NAME = f"monitor.dailystats.{VIN}"
     LENCHECK = 2
 debug(f"INPUT_CSV_FILE: {INPUT_CSV_FILE.name}")
@@ -217,7 +218,7 @@ def increment_totals(line):
     TOTAL_BATTERY_CARE += battery_care
 
 
-COLUMN_WIDTHS = [9, 10, 15, 10, 10, 12, 11]
+COLUMN_WIDTHS = [11, 10, 15, 10, 10, 10, 11]
 
 
 def print_output(sheet_array, output):
@@ -266,13 +267,15 @@ def print_stats(
 
     sheet_array = []
     if date == 'Totals':
-        lastrun = datetime.now().strftime("%Y%m%d %H:%M:%S")
-        print_output(sheet_array, f"Last run:,{lastrun},,,,,")
+        lastrun = datetime.now().strftime("%Y-%m-%d %H:%M %a")
+        print_output(sheet_array, f"Last run,{lastrun},,,,,")
         print_output(sheet_array, ",,,,,,")  # empty line/row
-    print_output(sheet_array, f"{date},Regen,Consumption,Engine,Climate,Electronics,BatteryCare")  # noqa pylint:disable=line-too-long
+
+    print_output(sheet_array, f"{date},Regen,Consumption,Engine,Climate,Electr.,BatteryCare")  # noqa pylint:disable=line-too-long
     print_output(sheet_array, f"{consumed_kwh:.1f}kWh,{regenerated_kwh:.1f}kWh,{km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh,{engine_kwh:.1f}kWh,{climate_kwh:.1f}kWh,{electronics_kwh:.1f}kWh,{battery_care_kwh:.1f}kWh")  # noqa pylint:disable=line-too-long
     print_output(sheet_array, f"{distance}{TOTAL_UNIT},{regenerated_perc:.1f}%,{kwh_per_km_mi:.1f}kWh/100{TOTAL_UNIT},{engine_perc:.0f}%,{climate_perc:.1f}%,{electronics_perc:.1f}%,{battery_care_perc:.1f}%")  # noqa pylint:disable=line-too-long
     print_output(sheet_array, ',,,,,,')  # empty line/row
+
     if SHEETUPDATE:
         retries = 2
         while retries > 0:
@@ -321,8 +324,11 @@ def reverse_print_dailystats():
         val = line.split(',')
         if len(val) != 9 or line.startswith("date"):
             continue
+        date = val[DATE].strip()
+        if len(date) == 8:
+            date = date[0:4] + "-" + date[4:6] + "-" + date[6:]
         print_stats(
-            val[DATE],
+            date,
             to_int(val[DISTANCE]),
             to_int(val[CONSUMED]),
             to_int(val[REGENERATED]),

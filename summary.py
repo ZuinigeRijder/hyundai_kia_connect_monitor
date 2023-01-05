@@ -94,6 +94,7 @@ LENCHECK = 1
 VIN = get_vin_arg()
 if VIN != '':
     INPUT_CSV_FILE = Path(f"monitor.{VIN}.csv")
+    INPUT_LASTRUN_FILE = Path(f"monitor.{VIN}.lastrun")
     OUTPUT_SPREADSHEET_NAME = f"monitor.{VIN}"
     LENCHECK = 2
 debug(f"INPUT_CSV_FILE: {INPUT_CSV_FILE.name}")
@@ -230,7 +231,7 @@ def split_output_to_sheet_list(queue_output):
 
 def print_output_queue():
     """ print output queue """
-    last_row = 73
+    last_row = 76
     array = []
     qlen = len(LAST_OUTPUT_QUEUE)
     current_row = last_row - (50 - qlen)
@@ -268,6 +269,16 @@ def get_address(split):
             location_str = ' "' + location_str + '"'
 
     return location_str
+
+
+def get_splitted_list_item(the_list, index):
+    """ get splitted item from list """
+    if index < 0 or index >= len(the_list):
+        return ['', '']
+    items = the_list[index].split(";")
+    if len(items) != 2:
+        return ['', '']
+    return [items[0].strip(), items[1].strip()]
 
 
 def print_summary(prefix, current, values, split, factor):
@@ -353,72 +364,89 @@ def print_summary(prefix, current, values, split, factor):
         kwh_per_km_mi_str = kwh_per_km_mi_str.strip()
         cost_str = cost_str.strip()
         prefix = prefix.replace("SHEET ", "")
+        last_line = get_last_line(INPUT_CSV_FILE)
         last_update_datetime = datetime.fromtimestamp(
             INPUT_LASTRUN_FILE.stat().st_mtime)
-        last_line = get_last_line(INPUT_CSV_FILE)
         day_info = last_update_datetime.strftime("%Y-%m-%d %H:%M %a")
+
+        lastrun_lines = []
+        with INPUT_LASTRUN_FILE.open("r", encoding="utf-8") as lastrun_file:
+            lastrun_lines = lastrun_file.readlines()
+
+        newest_updated_at = get_splitted_list_item(lastrun_lines, 2)
+        last_updated_at = get_splitted_list_item(lastrun_lines, 3)
+        location_last_updated_at = get_splitted_list_item(lastrun_lines, 4)
         SHEET.batch_update([{
             'range': 'A1:B1',
-            'values': [["Last update", f"{day_info}"]],
-        }, {
+            'values': [["Last run", f"{day_info}"]],
+         }, {
             'range': 'A2:B2',
-            'values': [["Last entry", f"{last_line}"]],
-        }, {
+            'values': [[newest_updated_at[0], f"{newest_updated_at[1]}"]],
+         }, {
             'range': 'A3:B3',
-            'values': [["Last address", f"{location_str}"]],
-        }, {
+            'values': [[last_updated_at[0], f"{last_updated_at[1]}"]],
+         }, {
             'range': 'A4:B4',
-            'values': [[f"Odometer {ODO_METRIC}", f"{odo:.1f}"]],
+            'values': [[location_last_updated_at[0], f"{location_last_updated_at[1]}"]],  # noqa pylint:disable=line-too-long
         }, {
             'range': 'A5:B5',
-            'values': [[f"Driven {ODO_METRIC}", f"{delta_odo:.1f}"]],
+            'values': [["Last entry", f"{last_line}"]],
         }, {
             'range': 'A6:B6',
-            'values': [["+kWh", f"{charged_kwh:.1f}"]],
+            'values': [["Last address", f"{location_str}"]],
         }, {
             'range': 'A7:B7',
-            'values': [["-kWh", f"{discharged_kwh:.1f}"]],
+            'values': [[f"Odometer {ODO_METRIC}", f"{odo:.1f}"]],
         }, {
             'range': 'A8:B8',
-            'values': [[f"{ODO_METRIC}/kWh", f"{km_mi_per_kwh_str}"]],
+            'values': [[f"Driven {ODO_METRIC}", f"{delta_odo:.1f}"]],
         }, {
             'range': 'A9:B9',
-            'values': [[f"kWh/100{ODO_METRIC}", f"{kwh_per_km_mi_str}"]],
+            'values': [["+kWh", f"{charged_kwh:.1f}"]],
         }, {
             'range': 'A10:B10',
-            'values': [[f"Cost {COST_CURRENCY}", f"{cost_str}"]],
+            'values': [["-kWh", f"{discharged_kwh:.1f}"]],
         }, {
             'range': 'A11:B11',
-            'values': [["Current SOC%", f"{t_soc_cur}"]],
+            'values': [[f"{ODO_METRIC}/kWh", f"{km_mi_per_kwh_str}"]],
         }, {
             'range': 'A12:B12',
-            'values': [["Average SOC%", f"{t_soc_avg}"]],
+            'values': [[f"kWh/100{ODO_METRIC}", f"{kwh_per_km_mi_str}"]],
         }, {
             'range': 'A13:B13',
-            'values': [["Min SOC%", f"{t_soc_min}"]],
+            'values': [[f"Cost {COST_CURRENCY}", f"{cost_str}"]],
         }, {
             'range': 'A14:B14',
-            'values': [["Max SOC%", f"{t_soc_max}"]],
+            'values': [["Current SOC%", f"{t_soc_cur}"]],
         }, {
             'range': 'A15:B15',
-            'values': [["Current 12V%", f"{t_volt12_cur}"]],
+            'values': [["Average SOC%", f"{t_soc_avg}"]],
         }, {
             'range': 'A16:B16',
-            'values': [["Average 12V%", f"{t_volt12_avg}"]],
+            'values': [["Min SOC%", f"{t_soc_min}"]],
         }, {
             'range': 'A17:B17',
-            'values': [["Min 12V%", f"{t_volt12_min}"]],
+            'values': [["Max SOC%", f"{t_soc_max}"]],
         }, {
             'range': 'A18:B18',
-            'values': [["Max 12V%", f"{t_volt12_max}"]],
+            'values': [["Current 12V%", f"{t_volt12_cur}"]],
         }, {
             'range': 'A19:B19',
-            'values': [["#Charges", f"{t_charges}"]],
+            'values': [["Average 12V%", f"{t_volt12_avg}"]],
         }, {
             'range': 'A20:B20',
-            'values': [["#Trips", f"{t_trips}"]],
+            'values': [["Min 12V%", f"{t_volt12_min}"]],
         }, {
             'range': 'A21:B21',
+            'values': [["Max 12V%", f"{t_volt12_max}"]],
+        }, {
+            'range': 'A22:B22',
+            'values': [["#Charges", f"{t_charges}"]],
+        }, {
+            'range': 'A23:B23',
+            'values': [["#Trips", f"{t_trips}"]],
+        }, {
+            'range': 'A24:B24',
             'values': [["EV range", f"{ev_range}"]],
         }])
     else:
