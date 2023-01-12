@@ -17,7 +17,7 @@ from pathlib import Path
 
 
 def get_vin_arg():
-    """ get vin arg"""
+    """get vin arg"""
     for i in range(1, len(sys.argv)):
         if "vin=" in sys.argv[i].lower():
             vin = sys.argv[i]
@@ -25,29 +25,32 @@ def get_vin_arg():
             vin = vin.replace("VIN=", "")
             return vin
 
-    return ''
+    return ""
 
 
 INPUT_CSV_FILE = Path("monitor.csv")
 OUTPUT_CSV_FILE = Path("shrinked_monitor.csv")
 VIN = get_vin_arg()
-if VIN != '':
+if VIN != "":
     INPUT_CSV_FILE = Path(f"monitor.{VIN}.csv")
     OUTPUT_CSV_FILE = Path(f"shrinked_monitor.{VIN}.csv")
 
 
 def shrink():
-    """ shrink csv file """
+    """shrink csv file"""
     with INPUT_CSV_FILE.open("r", encoding="utf-8") as inputfile:
         with OUTPUT_CSV_FILE.open("w", encoding="utf-8") as outputfile:
-            prevline = ''
+            prevline = ""
             previndex = -1
             for line in inputfile:
-                index = line.find(',')
-                if index < 0 or previndex < 0 or index != previndex or \
-                        prevline[previndex:] != line[index:]:
-                    tmp = line.replace("False", "0").replace("True", "1")
-                    outputfile.write(tmp)
+                index = line.find(",")
+                if (
+                    index < 0
+                    or previndex < 0
+                    or index != previndex
+                    or prevline[previndex:] != line[index:]
+                ):
+                    outputfile.write(line)
 
                 prevline = line
                 previndex = index

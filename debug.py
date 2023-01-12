@@ -8,14 +8,14 @@ logging.basicConfig(level=logging.DEBUG)
 
 # == read monitor settings in monitor.cfg ==================
 parser = configparser.ConfigParser()
-parser.read('monitor.cfg')
-monitor_settings = dict(parser.items('monitor'))
+parser.read("monitor.cfg")
+monitor_settings = dict(parser.items("monitor"))
 
-REGION = monitor_settings['region']
-BRAND = monitor_settings['brand']
-USERNAME = monitor_settings['username']
-PASSWORD = monitor_settings['password']
-PIN = monitor_settings['pin']
+REGION = monitor_settings["region"]
+BRAND = monitor_settings["brand"]
+USERNAME = monitor_settings["username"]
+PASSWORD = monitor_settings["password"]
+PIN = monitor_settings["pin"]
 
 
 # == get_child_value =========================================================
@@ -42,7 +42,7 @@ def print_indent(indent):
     i = 0
     while i < indent:
         i += 1
-        print('    ', end='')
+        print("    ", end="")
 
 
 # == print_indented ==========================================================
@@ -50,20 +50,20 @@ def print_indented(string):
     """print indented"""
     indent = 0
     for char in string:
-        if char == '{' or char == '[' or char == '(':
+        if char == "{" or char == "[" or char == "(":
             print_indent(indent)
-            print(char, end='')
+            print(char, end="")
             indent += 1
             print_indent(indent)
-        elif char == '}' or char == ']' or char == ')':
+        elif char == "}" or char == "]" or char == ")":
             indent -= 1
             print_indent(indent)
-            print(char, end='')
-        elif char == ',':
-            print(char, end='')
+            print(char, end="")
+        elif char == ",":
+            print(char, end="")
             print_indent(indent)
         else:
-            print(char, end='')
+            print(char, end="")
 
     print()
 
@@ -75,19 +75,15 @@ def print_info(vehicles):
         vehicle: Vehicle = vehicles[key]
         target_soc_list = get_child_value(
             vehicle.data,
-            "vehicleStatus.evStatus.reservChargeInfos.targetSOClist"
+            "vehicleStatus.evStatus.reservChargeInfos.targetSOClist",
         )
         print("targetSOClist:")
         print_indented(str(target_soc_list))
         print("Summary: ")
         for item in target_soc_list:
-            target_soc_level = get_child_value(
-                item,
-                "targetSOClevel"
-            )
+            target_soc_level = get_child_value(item, "targetSOClevel")
             target_soc_range = get_child_value(
-                item,
-                "dte.rangeByFuel.totalAvailableRange.value"
+                item, "dte.rangeByFuel.totalAvailableRange.value"
             )
             print("Target SOC level      : " + str(target_soc_level))
             print("Target SOC range      : " + str(target_soc_range))
@@ -110,7 +106,7 @@ vm = VehicleManager(
     brand=int(BRAND),
     username=USERNAME,
     password=PASSWORD,
-    pin=PIN
+    pin=PIN,
 )
 vm.check_and_refresh_token()
 print(type(vm.vehicles))

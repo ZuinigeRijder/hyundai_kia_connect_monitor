@@ -43,7 +43,7 @@ from hyundai_kia_connect_api import VehicleManager
 
 # == arg_has =================================================================
 def arg_has(string):
-    """ arguments has string """
+    """arguments has string"""
     for i in range(1, len(sys.argv)):
         if sys.argv[i].lower() == string:
             return True
@@ -52,60 +52,61 @@ def arg_has(string):
 
 
 # keep forceupdate and cacheupdate as keyword, but do nothing with them
-KEYWORD_LIST = ['forceupdate', 'cacheupdate', 'debug']
+KEYWORD_LIST = ["forceupdate", "cacheupdate", "debug"]
 KEYWORD_ERROR = False
 for kindex in range(1, len(sys.argv)):
     if sys.argv[kindex].lower() not in KEYWORD_LIST:
         print("Unknown keyword: " + sys.argv[kindex])
         KEYWORD_ERROR = True
 
-if KEYWORD_ERROR or arg_has('help'):
-    print('Usage: python monitor.py')
+if KEYWORD_ERROR or arg_has("help"):
+    print("Usage: python monitor.py")
     exit()
 
-DEBUG = arg_has('debug')
-if DEBUG:
+D = arg_has("debug")
+if D:
     logging.basicConfig(level=logging.DEBUG)
 
 
 # == read monitor in monitor.cfg ===========================
 parser = configparser.ConfigParser()
-parser.read('monitor.cfg')
-monitor_settings = dict(parser.items('monitor'))
+parser.read("monitor.cfg")
+monitor_settings = dict(parser.items("monitor"))
 
-REGION = monitor_settings['region']
-BRAND = monitor_settings['brand']
-USERNAME = monitor_settings['username']
-PASSWORD = monitor_settings['password']
-PIN = monitor_settings['pin']
-USE_GEOCODE = monitor_settings['use_geocode'].lower() == 'true'
-USE_GEOCODE_EMAIL = monitor_settings['use_geocode_email'].lower() == 'true'
-LANGUAGE = monitor_settings['language']
+REGION = monitor_settings["region"]
+BRAND = monitor_settings["brand"]
+USERNAME = monitor_settings["username"]
+PASSWORD = monitor_settings["password"]
+PIN = monitor_settings["pin"]
+USE_GEOCODE = monitor_settings["use_geocode"].lower() == "true"
+USE_GEOCODE_EMAIL = monitor_settings["use_geocode_email"].lower() == "true"
+LANGUAGE = monitor_settings["language"]
 
 
 # == subroutines =============================================================
-def debug(line):
-    """ print line if debugging """
-    if DEBUG:
-        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ': ' + line)
+def dbg(line):
+    """print line if debugging"""
+    if D:
+        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ": " + line)
+    return D  # just to make a lazy evaluation expression possible
 
 
 def log(msg):
     """log a message prefixed with a date/time format yyyymmdd hh:mm:ss"""
-    print(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ': ' + msg)
+    print(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ": " + msg)
 
 
 def to_int(string):
-    """ convert to int """
+    """convert to int"""
     if "None" in string:
         return -1
-    split = string.split('.')  # get rid of decimal part
+    split = string.split(".")  # get rid of decimal part
     return int(split[0].strip())
 
 
 def writeln(filename, string):
-    """ append line at monitor text file with end of line character """
-    debug(string)
+    """append line at monitor text file with end of line character"""
+    _ = D and dbg(string)
     monitor_csv_file = Path(filename)
     write_header = False
     # create header if file does not exists
@@ -114,44 +115,47 @@ def writeln(filename, string):
         write_header = True
     with monitor_csv_file.open("a", encoding="utf-8") as file:
         if write_header:
-            file.write("datetime, longitude, latitude, engineOn, 12V%, odometer, SOC%, charging, plugged, address, EV range\n")  # noqa pylint:disable=line-too-long
+            file.write(
+                "datetime, longitude, latitude, engineOn, 12V%, odometer, SOC%, charging, plugged, address, EV range\n"  # noqa pylint:disable=line-too-long
+            )
         file.write(string)
-        file.write('\n')
+        file.write("\n")
 
 
 def get_last_line(filename):
-    """ get last line of filename """
-    last_line = ''
+    """get last line of filename"""
+    last_line = ""
     filename_file = Path(filename)
     if filename_file.is_file():
         with open(filename, "rb") as file:
             try:
                 file.seek(-2, os.SEEK_END)
-                while file.read(1) != b'\n':
+                while file.read(1) != b"\n":
                     file.seek(-2, os.SEEK_CUR)
             except OSError:
                 file.seek(0)
             last_line = file.readline().decode().strip()
-            debug(f"{filename} last_line: [{last_line}]")
+            _ = D and dbg(f"{filename} last_line: [{last_line}]")
     return last_line
 
 
 def get_last_date(last_line):
-    """ get last date of last_line """
-    last_date = '20000101'  # millenium
+    """get last date of last_line"""
+    last_date = "20000101"  # millenium
     if last_line.startswith("20"):  # year starts with 20
-        last_date = last_line.split(',')[0].strip()
-    debug(f"{last_line} last_date: [{last_date}]")
+        last_date = last_line.split(",")[0].strip()
+    _ = D and dbg(f"{last_line} last_date: [{last_date}]")
     return last_date
 
 
 def handle_daily_stats(vehicle, number_of_vehicles):
-    """ handle daily stats """
+    """handle daily stats"""
     daily_stats = vehicle.daily_stats
     if len(daily_stats) == 0:
-        debug("No daily stats")
-        return
+        _ = D and dbg("No daily stats")
+        return ""
 
+    today_stats = ""
     filename = "monitor.dailystats.csv"
     if number_of_vehicles > 1:
         filename = "monitor.dailystats." + vehicle.VIN + ".csv"
@@ -163,7 +167,9 @@ def handle_daily_stats(vehicle, number_of_vehicles):
         write_header = True
     with dailystats_file.open("a", encoding="utf-8") as file:
         if write_header:
-            file.write("date, distance, distance_unit, total_consumed, regenerated_energy, engine_consumption, climate_consumption, onboard_electronics_consumption, battery_care_consumption\n")  # noqa pylint:disable=line-too-long
+            file.write(
+                "date, distance, distance_unit, total_consumed, regenerated_energy, engine_consumption, climate_consumption, onboard_electronics_consumption, battery_care_consumption\n"  # noqa pylint:disable=line-too-long
+            )
         today = datetime.now().strftime("%Y%m%d")
         last_line = get_last_line(filename)
         last_date = get_last_date(last_line)
@@ -172,21 +178,39 @@ def handle_daily_stats(vehicle, number_of_vehicles):
             i = i - 1
             stat = daily_stats[i]
             dailystats_date = stat.date.strftime("%Y%m%d")
-            if today != dailystats_date and dailystats_date >= last_date:
+            if D:
+                dbg(
+                    f"{i} dailystats_date:[{dailystats_date}] [{last_date}] {stat}"  # noqa pylint:disable=line-too-long
+                )
+            if dailystats_date >= last_date:
                 # only append not already written daily stats and not today
                 line = f"{dailystats_date}, {stat.distance}, {stat.distance_unit}, {stat.total_consumed}, {stat.regenerated_energy},  {stat.engine_consumption}, {stat.climate_consumption}, {stat.onboard_electronics_consumption}, {stat.battery_care_consumption}"  # noqa pylint:disable=line-too-long
                 if last_line != line:
-                    debug(f"Writing dailystats:\nline=[{line}]\nlast=[{last_line}]")  # noqa pylint:disable=line-too-long
-                    file.write(line)
-                    file.write("\n")
+                    if today != dailystats_date:
+                        if D:
+                            dbg(
+                                f"Writing dailystats:\nline=[{line}]\nlast=[{last_line}]"  # noqa pylint:disable=line-too-long
+                            )
+                        file.write(line)
+                        file.write("\n")
+                        last_line = line
+                    else:
+                        today_stats = line
                 else:
-                    debug(f"Skipping dailystats: date=[{dailystats_date}]\nlast=[{last_line}]\nline=[{line}]")  # noqa pylint:disable=line-too-long
+                    if D:
+                        dbg(
+                            f"Skipping dailystats: date=[{dailystats_date}]\nlast=[{last_line}]\nline=[{line}]"  # noqa pylint:disable=line-too-long
+                        )
             else:
-                debug(f"Skipping dailystats: [{dailystats_date}] [{last_line}]")  # noqa pylint:disable=line-too-long
+                if D:
+                    dbg(
+                        f"Skipping dailystats: [{dailystats_date}] [{last_line}]"  # noqa pylint:disable=line-too-long
+                    )
+    return today_stats
 
 
 def write_last_run(vehicle, number_of_vehicles, vehicle_stats):
-    """ write last run """
+    """write last run"""
     filename = "monitor.lastrun"
     vin = vehicle.VIN
     if number_of_vehicles > 1:
@@ -194,38 +218,40 @@ def write_last_run(vehicle, number_of_vehicles, vehicle_stats):
     lastrun_file = Path(filename)
     with lastrun_file.open("w", encoding="utf-8") as file:
         now_string = datetime.now().strftime("%Y-%m-%d %H:%M %a")
-        newest_updated_at = vehicle_stats[0].split("+")[0]
-        last_updated_at = vehicle_stats[1].split("+")[0]
-        location_last_updated_at = vehicle_stats[2].split("+")[0]
-        last_line = vehicle_stats[3]
-        file.write(f"last run   ; {now_string}\n")
-        file.write(f"vin        ; {vin}\n")
-        file.write(f"newest dt  ; {newest_updated_at}\n")
-        file.write(f"last dt    ; {last_updated_at}\n")
-        file.write(f"location dt; {location_last_updated_at}\n")
-        file.write("last line   ;\n")
+        last_updated_at = vehicle_stats[0].split("+")[0]
+        location_last_updated_at = vehicle_stats[1].split("+")[0]
+        last_line = vehicle_stats[2]
+        today_daily_stats_line = vehicle_stats[3]
+
+        file.write(f"last run      ; {now_string}\n")
+        file.write(f"vin           ; {vin}\n")
+        file.write(f"vehicle update; {last_updated_at}\n")
+        file.write(f"gps update    ; {location_last_updated_at}\n")
         file.write(f"{last_line}\n")
+        file.write(f"{today_daily_stats_line}\n")
 
 
 def handle_one_vehicle(vehicle, number_of_vehicles):
-    """ handle one vehicle and return if error occurred"""
-    geocode = ''
+    """handle one vehicle and return if error occurred"""
+    geocode = ""
     if USE_GEOCODE:
         if len(vehicle.geocode) > 0:
             # replace comma by semicolon for easier splitting
             geocode_name = vehicle.geocode[0]
-            if geocode_name != '':
-                geocode = geocode_name.replace(',', ';')
+            if geocode_name != "":
+                geocode = geocode_name.replace(",", ";")
 
     last_updated_at = vehicle.last_updated_at
-    location_last_updated_at = vehicle._location_last_set_time   # noqa pylint:disable=protected-access
+    location_last_updated_at = (
+        vehicle._location_last_set_time  # noqa pylint:disable=protected-access
+    )
     # vehicle.location_last_updated_at  # api 2.1.2 onwards
     dates = [last_updated_at, location_last_updated_at]
     newest_updated_at = max(dates)
-    debug(f"newest: {newest_updated_at} from {dates}")
+    _ = D and dbg(f"newest: {newest_updated_at} from {dates}")
     ev_driving_range = to_int(f"{vehicle.ev_driving_range}")
-    line = f"{newest_updated_at}, {vehicle.location_longitude}, {vehicle.location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {vehicle.odometer}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"   # noqa pylint:disable=line-too-long
-    if 'None, None' in line:  # something gone wrong, retry
+    line = f"{newest_updated_at}, {vehicle.location_longitude}, {vehicle.location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {vehicle.odometer}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa pylint:disable=line-too-long
+    if "None, None" in line:  # something gone wrong, retry
         log(f"Skipping Unexpected line: {line}")
         return True  # exit subroutine with error
 
@@ -235,36 +261,43 @@ def handle_one_vehicle(vehicle, number_of_vehicles):
     last_line = get_last_line(filename)
     last_date = get_last_date(last_line)
     current_date = line.split(",")[0].strip()
-    debug(f"Current date:          [{current_date}]")
+    _ = D and dbg(f"Current date:          [{current_date}]")
     if current_date == last_date:
         if line != last_line:
-            debug(f"Writing1:\nline=[{line}]\nlast=[{last_line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]")  # noqa pylint:disable=line-too-long
+            if D:
+                dbg(
+                    f"Writing1:\nline=[{line}]\nlast=[{last_line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]"  # noqa pylint:disable=line-too-long
+                )
             writeln(filename, line)
         else:
-            debug(f"Skipping1:\nline=[{line}]\nlast=[{last_line}]")  # noqa pylint:disable=line-too-long
+            if D:
+                dbg(f"Skipping1:\nline=[{line}]\nlast=[{last_line}]")
     else:
-        debug(f"Writing2:\nline=[{line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]")   # noqa pylint:disable=line-too-long
+        if D:
+            dbg(
+                f"Writing2:\nline=[{line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]"  # noqa pylint:disable=line-too-long
+            )
         writeln(filename, line)
-    handle_daily_stats(vehicle, number_of_vehicles)
+    today_daily_stats = handle_daily_stats(vehicle, number_of_vehicles)
     vehicle_stats = [
-        str(newest_updated_at),
         str(last_updated_at),
         str(location_last_updated_at),
-        line
+        line,
+        today_daily_stats,
     ]
     write_last_run(vehicle, number_of_vehicles, vehicle_stats)
     return False
 
 
 def sleep(retries):
-    """ sleep when retries > 0 """
+    """sleep when retries > 0"""
     if retries > 0:
         log("Sleeping a minute")
         time.sleep(60)
 
 
 def handle_vehicles():
-    """ handle vehicles """
+    """handle vehicles"""
     retries = 2
     while retries > 0:
         try:
@@ -277,7 +310,7 @@ def handle_vehicles():
                 pin=PIN,
                 geocode_api_enable=USE_GEOCODE,
                 geocode_api_use_email=USE_GEOCODE_EMAIL,
-                language=LANGUAGE
+                language=LANGUAGE,
             )
             manager.check_and_refresh_token()
             manager.update_all_vehicles_with_cached_state()  # needed >= 2.0.0
@@ -295,7 +328,7 @@ def handle_vehicles():
             else:
                 retries = 0  # successfully end while loop
         except Exception as ex:  # pylint: disable=broad-except
-            log('Exception: ' + str(ex))
+            log("Exception: " + str(ex))
             traceback.print_exc()
             retries -= 1
             sleep(retries)

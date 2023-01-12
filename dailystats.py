@@ -8,95 +8,100 @@ import traceback
 import time
 from datetime import datetime
 from pathlib import Path
+from collections import deque
 import gspread
+
+# Initializing a queue for about 30 days
+MAX_QUEUE_LEN = 122
+PRINTED_OUTPUT_QUEUE = deque(maxlen=MAX_QUEUE_LEN)
 
 
 def log(msg):
     """log a message prefixed with a date/time format yyyymmdd hh:mm:ss"""
-    print(datetime.now().strftime("%Y%m%d %H:%M:%S") + ': ' + msg)
+    print(datetime.now().strftime("%Y%m%d %H:%M:%S") + ": " + msg)
 
 
 def arg_has(string):
-    """ arguments has string """
+    """arguments has string"""
     for i in range(1, len(sys.argv)):
         if sys.argv[i].lower() == string:
             return True
     return False
 
 
-DEBUG = arg_has('debug')
+D = arg_has("debug")
 
 
-def debug(line):
-    """ print line if debugging """
-    if DEBUG:
+def dbg(line):
+    """print line if debugging"""
+    if D:
         print(line)
+    return D  # just to make a lazy evaluation expression possible
 
 
 def get_vin_arg():
-    """ get vin argument"""
+    """get vin argument"""
     for i in range(1, len(sys.argv)):
         if "vin=" in sys.argv[i].lower():
             vin = sys.argv[i]
             vin = vin.replace("vin=", "")
             vin = vin.replace("VIN=", "")
-            debug(f"VIN = {vin}")
+            _ = D and dbg(f"VIN = {vin}")
             return vin
 
-    return ''
+    return ""
 
 
 def safe_divide(numerator, denumerator):
-    """ safe_divide """
+    """safe_divide"""
     if denumerator == 0.0:
         return 1.0
-    return numerator/denumerator
+    return numerator / denumerator
 
 
 def to_int(string):
-    """ convert to int """
+    """convert to int"""
     if "None" in string:
         return -1
-    split = string.split('.')  # get rid of decimal part
+    split = string.split(".")  # get rid of decimal part
     return int(split[0].strip())
 
 
 def to_float(string):
-    """ convert to float """
+    """convert to float"""
     if "None" in string:
         return 0.0
     return float(string.strip())
 
 
-KEYWORD_LIST = ['help', 'sheetupdate', 'debug']
+KEYWORD_LIST = ["help", "sheetupdate", "debug"]
 KEYWORD_ERROR = False
 for kindex in range(1, len(sys.argv)):
     if sys.argv[kindex].lower() not in KEYWORD_LIST:
         arg = sys.argv[kindex]
         if "vin=" in arg.lower():
-            debug("vin parameter: " + arg)
+            _ = D and dbg("vin parameter: " + arg)
         else:
             print("Unknown keyword: " + arg)
             KEYWORD_ERROR = True
 
-if KEYWORD_ERROR or arg_has('help'):
-    print('Usage: python dailystats.py [sheetupdate] [vin=VIN]')
+if KEYWORD_ERROR or arg_has("help"):
+    print("Usage: python dailystats.py [sheetupdate] [vin=VIN]")
     exit()
 
-SHEETUPDATE = arg_has('sheetupdate')
+SHEETUPDATE = arg_has("sheetupdate")
 OUTPUT_SPREADSHEET_NAME = "monitor.dailystats"
-SHEET_CURRENT_ROW = 1
 
-INPUT_CSV_FILE = Path("monitor.dailystats.csv")
-INPUT_LASTRUN_FILE = Path("monitor.lastrun")
+DAILYSTATS_CSV_FILE = Path("monitor.dailystats.csv")
+LASTRUN_FILE = Path("monitor.lastrun")
 LENCHECK = 1
 VIN = get_vin_arg()
-if VIN != '':
-    INPUT_CSV_FILE = Path(f"monitor.dailystats.{VIN}.csv")
-    INPUT_LASTRUN_FILE = Path(f"monitor.{VIN}.lastrun")
+if VIN != "":
+    DAILYSTATS_CSV_FILE = Path(f"monitor.dailystats.{VIN}.csv")
+    LASTRUN_FILE = Path(f"monitor.{VIN}.lastrun")
     OUTPUT_SPREADSHEET_NAME = f"monitor.dailystats.{VIN}"
     LENCHECK = 2
-debug(f"INPUT_CSV_FILE: {INPUT_CSV_FILE.name}")
+_ = D and dbg(f"DAILYSTATS_CSV_FILE: {DAILYSTATS_CSV_FILE.name}")
 
 
 # indexes to splitted monitor.dailystats.csv items
@@ -111,7 +116,7 @@ ELECTRONICS = 7
 BATTERY_CARE = 8
 
 TOTAL_DAYS = 0
-TOTAL_UNIT = 'km'
+TOTAL_UNIT = "km"
 TOTAL_DISTANCE = 0
 TOTAL_CONSUMED = 0
 TOTAL_REGENERATED = 0
@@ -122,41 +127,41 @@ TOTAL_BATTERY_CARE = 0
 
 
 def float_to_string(input_value):
-    """ float to string without trailing zero """
-    return (f"{input_value:9.1f}").rstrip('0').rstrip('.')
+    """float to string without trailing zero"""
+    return (f"{input_value:9.1f}").rstrip("0").rstrip(".")
 
 
 def get_last_line(filename):
-    """ get last line of filename """
-    last_line = ''
+    """get last line of filename"""
+    last_line = ""
     filename_file = Path(filename)
     if filename_file.is_file():
         with open(filename, "rb") as file:
             try:
                 file.seek(-2, os.SEEK_END)
-                while file.read(1) != b'\n':
+                while file.read(1) != b"\n":
                     file.seek(-2, os.SEEK_CUR)
             except OSError:
                 file.seek(0)
             last_line = file.readline().decode()
-            debug(f"{filename} last_line: [{last_line}]")
+            _ = D and dbg(f"{filename} last_line: [{last_line}]")
     return last_line
 
 
 def get_last_date(filename):
-    """ get last date of filename """
-    last_date = '20000101'  # millenium
+    """get last date of filename"""
+    last_date = "20000101"  # millenium
     last_line = get_last_line(filename)
     if last_line.startswith("20"):  # year starts with 20
-        last_date = last_line.split(',')[0].strip()
-    debug(f"{filename} last_date: [{last_date}]")
+        last_date = last_line.split(",")[0].strip()
+    _ = D and dbg(f"{filename} last_date: [{last_date}]")
     return last_date
 
 
 def read_reverse_order(file_name):
-    """ read in reverse order """
+    """read in reverse order"""
     # Open file for reading in binary mode
-    with open(file_name, 'rb') as read_obj:
+    with open(file_name, "rb") as read_obj:
         # Move the cursor to the end of the file
         read_obj.seek(0, os.SEEK_END)
         # Get the current position of pointer i.e eof
@@ -172,7 +177,7 @@ def read_reverse_order(file_name):
             # read that byte / character
             new_byte = read_obj.read(1)
             # If the read byte is newline character then one line is read
-            if new_byte == b'\n':
+            if new_byte == b"\n":
                 # Fetch the line from buffer and yield it
                 yield buffer.decode()[::-1]
                 # Reinitialize the byte array to save next line
@@ -187,16 +192,16 @@ def read_reverse_order(file_name):
 
 
 def split_output_to_sheet_list(string):
-    """ split output to sheet list """
-    split = string.split(',')
+    """split output to sheet list"""
+    split = string.split(",")
     return [split]
 
 
 def increment_totals(line):
-    """ handle line """
-    debug(f"handle_line: {line}")
-    global TOTAL_DAYS, TOTAL_UNIT, TOTAL_DISTANCE, TOTAL_CONSUMED, TOTAL_REGENERATED, TOTAL_ENGINE, TOTAL_CLIMATE, TOTAL_ELECTRONICS, TOTAL_BATTERY_CARE   # noqa pylint:disable=line-too-long,disable=global-statement
-    split = line.split(',')
+    """handle line"""
+    _ = D and dbg(f"handle_line: {line}")
+    global TOTAL_DAYS, TOTAL_UNIT, TOTAL_DISTANCE, TOTAL_CONSUMED, TOTAL_REGENERATED, TOTAL_ENGINE, TOTAL_CLIMATE, TOTAL_ELECTRONICS, TOTAL_BATTERY_CARE  # noqa pylint:disable=line-too-long,disable=global-statement
+    split = line.split(",")
     # date = split[DATE].strip()
     distance = to_int(split[DISTANCE])
     unit = split[DISTANCE_UNIT].strip()
@@ -221,22 +226,16 @@ def increment_totals(line):
 COLUMN_WIDTHS = [11, 10, 15, 10, 10, 10, 11]
 
 
-def print_output(sheet_array, output):
+def print_output(output):
     """print output"""
-    global SHEET_CURRENT_ROW  # pylint:disable=global-statement
-    split = output.split(',')
+    split = output.split(",")
     for i in range(len(split)):  # pylint:disable=consider-using-enumerate
         text = split[i].center(COLUMN_WIDTHS[i])
-        print(text, end='')
-    print('')
+        print(text, end="")
+    print("")
 
-    if SHEETUPDATE:
-        list_output = split_output_to_sheet_list(output)
-        sheet_array.append({
-            'range': f"A{SHEET_CURRENT_ROW}:G{SHEET_CURRENT_ROW}",
-            'values': list_output,
-        })
-        SHEET_CURRENT_ROW += 1
+    if SHEETUPDATE and len(PRINTED_OUTPUT_QUEUE) < MAX_QUEUE_LEN:
+        PRINTED_OUTPUT_QUEUE.append(output)
 
 
 def print_stats(
@@ -247,15 +246,15 @@ def print_stats(
     engine,
     climate,
     electronics,
-    batterycare
+    batterycare,
 ):
-    """ print stats """
-    regenerated_perc = safe_divide(regenerated*100, consumed)
-    engine_perc = safe_divide(engine*100, consumed)
-    climate_perc = safe_divide(climate*100, consumed)
-    electronics_perc = safe_divide(electronics*100, consumed)
-    battery_care_perc = safe_divide(batterycare*100, consumed)
-    km_mi_per_kwh = safe_divide(distance, consumed/1000)
+    """print stats"""
+    regenerated_perc = safe_divide(regenerated * 100, consumed)
+    engine_perc = safe_divide(engine * 100, consumed)
+    climate_perc = safe_divide(climate * 100, consumed)
+    electronics_perc = safe_divide(electronics * 100, consumed)
+    battery_care_perc = safe_divide(batterycare * 100, consumed)
+    km_mi_per_kwh = safe_divide(distance, consumed / 1000)
     kwh_per_km_mi = safe_divide(100, km_mi_per_kwh)
 
     consumed_kwh = consumed / 1000
@@ -265,78 +264,97 @@ def print_stats(
     electronics_kwh = electronics / 1000
     battery_care_kwh = batterycare / 1000
 
-    sheet_array = []
-    if date == 'Totals':
+    if date == "Totals":
         lastrun = datetime.now().strftime("%Y-%m-%d %H:%M %a")
-        print_output(sheet_array, f"Last run,{lastrun},,,,,")
-        print_output(sheet_array, ",,,,,,")  # empty line/row
+        print_output(f"Last run,{lastrun},,,,,")
+        print_output(",,,,,,")  # empty line/row
 
-    print_output(sheet_array, f"{date},Regen,Consumption,Engine,Climate,Electr.,BatteryCare")  # noqa pylint:disable=line-too-long
-    print_output(sheet_array, f"{consumed_kwh:.1f}kWh,{regenerated_kwh:.1f}kWh,{km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh,{engine_kwh:.1f}kWh,{climate_kwh:.1f}kWh,{electronics_kwh:.1f}kWh,{battery_care_kwh:.1f}kWh")  # noqa pylint:disable=line-too-long
-    print_output(sheet_array, f"{distance}{TOTAL_UNIT},{regenerated_perc:.1f}%,{kwh_per_km_mi:.1f}kWh/100{TOTAL_UNIT},{engine_perc:.0f}%,{climate_perc:.1f}%,{electronics_perc:.1f}%,{battery_care_perc:.1f}%")  # noqa pylint:disable=line-too-long
-    print_output(sheet_array, ',,,,,,')  # empty line/row
-
-    if SHEETUPDATE:
-        retries = 2
-        while retries > 0:
-            try:
-                SHEET.batch_update(sheet_array)
-                retries = 0
-            except Exception as exep:  # pylint: disable=broad-except
-                log('Exception: ' + str(exep))
-                traceback.print_exc()
-                retries -= 1
-                log("Sleeping a minute")
-                time.sleep(60)
+    print_output(
+        f"{date},Regen,Consumption,Engine,Climate,Electr.,BatteryCare"
+    )
+    print_output(
+        f"{consumed_kwh:.1f}kWh,{regenerated_kwh:.1f}kWh,{km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh,{engine_kwh:.1f}kWh,{climate_kwh:.1f}kWh,{electronics_kwh:.1f}kWh,{battery_care_kwh:.1f}kWh"  # noqa pylint:disable=line-too-long
+    )
+    print_output(
+        f"{distance}{TOTAL_UNIT},{regenerated_perc:.1f}%,{kwh_per_km_mi:.1f}kWh/100{TOTAL_UNIT},{engine_perc:.0f}%,{climate_perc:.1f}%,{electronics_perc:.1f}%,{battery_care_perc:.1f}%"  # noqa pylint:disable=line-too-long
+    )
+    print_output(",,,,,,")  # empty line/row
 
 
-def summary():
-    """ summary of monitor.dailystats.csv file """
-    with INPUT_CSV_FILE.open("r", encoding="utf-8") as inputfile:
+def summary(today_daily_stats_line):
+    """summary of monitor.dailystats.csv file"""
+    if today_daily_stats_line != "":
+        increment_totals(today_daily_stats_line)
+    with DAILYSTATS_CSV_FILE.open("r", encoding="utf-8") as inputfile:
         linecount = 0
         for line in inputfile:
             line = line.strip()
             linecount += 1
-            debug(str(linecount) + ': LINE=[' + line + ']')
-            index = line.find(',')
+            _ = D and dbg(str(linecount) + ": LINE=[" + line + "]")
+            index = line.find(",")
             if index <= 0 or line.startswith("date"):
-                debug(f"Skipping line:\n{line}")
-                continue  # skip headers and lines starting or without ,
-            increment_totals(line)
+                _ = D and dbg(f"Skipping line:\n{line}")
+            else:
+                increment_totals(line)
 
     print_stats(
-        'Totals',
+        "Totals",
         TOTAL_DISTANCE,
         TOTAL_CONSUMED,
         TOTAL_REGENERATED,
         TOTAL_ENGINE,
         TOTAL_CLIMATE,
         TOTAL_ELECTRONICS,
-        TOTAL_BATTERY_CARE
+        TOTAL_BATTERY_CARE,
     )
 
 
-def reverse_print_dailystats():
-    """ reverse print dailystats """
-    for line in read_reverse_order(INPUT_CSV_FILE.name):
-        line = line.strip()
-        debug(f"line={line}")
-        val = line.split(',')
-        if len(val) != 9 or line.startswith("date"):
-            continue
-        date = val[DATE].strip()
-        if len(date) == 8:
-            date = date[0:4] + "-" + date[4:6] + "-" + date[6:]
-        print_stats(
-            date,
-            to_int(val[DISTANCE]),
-            to_int(val[CONSUMED]),
-            to_int(val[REGENERATED]),
-            to_int(val[ENGINE]),
-            to_int(val[CLIMATE]),
-            to_int(val[ELECTRONICS]),
-            to_int(val[BATTERY_CARE])
+def reverse_print_dailystats_one_line(line):
+    """reverse print dailystats one line"""
+    line = line.strip()
+    _ = D and dbg(f"line={line}")
+    val = line.split(",")
+    if len(val) != 9 or line.startswith("date"):
+        return  # nothing to do
+
+    date = val[DATE].strip()
+    if len(date) == 8:
+        date = date[0:4] + "-" + date[4:6] + "-" + date[6:]
+    print_stats(
+        date,
+        to_int(val[DISTANCE]),
+        to_int(val[CONSUMED]),
+        to_int(val[REGENERATED]),
+        to_int(val[ENGINE]),
+        to_int(val[CLIMATE]),
+        to_int(val[ELECTRONICS]),
+        to_int(val[BATTERY_CARE]),
+    )
+
+
+def reverse_print_dailystats(today_daily_stats_line):
+    """reverse print dailystats"""
+    if today_daily_stats_line != "":
+        reverse_print_dailystats_one_line(today_daily_stats_line)
+    for line in read_reverse_order(DAILYSTATS_CSV_FILE.name):
+        reverse_print_dailystats_one_line(line)
+
+
+def print_output_queue():
+    """print output queue"""
+    array = []
+    current_row = 0
+    for queue_output in PRINTED_OUTPUT_QUEUE:
+        current_row += 1
+        _ = D and dbg(f"write row: {current_row} {queue_output}")
+        list_output = split_output_to_sheet_list(queue_output)
+        array.append(
+            {
+                "range": f"A{current_row}:G{current_row}",
+                "values": list_output,
+            }
         )
+    SHEET.batch_update(array)
 
 
 if SHEETUPDATE:
@@ -349,11 +367,31 @@ if SHEETUPDATE:
             SHEET.clear()
             RETRIES = 0
         except Exception as ex:  # pylint: disable=broad-except
-            log('Exception: ' + str(ex))
+            log("Exception: " + str(ex))
             traceback.print_exc()
             RETRIES -= 1
             log("Sleeping a minute")
             time.sleep(60)
 
-summary()  # do the total summary first
-reverse_print_dailystats()  # and then dailystats
+
+TODAY_DAILY_STATS_LINE = ""
+with LASTRUN_FILE.open("r", encoding="utf-8") as lastrun_file:
+    lastrun_lines = lastrun_file.readlines()
+    if len(lastrun_lines) > 5:
+        TODAY_DAILY_STATS_LINE = lastrun_lines[5].strip()
+
+summary(TODAY_DAILY_STATS_LINE)  # do the total summary first
+reverse_print_dailystats(TODAY_DAILY_STATS_LINE)  # and then dailystats
+
+if SHEETUPDATE:
+    RETRIES = 2
+    while RETRIES > 0:
+        try:
+            print_output_queue()
+            RETRIES = 0
+        except Exception as ex:  # pylint: disable=broad-except
+            log("Exception: " + str(ex))
+            traceback.print_exc()
+            RETRIES -= 1
+            log("Sleeping a minute")
+            time.sleep(60)

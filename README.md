@@ -60,7 +60,7 @@ For this you need to install Python 3.9 or higher. I have installed Python 3.9.1
 Steps:
 - Download the source code of [hyundai_kia_connect_api v2.1.2 here](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases/tag/v2.1.2)
 - Download the [latest hyundai_kia_connect_monitor release here](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases)
-- Extract both and move the hyundai_kia_connect_api subfolder of hyundai_kia_connect_api-1.50.3 under hyundai_kia_connect_monitor.
+- Extract both and move the hyundai_kia_connect_api subfolder of hyundai_kia_connect_api-<version> under hyundai_kia_connect_monitor.
 - Then configure monitor.cfg
 - Then run: python monitor.py
 
@@ -253,6 +253,7 @@ python summary.py year
 - INPUTFILE: summary.cfg (configuration of kilometers or miles, net battery size in kWh, average cost per kWh and cost currency)
 - INPUTFILE: monitor.csv or monitor.VIN.csv (latter if vin=VIN is given as parameter)
 - standard output: summary per TRIP, DAY, WEEK, MONTH, YEAR in csv format, default all summaries when no parameters given
+- OUTPUTFILE: summary.charged.csv or summary.charged.VIN.csv, showing per day "date, odometer, +kWh, end of charge SOC%", can be used by other tools
 
 Notes:
 - add trip, day, week, month, year or -trip or a combination as parameter, which respectively only shows lines for TRIP, DAY, WEEK, MONTH, YEAR or all without TRIP or a combination
@@ -293,6 +294,7 @@ python summary.py sheetupdate vin=VIN
 - INPUTFILE: summary.cfg (configuration of kilometers or miles, net battery size in kWh, average cost per kWh and cost currency)
 - INPUTFILE: monitor.csv or or monitor.VIN.csv (latter if vin=VIN is given as parameter)
 - standard output: summary per DAY, WEEK, MONTH, YEAR in csv format
+- OUTPUTFILE: summary.charged.csv or summary.charged.VIN.csv, showing per day "date, odometer, +kWh, end of charge SOC%", can be used by other tools
 - Google spreadsheet update with name: hyundai-kia-connect-monitor or monitor.VIN or (latter if vin=VIN is given as parameter)
 
 For easier use on a mobile phone, the spreadsheet will contain first the overall information in row 1 till 24:
@@ -327,8 +329,8 @@ And thereafter the last 50 lines of the summary in reverse order, so you do not 
 ```
   
 ## configuration of gspread for "python summary.py sheetupdate"
-For updating the Google Spreadsheet, summary.py is using the package gspread. For Authentication with Google Spreadsheet you have to configure authentication for gspread. This [authentication configuration is described here](https://docs.gspread.org/en/latest/oauth2.html)
-The summary.py script uses access to the Google spreadsheets on behalf of a bot account using Service Account.
+For updating the Google Spreadsheet, summary.py and dailystats.py are using the package gspread. For Authentication with Google Spreadsheet you have to configure authentication for gspread. This [authentication configuration is described here](https://docs.gspread.org/en/latest/oauth2.html)
+The summary.py and dailystats.py script uses access to the Google spreadsheets on behalf of a bot account using Service Account.
 Follow the steps in this link above, here is the summary of these steps:
 - Enable API Access for a Project
 - - Head to [Google Developers Console](https://console.developers.google.com/) and create a new project (or select the one you already have).
@@ -410,11 +412,12 @@ crontab -e:
 Note: 
 - there is a limit in the number of request per country, but 1 request per hour should not hamper using the Bluelink or UVO Connect App at the same time
 
-I also want to update the google spreadsheet, so I adapted [run_monitor_once.sh](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/run_monitor_once.sh) to run a summary after running monitor.py.
-The last line of run_monitor_once.sh is changed into:
+I also want to update the google spreadsheets, so I adapted [run_monitor_once.sh](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/run_monitor_once.sh) to run a summary after running monitor.py.
+The last line of run_monitor_once.sh is changed into 3 lines:
 ```
 /usr/bin/python -u ~/hyundai_kia_connect_monitor/monitor.py >> run_monitor_once.log 2>&1
 /usr/bin/python -u ~/hyundai_kia_connect_monitor/summary.py trip sheetupdate > run_monitor_once.summary.log 2>&1
+/usr/bin/python -u ~/hyundai_kia_connect_monitor/dailystats.py sheetupdate > run_monitor_once.dailystats.log 2>&1
 ```
 
 # debug.py
@@ -641,7 +644,47 @@ Also the 12 Volt battery is shown and it has not become beneath 85%, with an ave
 
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/Lead-Acid-Battery-Voltage-Charts.jpg)
 
-Example output when filtering on DAY:
+Example output of summary.charged.csv:
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.charge.csv)
+```
+date, odometer, +kWh, end charged SOC%
+2022-09-21, 17383.5, 15.4, 68
+2022-09-23, 17387.1, 6.3, 80
+2022-09-24, 17794.9, 15.4, 7
+2022-09-25, 17810.9, 37.1, 60
+2022-09-30, 17867.2, 12.6, 60
+2022-10-03, 18026.2, 23.8, 60
+2022-10-09, 18115.4, 14.0, 58
+2022-10-13, 18221.0, 13.3, 54
+2022-10-14, 18248.3, 4.2, 60
+2022-10-15, 18252.1, 4.2, 60
+2022-10-17, 18406.7, 21.7, 59
+2022-10-21, 18530.4, 17.5, 58
+2022-10-22, 18564.9, 15.4, 80
+2022-10-23, 18973.0, 51.1, 51
+2022-10-24, 19026.6, 4.2, 57
+2022-10-27, 19083.1, 27.3, 72
+2022-10-31, 19262.4, 28.7, 72
+2022-11-09, 19454.7, 15.4, 62
+2022-11-16, 19555.6, 22.4, 70
+2022-11-26, 20005.7, 13.3, 60
+2022-11-27, 20428.2, 56.0, 30
+2022-11-28, 20443.8, 48.3, 100
+2022-12-04, 20779.8, 42.0, 90
+2022-12-12, 20879.4, 23.1, 74
+2022-12-21, 20994.2, 31.5, 80
+2022-12-23, 21168.1, 42.0, 100
+2022-12-24, 21579.5, 51.1, 70
+2022-12-25, 21706.6, 5.6, 77
+2022-12-31, 21746.9, 15.4, 76
+2023-01-08, 22055.4, 42.7, 80
+```
+
+You can use summary.charged.csv also in other tools, e.g. Excel: ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.charge.xlsx)
+Screenshot of Excel example using summary.charged.csv:
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.charge.jpg)
+
+Example output "python summary.py day" when filtering on DAY:
 ```
 C:\Users\Rick\git\monitor>python summary.py day
   Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips
@@ -656,7 +699,7 @@ DAY     , 2022-09-24, Sat  ,  17794.9,    407.8,    25.9,    -66.5,    6.1,     
 DAY     , 2022-09-25, Sun  ,  17794.9,         ,     5.6,         ,       ,          ,          ,      50, 50, 43, 50,      97, 97, 97, 97,         ,         
 ```
 
-Example output when filtering on TRIP:
+Example output "python summary.py trip" when filtering on TRIP:
 ```
 C:\Users\Rick\git\monitor>python summary.py trip
 Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges, #drives
@@ -677,7 +720,7 @@ TRIP  , 2022-09-24, 19:00,  17794.9,    197.6,        ,    -31.5,    6.3,      1
 
 ```
 
-Example output when filtering on DAY and TRIP:
+Example output "python summary.py day trip" when filtering on DAY and TRIP:
 ```
 C:\Users\Rick\git\monitor>python summary.py day trip
   Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips
@@ -706,7 +749,7 @@ DAY     , 2022-09-24, Sat  ,  17794.9,    407.8,    25.9,    -66.5,    6.1,     
 DAY     , 2022-09-25, Sun  ,  17794.9,         ,     5.6,         ,       ,          ,          ,      50, 50, 43, 50,      97, 97, 97, 97,         ,         
 ```
 
-Example output when filtering on WEEK:
+Example output "python summary.py week" when filtering on WEEK:
 ```
 C:\Users\Rick\git\monitor>python summary.py week
   Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips
@@ -714,14 +757,14 @@ WEEK    , 2022-09-18, WK 37,  17324.2,         ,     3.5,         ,       ,     
 WEEK    , 2022-09-25, WK 38,  17794.9,    470.7,    67.2,    -73.5,    6.4,      15.6,     18.08,      50, 50,  5,100,      97, 97, 85, 98,      6  ,     14  
 ```
 
-Example output when filtering on MONTH:
+Example output "python summary.py month" when filtering on MONTH:
 ```
 C:\Users\Rick\git\monitor>python summary.py month
   Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips
 MONTH   , 2022-09-25, Sep  ,  17794.9,    470.7,    70.7,    -73.5,    6.4,      15.6,     18.08,      50, 50,  5,100,      97, 97, 85, 98,      7  ,     14  
 ```
 
-Example output when filtering on YEAR:
+Example output "python summary.py year" when filtering on YEAR:
 ```
 C:\Users\Rick\git\monitor>python summary.py year
   Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips
@@ -737,7 +780,7 @@ Note that you see also a prediction (YEARLY) how many kilometers (or miles) you 
 Also how much kWh you will approximately need for this distance, and based on the consumption and cost per kWh, how much this will cost.
 Averages for DAY, WEEK, MONTH are shown, based on these 9 days. And also the average per trip, based on 14 trips in this example.
 
-Example output when showing everything except TRIP:
+Example output "python summary.py -trip" when showing everything except TRIP:
 ```
 C:\Users\Rick\git\monitor>python summary.py -trip
   Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips
