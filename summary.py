@@ -1,4 +1,4 @@
-# == summary.py Author: Zuinige Rijder =======================================
+# == summary.py Author: Zuinige Rijder ========= pylint:disable=too-many-lines
 """
 Simple Python3 script to make a summary of monitor.csv
 """
@@ -268,16 +268,21 @@ def print_output_and_update_queue(output):
     print(output)
 
 
-def split_output_to_sheet_list(queue_output):
+def split_output_to_sheet_list(text):
     """split output to sheet list"""
-    split = queue_output.split(",")
-    return [split]
+    result = [x.strip() for x in text.split(",") if x != ""]
+    if len(result) == 22:  # swap Range and Address
+        tmp = result[20]
+        result[20] = result[21]
+        result[21] = tmp
+    return [result]
 
 
 def print_output_queue():
     """print output queue"""
     last_row = 75
     array = []
+    formats = []
     qlen = len(LAST_OUTPUT_QUEUE)
     current_row = last_row - (50 - qlen)
 
@@ -292,12 +297,43 @@ def print_output_queue():
                 "values": list_output,
             }
         )
-    SHEET.batch_update(array)
+        if "Period" in queue_output:
+            formats.append(
+                {
+                    "range": f"A{current_row}:W{current_row}",
+                    "format": {
+                        "horizontalAlignment": "CENTER",
+                        "textFormat": {
+                            "bold": True,
+                            "underline": True,
+                            "italic": True,
+                        },
+                    },
+                }
+            )
+        else:
+            formats.append(
+                {
+                    "range": f"A{current_row}:W{current_row}",
+                    "format": {
+                        "horizontalAlignment": "CENTER",
+                        "textFormat": {
+                            "bold": False,
+                            "underline": False,
+                            "italic": False,
+                        },
+                    },
+                }
+            )
+    if len(array) > 0:
+        SHEET.batch_update(array)
+    if len(formats) > 0:
+        SHEET.batch_format(formats)
 
 
 def print_header_and_update_queue():
     """print header and update queue"""
-    output = f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips, Address, EV range"  # noqa pylint:disable=line-too-long
+    output = f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%,AVG,MIN,MAX, 12V%,AVG,MIN,MAX, #charges,   #trips, Address, EV range"  # noqa pylint:disable=line-too-long
     print_output_and_update_queue(output)
 
 
@@ -548,6 +584,21 @@ def print_summary(prefix, current, values, split, factor):
                 },
             ]
         )
+        formats = []
+        formats.append(
+            {
+                "range": "A1:A23",
+                "format": {
+                    "horizontalAlignment": "RIGHT",
+                    "textFormat": {
+                        "bold": True,
+                        "underline": True,
+                        "italic": True,
+                    },
+                },
+            }
+        )
+        SHEET.batch_format(formats)
     else:
         output = f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{location_str},{ev_range}"  # noqa pylint:disable=line-too-long
         print_output_and_update_queue(output)

@@ -191,10 +191,10 @@ def read_reverse_order(file_name):
             yield buffer.decode()[::-1]
 
 
-def split_output_to_sheet_list(string):
+def split_output_to_sheet_list(text):
     """split output to sheet list"""
-    split = string.split(",")
-    return [split]
+    result = [x.strip() for x in text.split(",") if x != ""]
+    return [result]
 
 
 def increment_totals(line):
@@ -343,18 +343,48 @@ def reverse_print_dailystats(today_daily_stats_line):
 def print_output_queue():
     """print output queue"""
     array = []
+    formats = []
     current_row = 0
     for queue_output in PRINTED_OUTPUT_QUEUE:
         current_row += 1
         _ = D and dbg(f"write row: {current_row} {queue_output}")
         list_output = split_output_to_sheet_list(queue_output)
         array.append(
-            {
-                "range": f"A{current_row}:G{current_row}",
-                "values": list_output,
-            }
+            {"range": f"A{current_row}:G{current_row}", "values": list_output}
         )
-    SHEET.batch_update(array)
+        if "Regen" in queue_output:
+            formats.append(
+                {
+                    "range": f"A{current_row}:G{current_row}",
+                    "format": {
+                        "horizontalAlignment": "CENTER",
+                        "textFormat": {
+                            "bold": True,
+                            "underline": True,
+                            "italic": True,
+                        },
+                    },
+                }
+            )
+        else:
+            formats.append(
+                {
+                    "range": f"A{current_row}:G{current_row}",
+                    "format": {
+                        "horizontalAlignment": "CENTER",
+                        "textFormat": {
+                            "bold": False,
+                            "underline": False,
+                            "italic": False,
+                        },
+                    },
+                }
+            )
+
+    if len(array) > 0:
+        SHEET.batch_update(array)
+    if len(formats) > 0:
+        SHEET.batch_format(formats)
 
 
 if SHEETUPDATE:
