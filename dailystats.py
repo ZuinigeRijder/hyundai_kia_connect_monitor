@@ -9,6 +9,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from collections import deque
+from dateutil.relativedelta import relativedelta
 import gspread
 
 # Initializing a queue for about 30 days
@@ -93,11 +94,17 @@ SHEETUPDATE = arg_has("sheetupdate")
 OUTPUT_SPREADSHEET_NAME = "monitor.dailystats"
 
 DAILYSTATS_CSV_FILE = Path("monitor.dailystats.csv")
+TRIPINFO_CSV_FILE = Path("monitor.tripinfo.csv")
+CHARGE_CSV_FILE = Path("summary.charge.csv")
+SUMMARY_TRIP_CSV_FILE = Path("summary.trip.csv")
 LASTRUN_FILE = Path("monitor.lastrun")
 LENCHECK = 1
 VIN = get_vin_arg()
 if VIN != "":
     DAILYSTATS_CSV_FILE = Path(f"monitor.dailystats.{VIN}.csv")
+    TRIPINFO_CSV_FILE = Path(f"monitor.tripinfo.{VIN}.csv")
+    CHARGE_CSV_FILE = Path(f"summary.charge.{VIN}.csv")
+    SUMMARY_TRIP_CSV_FILE = Path(f"summary.trip.{VIN}.csv")
     LASTRUN_FILE = Path(f"monitor.{VIN}.lastrun")
     OUTPUT_SPREADSHEET_NAME = f"monitor.dailystats.{VIN}"
     LENCHECK = 2
@@ -191,16 +198,100 @@ def read_reverse_order(file_name):
             yield buffer.decode()[::-1]
 
 
+SUMMARY_TRIP_EOF = False
+SUMMARY_TRIP_LAST_READ_LINE = ""
+SUMMARY_TRIP_READ_REVERSE_ORDER = None
+if SUMMARY_TRIP_CSV_FILE.is_file():
+    SUMMARY_TRIP_READ_REVERSE_ORDER = read_reverse_order(SUMMARY_TRIP_CSV_FILE.name)
+else:
+    SUMMARY_TRIP_EOF = True
+
+
+def reverse_read_next_summary_trip_line():
+    """reverse_read_next_trip_info_line"""
+    global SUMMARY_TRIP_EOF, SUMMARY_TRIP_LAST_READ_LINE  # noqa pylint:disable=global-statement
+    stop_value = None
+    while not SUMMARY_TRIP_EOF:
+        line = next(SUMMARY_TRIP_READ_REVERSE_ORDER, stop_value)
+        if line is stop_value:
+            SUMMARY_TRIP_EOF = True
+            SUMMARY_TRIP_LAST_READ_LINE = ""
+            _ = D and dbg("reverse_read_next_trip_info_line: EOF")
+            return
+        else:
+            line = line.strip()
+            if line != "" and "Date" not in line:  # skip header/empty lines
+                _ = D and dbg(f"reverse_read_next_trip_info_line: [{line}]")
+                SUMMARY_TRIP_LAST_READ_LINE = line
+                return
+
+
+TRIPINFO_EOF = False
+TRIPINFO_LAST_READ_LINE = ""
+TRIPINFO_READ_REVERSE_ORDER = None
+if TRIPINFO_CSV_FILE.is_file():
+    TRIPINFO_READ_REVERSE_ORDER = read_reverse_order(TRIPINFO_CSV_FILE.name)
+else:
+    TRIPINFO_EOF = True
+
+
+def reverse_read_next_trip_info_line():
+    """reverse_read_next_trip_info_line"""
+    global TRIPINFO_EOF, TRIPINFO_LAST_READ_LINE  # noqa pylint:disable=global-statement
+    stop_value = None
+    while not TRIPINFO_EOF:
+        line = next(TRIPINFO_READ_REVERSE_ORDER, stop_value)
+        if line is stop_value:
+            TRIPINFO_EOF = True
+            TRIPINFO_LAST_READ_LINE = ""
+            _ = D and dbg("reverse_read_next_trip_info_line: EOF")
+            return
+        else:
+            line = line.strip()
+            if line != "" and "Date" not in line:  # skip header/empty lines
+                _ = D and dbg(f"reverse_read_next_trip_info_line: [{line}]")
+                TRIPINFO_LAST_READ_LINE = line
+                return
+
+
+CHARGE_EOF = False
+CHARGE_LAST_READ_LINE = ""
+CHARGE_READ_REVERSE_ORDER = None
+if CHARGE_CSV_FILE.is_file():
+    CHARGE_READ_REVERSE_ORDER = read_reverse_order(CHARGE_CSV_FILE.name)
+else:
+    CHARGE_EOF = True
+
+
+def reverse_read_next_charge_line():
+    """reverse_read_next_charge_line"""
+    global CHARGE_EOF, CHARGE_LAST_READ_LINE  # noqa pylint:disable=global-statement
+    stop_value = None
+    while not CHARGE_EOF:
+        line = next(CHARGE_READ_REVERSE_ORDER, stop_value)
+        if line is stop_value:
+            CHARGE_EOF = True
+            CHARGE_LAST_READ_LINE = ""
+            _ = D and dbg("reverse_read_next_charge_line: EOF")
+            return
+        else:
+            line = line.strip()
+            if line != "" and "date" not in line:  # skip header/empty lines
+                _ = D and dbg(f"reverse_read_next_charge_line: [{line}]")
+                CHARGE_LAST_READ_LINE = line
+                return
+
+
 def split_output_to_sheet_list(text):
     """split output to sheet list"""
-    result = [x.strip() for x in text.split(",") if x != ""]
+    result = [x.strip() for x in text.split(",")]
     return [result]
 
 
 def increment_totals(line):
     """handle line"""
     _ = D and dbg(f"handle_line: {line}")
-    global TOTAL_DAYS, TOTAL_UNIT, TOTAL_DISTANCE, TOTAL_CONSUMED, TOTAL_REGENERATED, TOTAL_ENGINE, TOTAL_CLIMATE, TOTAL_ELECTRONICS, TOTAL_BATTERY_CARE  # noqa pylint:disable=line-too-long,disable=global-statement
+    global TOTAL_DAYS, TOTAL_UNIT, TOTAL_DISTANCE, TOTAL_CONSUMED, TOTAL_REGENERATED, TOTAL_ENGINE, TOTAL_CLIMATE, TOTAL_ELECTRONICS, TOTAL_BATTERY_CARE  # noqa pylint:disable=global-statement
     split = line.split(",")
     # date = split[DATE].strip()
     distance = to_int(split[DISTANCE])
@@ -223,7 +314,7 @@ def increment_totals(line):
     TOTAL_BATTERY_CARE += battery_care
 
 
-COLUMN_WIDTHS = [11, 10, 15, 10, 10, 10, 11]
+COLUMN_WIDTHS = [11, 17, 15, 10, 10, 10, 11]
 
 
 def print_output(output):
@@ -238,8 +329,152 @@ def print_output(output):
         PRINTED_OUTPUT_QUEUE.append(output)
 
 
+def get_charge_for_date(date):
+    """get_charge_for_date"""
+    charge = ""
+    while not CHARGE_EOF:
+        line = CHARGE_LAST_READ_LINE
+        splitted_line = line.split(",")
+        if len(splitted_line) > 3:
+            charge_date = splitted_line[0].strip()
+            if charge_date == date:
+                _ = D and dbg(f"charge match: {line}")
+                charged = splitted_line[2].strip()
+                charge = f"(+{charged}kWh)"
+                reverse_read_next_charge_line()
+                break  # finished
+            elif charge_date < date:
+                _ = D and dbg(f"charge_date {charge_date} < {date}: {line}")
+                break  # finished
+            else:
+                _ = D and dbg(f"charge skip: {line}")
+        reverse_read_next_charge_line()
+    _ = D and dbg(f"get_charge_for_date=({date})={charge}")
+    return charge
+
+
+def get_trip_for_datetime(date, trip_time_start_str, trip_time_end_str):
+    """get_trip_for_datetime"""
+    # global D
+    matched_time = ""
+    distance = 0
+    kwh_consumed = 0.0
+    kwh_charged = 0.0
+    # D = True
+    if D:
+        print(f"get_trip_for_datetime: {date} {trip_time_start_str}{trip_time_end_str}")
+    while not SUMMARY_TRIP_EOF:
+        line = SUMMARY_TRIP_LAST_READ_LINE
+        splitted_line = line.split(",")
+        if len(splitted_line) > 3:
+            trip_datetime = splitted_line[0].strip()
+            trip_date = trip_datetime.split(" ")[0]
+            trip_time = trip_datetime.split(" ")[1]
+            if trip_date == date:
+                _ = D and dbg(f"trip date match: {line}")
+                if trip_time > trip_time_start_str:
+                    matched_time = trip_time
+                    distance = to_float(splitted_line[2])
+                    kwh_consumed = to_float(splitted_line[3])
+                    kwh_charged = to_float(splitted_line[4])
+                    reverse_read_next_summary_trip_line()
+                    break  # possible match
+            elif trip_date < date:
+                _ = D and dbg(f"trip_date {trip_date} < {date}: {line}")
+                break  # finished
+            else:
+                _ = D and dbg(f"trip_date skip: {line}")
+        reverse_read_next_summary_trip_line()
+
+    if D and matched_time != "":
+        print(
+            f"get_trip_for_datetime=({date} {trip_time_start_str}{trip_time_end_str})={matched_time}, {distance}, {kwh_consumed}, {kwh_charged}"  # noqa
+        )
+    # D = False
+    return distance, kwh_consumed
+
+
+def print_tripinfo(
+    date_org,
+    header,
+    charge,
+    start_time,
+    drive_time,
+    idle_time,
+    distance,
+    avg_speed,
+    max_speed,
+):
+    """print_tripinfo"""
+    if header:
+        print_output(
+            f"{charge}, Trip,,Distance, Avg speed, Max speed, Idle time"  # noqa
+        )
+    trip_time_start_str = start_time[0:2] + ":" + start_time[2:4]
+    trip_time_date = datetime.strptime(trip_time_start_str, "%H:%M")
+    trip_time_end = trip_time_date + relativedelta(minutes=to_int(drive_time))
+    trip_time_end_str = trip_time_end.strftime("-%H:%M")
+    trip_time_str = trip_time_start_str + trip_time_end_str
+
+    # match with summary.tripinfo.csv and return kwh_consumed
+    distance_summary_trip, kwh_consumed = get_trip_for_datetime(
+        date_org, trip_time_start_str, trip_time_end_str
+    )
+    kwh_consumed = abs(kwh_consumed)
+    kwh = ""
+    consumption = ""
+    if distance_summary_trip == 0.0:  # just user other distance
+        distance_summary_trip = to_int(distance)
+    else:
+        consumption = f"({distance_summary_trip:.1f}{TOTAL_UNIT})"
+
+    if kwh_consumed > 0:
+        kwh = f"({kwh_consumed:.1f}kWh)"
+        km_mi_per_kwh = safe_divide(distance_summary_trip, kwh_consumed)
+        consumption = f"({km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh)"
+
+    print_output(
+        f"{kwh},{trip_time_str},{consumption},{distance}{TOTAL_UNIT},{avg_speed}{TOTAL_UNIT}/h,{max_speed}{TOTAL_UNIT}/h,{idle_time} min"  # noqa
+    )
+
+
+def print_day_trip_info(date_org):
+    """print stats"""
+    charge = get_charge_for_date(date_org)
+    date = date_org.replace("-", "")
+    header = True
+    while not TRIPINFO_EOF:
+        line = TRIPINFO_LAST_READ_LINE
+        splitted_line = line.split(",")
+        if len(splitted_line) > 5:
+            tripinfo_date = splitted_line[0].strip()
+            if tripinfo_date == date:
+                _ = D and (f"tripinfo match: {line}")
+                print_tripinfo(
+                    date_org,
+                    header,
+                    charge,
+                    splitted_line[1],
+                    splitted_line[2],
+                    splitted_line[3],
+                    splitted_line[4],
+                    splitted_line[5],
+                    splitted_line[6],
+                )
+                header = False
+            elif tripinfo_date < date:
+                _ = D and dbg(f"tripinfo_date {tripinfo_date} < {date}: {line}")
+                break  # finished
+            else:
+                _ = D and dbg(f"tripinfo skip: {line}")
+        reverse_read_next_trip_info_line()
+    if header and charge != "":  # no trip info written, but charging session
+        print_output(f"{charge},,,,,")  # still print charge
+
+
 def print_stats(
     date,
+    total_charge,
     distance,
     consumed,
     regenerated,
@@ -269,36 +504,57 @@ def print_stats(
         print_output(f"Last run,{lastrun},,,,,")
         print_output(",,,,,,")  # empty line/row
 
+    print_output(f"{date},Regen,Consumption,Engine,Climate,Electr.,BatteryCare")
     print_output(
-        f"{date},Regen,Consumption,Engine,Climate,Electr.,BatteryCare"
+        f"{consumed_kwh:.1f}kWh,{regenerated_kwh:.1f}kWh,{km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh,{engine_kwh:.1f}kWh,{climate_kwh:.1f}kWh,{electronics_kwh:.1f}kWh,{battery_care_kwh:.1f}kWh"  # noqa
     )
     print_output(
-        f"{consumed_kwh:.1f}kWh,{regenerated_kwh:.1f}kWh,{km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh,{engine_kwh:.1f}kWh,{climate_kwh:.1f}kWh,{electronics_kwh:.1f}kWh,{battery_care_kwh:.1f}kWh"  # noqa pylint:disable=line-too-long
+        f"{distance}{TOTAL_UNIT},{regenerated_perc:.1f}%,{kwh_per_km_mi:.1f}kWh/100{TOTAL_UNIT},{engine_perc:.0f}%,{climate_perc:.1f}%,{electronics_perc:.1f}%,{battery_care_perc:.1f}%"  # noqa
     )
-    print_output(
-        f"{distance}{TOTAL_UNIT},{regenerated_perc:.1f}%,{kwh_per_km_mi:.1f}kWh/100{TOTAL_UNIT},{engine_perc:.0f}%,{climate_perc:.1f}%,{electronics_perc:.1f}%,{battery_care_perc:.1f}%"  # noqa pylint:disable=line-too-long
-    )
-    print_output(",,,,,,")  # empty line/row
+    if date == "Totals":
+        print_output(f"(+{total_charge:.1f}kWh)")
+
+
+def compute_total_charge():
+    """compute_total_charge"""
+    total_charge = 0.0
+    if CHARGE_CSV_FILE.is_file():
+        with CHARGE_CSV_FILE.open("r", encoding="utf-8") as inputfile:
+            linecount = 0
+            for line in inputfile:
+                line = line.strip()
+                linecount += 1
+                _ = D and dbg(str(linecount) + ": LINE=[" + line + "]")
+                split = line.split(",")
+                if len(split) < 4 or line.startswith("date"):
+                    _ = D and dbg(f"Skipping line:\n{line}")
+                else:
+                    charge = to_float(split[2])
+                    total_charge += charge
+    return total_charge
 
 
 def summary(today_daily_stats_line):
     """summary of monitor.dailystats.csv file"""
     if today_daily_stats_line != "":
         increment_totals(today_daily_stats_line)
-    with DAILYSTATS_CSV_FILE.open("r", encoding="utf-8") as inputfile:
-        linecount = 0
-        for line in inputfile:
-            line = line.strip()
-            linecount += 1
-            _ = D and dbg(str(linecount) + ": LINE=[" + line + "]")
-            index = line.find(",")
-            if index <= 0 or line.startswith("date"):
-                _ = D and dbg(f"Skipping line:\n{line}")
-            else:
-                increment_totals(line)
+    if DAILYSTATS_CSV_FILE.is_file():
+        with DAILYSTATS_CSV_FILE.open("r", encoding="utf-8") as inputfile:
+            linecount = 0
+            for line in inputfile:
+                line = line.strip()
+                linecount += 1
+                _ = D and dbg(str(linecount) + ": LINE=[" + line + "]")
+                index = line.find(",")
+                if index <= 0 or line.startswith("date"):
+                    _ = D and dbg(f"Skipping line:\n{line}")
+                else:
+                    increment_totals(line)
 
+    total_charge = compute_total_charge()
     print_stats(
         "Totals",
+        total_charge,
         TOTAL_DISTANCE,
         TOTAL_CONSUMED,
         TOTAL_REGENERATED,
@@ -307,6 +563,7 @@ def summary(today_daily_stats_line):
         TOTAL_ELECTRONICS,
         TOTAL_BATTERY_CARE,
     )
+    print_output(",,,,,,")  # empty line/row
 
 
 def reverse_print_dailystats_one_line(line):
@@ -322,6 +579,7 @@ def reverse_print_dailystats_one_line(line):
         date = date[0:4] + "-" + date[4:6] + "-" + date[6:]
     print_stats(
         date,
+        "",
         to_int(val[DISTANCE]),
         to_int(val[CONSUMED]),
         to_int(val[REGENERATED]),
@@ -330,14 +588,18 @@ def reverse_print_dailystats_one_line(line):
         to_int(val[ELECTRONICS]),
         to_int(val[BATTERY_CARE]),
     )
+    if date != "Totals":
+        print_day_trip_info(date)
+    print_output(",,,,,,")  # empty line/row
 
 
 def reverse_print_dailystats(today_daily_stats_line):
     """reverse print dailystats"""
     if today_daily_stats_line != "":
         reverse_print_dailystats_one_line(today_daily_stats_line)
-    for line in read_reverse_order(DAILYSTATS_CSV_FILE.name):
-        reverse_print_dailystats_one_line(line)
+    if DAILYSTATS_CSV_FILE.is_file():
+        for line in read_reverse_order(DAILYSTATS_CSV_FILE.name):
+            reverse_print_dailystats_one_line(line)
 
 
 def print_output_queue():
@@ -349,10 +611,8 @@ def print_output_queue():
         current_row += 1
         _ = D and dbg(f"write row: {current_row} {queue_output}")
         list_output = split_output_to_sheet_list(queue_output)
-        array.append(
-            {"range": f"A{current_row}:G{current_row}", "values": list_output}
-        )
-        if "Regen" in queue_output:
+        array.append({"range": f"A{current_row}:G{current_row}", "values": list_output})
+        if "Regen" in queue_output or "Trip" in queue_output:
             formats.append(
                 {
                     "range": f"A{current_row}:G{current_row}",
@@ -387,6 +647,7 @@ def print_output_queue():
         SHEET.batch_format(formats)
 
 
+# main program
 if SHEETUPDATE:
     RETRIES = 2
     while RETRIES > 0:
@@ -405,10 +666,11 @@ if SHEETUPDATE:
 
 
 TODAY_DAILY_STATS_LINE = ""
-with LASTRUN_FILE.open("r", encoding="utf-8") as lastrun_file:
-    lastrun_lines = lastrun_file.readlines()
-    if len(lastrun_lines) > 5:
-        TODAY_DAILY_STATS_LINE = lastrun_lines[5].strip()
+if LASTRUN_FILE.is_file():
+    with LASTRUN_FILE.open("r", encoding="utf-8") as lastrun_file:
+        lastrun_lines = lastrun_file.readlines()
+        if len(lastrun_lines) > 5:
+            TODAY_DAILY_STATS_LINE = lastrun_lines[5].strip()
 
 summary(TODAY_DAILY_STATS_LINE)  # do the total summary first
 reverse_print_dailystats(TODAY_DAILY_STATS_LINE)  # and then dailystats

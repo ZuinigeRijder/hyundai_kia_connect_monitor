@@ -109,6 +109,7 @@ vm = VehicleManager(
     pin=PIN,
 )
 vm.check_and_refresh_token()
+vm.update_all_vehicles_with_cached_state()  # needed >= 2.0.0
 print(type(vm.vehicles))
 print(vm.vehicles)
 print("Pretty print vm.vehicles:")

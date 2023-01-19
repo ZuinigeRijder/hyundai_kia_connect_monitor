@@ -141,9 +141,9 @@ def write_kml(outputfile, count, items, prev_items):
     coordinates = f"<coordinates>{lon}, {lat}</coordinates>"
     address = get_address(items)
     if address == "":
-        description = f"SOC:{soc:>3}% 12V:{voltage_12:>3}% ODO:{odometer:8.1f}"  # noqa pylint:disable=line-too-long
+        description = f"SOC:{soc:>3}% 12V:{voltage_12:>3}% ODO:{odometer:8.1f}"
     else:
-        description = f"SOC:{soc:>3}% 12V:{voltage_12:>3}% ODO:{odometer:8.1f} Address: {address}"  # noqa pylint:disable=line-too-long
+        description = f"SOC:{soc:>3}% 12V:{voltage_12:>3}% ODO:{odometer:8.1f} Address: {address}"  # noqa
 
     delta_odometer = 0
     if len(prev_items) > 8:

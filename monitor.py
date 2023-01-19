@@ -36,8 +36,9 @@ import configparser
 import traceback
 import time
 import logging
-from datetime import datetime
 from pathlib import Path
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from hyundai_kia_connect_api import VehicleManager
 
 
@@ -116,7 +117,7 @@ def writeln(filename, string):
     with monitor_csv_file.open("a", encoding="utf-8") as file:
         if write_header:
             file.write(
-                "datetime, longitude, latitude, engineOn, 12V%, odometer, SOC%, charging, plugged, address, EV range\n"  # noqa pylint:disable=line-too-long
+                "datetime, longitude, latitude, engineOn, 12V%, odometer, SOC%, charging, plugged, address, EV range\n"  # noqa
             )
         file.write(string)
         file.write("\n")
@@ -168,7 +169,7 @@ def handle_daily_stats(vehicle, number_of_vehicles):
     with dailystats_file.open("a", encoding="utf-8") as file:
         if write_header:
             file.write(
-                "date, distance, distance_unit, total_consumed, regenerated_energy, engine_consumption, climate_consumption, onboard_electronics_consumption, battery_care_consumption\n"  # noqa pylint:disable=line-too-long
+                "date, distance, distance_unit, total_consumed, regenerated_energy, engine_consumption, climate_consumption, onboard_electronics_consumption, battery_care_consumption\n"  # noqa
             )
         today = datetime.now().strftime("%Y%m%d")
         last_line = get_last_line(filename)
@@ -180,16 +181,16 @@ def handle_daily_stats(vehicle, number_of_vehicles):
             dailystats_date = stat.date.strftime("%Y%m%d")
             if D:
                 dbg(
-                    f"{i} dailystats_date:[{dailystats_date}] [{last_date}] {stat}"  # noqa pylint:disable=line-too-long
+                    f"{i} dailystats_date:[{dailystats_date}] [{last_date}] {stat}"  # noqa
                 )
             if dailystats_date >= last_date:
                 # only append not already written daily stats and not today
-                line = f"{dailystats_date}, {stat.distance}, {stat.distance_unit}, {stat.total_consumed}, {stat.regenerated_energy},  {stat.engine_consumption}, {stat.climate_consumption}, {stat.onboard_electronics_consumption}, {stat.battery_care_consumption}"  # noqa pylint:disable=line-too-long
+                line = f"{dailystats_date}, {stat.distance}, {stat.distance_unit}, {stat.total_consumed}, {stat.regenerated_energy},  {stat.engine_consumption}, {stat.climate_consumption}, {stat.onboard_electronics_consumption}, {stat.battery_care_consumption}"  # noqa
                 if last_line != line:
                     if today != dailystats_date:
                         if D:
                             dbg(
-                                f"Writing dailystats:\nline=[{line}]\nlast=[{last_line}]"  # noqa pylint:disable=line-too-long
+                                f"Writing dailystats:\nline=[{line}]\nlast=[{last_line}]"  # noqa
                             )
                         file.write(line)
                         file.write("\n")
@@ -199,12 +200,12 @@ def handle_daily_stats(vehicle, number_of_vehicles):
                 else:
                     if D:
                         dbg(
-                            f"Skipping dailystats: date=[{dailystats_date}]\nlast=[{last_line}]\nline=[{line}]"  # noqa pylint:disable=line-too-long
+                            f"Skipping dailystats: date=[{dailystats_date}]\nlast=[{last_line}]\nline=[{line}]"  # noqa
                         )
             else:
                 if D:
                     dbg(
-                        f"Skipping dailystats: [{dailystats_date}] [{last_line}]"  # noqa pylint:disable=line-too-long
+                        f"Skipping dailystats: [{dailystats_date}] [{last_line}]"  # noqa
                     )
     return today_stats
 
@@ -231,8 +232,89 @@ def write_last_run(vehicle, number_of_vehicles, vehicle_stats):
         file.write(f"{today_daily_stats_line}\n")
 
 
-def handle_one_vehicle(vehicle, number_of_vehicles):
+def handle_day_trip_info(
+    manager, vehicle, file, month_trip_info, last_date, last_hhmmss
+):
+    """handle_day_trip_info"""
+    for day in month_trip_info.day_list:
+        yyyymmdd = day.yyyymmdd
+        if yyyymmdd >= last_date:
+            manager.update_day_trip_info(vehicle.id, yyyymmdd)
+            day_trip_info = vehicle.day_trip_info
+            if day_trip_info is not None:
+                for trip in reversed(day_trip_info.trip_list):
+                    hhmmss = trip.hhmmss
+                    if yyyymmdd > last_date or hhmmss > last_hhmmss:
+                        line = f"{yyyymmdd},{hhmmss},{trip.drive_time},{trip.idle_time},{trip.distance},{trip.avg_speed},{trip.max_speed}"  # noqa
+                        _ = D and dbg(f"Writing tripinfo line:[{line}]")
+                        file.write(line)
+                        file.write("\n")
+                        last_date = yyyymmdd
+                        last_hhmmss = hhmmss
+                    else:
+                        _ = D and dbg(f"Skipping trip: {yyyymmdd},{hhmmss}")
+            else:
+                _ = D and dbg(f"Empty day_trip_info: {yyyymmdd}")
+        else:
+            _ = D and dbg(f"Skipping written tripinfo day: {yyyymmdd}")
+    return last_date, last_hhmmss
+
+
+def handle_trip_info(manager, vehicle, number_of_vehicles):
+    """Handle trip info"""
+    now = datetime.now()
+    filename = "monitor.tripinfo.csv"
+    if number_of_vehicles > 1:
+        filename = "monitor.tripinfo." + vehicle.VIN + ".csv"
+    write_header = False  # create header if file does not exists
+    monitor_tripinfo_csv_file = Path(filename)
+    if not monitor_tripinfo_csv_file.is_file():
+        monitor_tripinfo_csv_file.touch()
+        write_header = True
+    last_line = get_last_line(filename)
+    last_date = get_last_date(last_line)
+    last_line_splitted = last_line.split(",")
+    last_hhmmss = "000000"
+    if len(last_line_splitted) > 6 and "Date," not in last_line:
+        last_hhmmss = last_line_splitted[1]
+    with monitor_tripinfo_csv_file.open("a", encoding="utf-8") as file:
+        from_month = now  # default only get the current month statistics
+        if write_header:
+            file.write(
+                "Date, Start time, Drive time, Idle time, Distance, Avg speed, Max speed\n"  # noqa
+            )
+            # only last 4 months can be retrieved
+            # only fill when header is written
+            # because for each day with trips an API call will be made
+            from_month = now - relativedelta(months=3)
+        else:
+            if now.day == 1:  # first day of month also retrieve previous month
+                from_month = now - relativedelta(months=1)
+
+        while from_month <= now:
+            yyymm = from_month.strftime("%Y%m")
+            from_month = from_month + relativedelta(months=1)
+            manager.update_month_trip_info(vehicle.id, yyymm)
+            month_trip_info = vehicle.month_trip_info
+            if month_trip_info is not None:
+                last_date, last_hhmmss = handle_day_trip_info(
+                    manager,
+                    vehicle,
+                    file,
+                    month_trip_info,
+                    last_date,
+                    last_hhmmss,
+                )
+
+
+def handle_one_vehicle(manager, vehicle, number_of_vehicles):
     """handle one vehicle and return if error occurred"""
+    try:
+        handle_trip_info(manager, vehicle, number_of_vehicles)
+    except Exception as ex:  # pylint: disable=broad-except
+        log("Warning: handle_trip_info Exception: " + str(ex))
+        traceback.print_exc()
+
     geocode = ""
     if USE_GEOCODE:
         if len(vehicle.geocode) > 0:
@@ -242,15 +324,12 @@ def handle_one_vehicle(vehicle, number_of_vehicles):
                 geocode = geocode_name.replace(",", ";")
 
     last_updated_at = vehicle.last_updated_at
-    location_last_updated_at = (
-        vehicle._location_last_set_time  # noqa pylint:disable=protected-access
-    )
-    # vehicle.location_last_updated_at  # api 2.1.2 onwards
+    location_last_updated_at = vehicle.location_last_updated_at
     dates = [last_updated_at, location_last_updated_at]
     newest_updated_at = max(dates)
     _ = D and dbg(f"newest: {newest_updated_at} from {dates}")
     ev_driving_range = to_int(f"{vehicle.ev_driving_range}")
-    line = f"{newest_updated_at}, {vehicle.location_longitude}, {vehicle.location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {vehicle.odometer}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa pylint:disable=line-too-long
+    line = f"{newest_updated_at}, {vehicle.location_longitude}, {vehicle.location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {vehicle.odometer}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa
     if "None, None" in line:  # something gone wrong, retry
         log(f"Skipping Unexpected line: {line}")
         return True  # exit subroutine with error
@@ -266,7 +345,7 @@ def handle_one_vehicle(vehicle, number_of_vehicles):
         if line != last_line:
             if D:
                 dbg(
-                    f"Writing1:\nline=[{line}]\nlast=[{last_line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]"  # noqa pylint:disable=line-too-long
+                    f"Writing1:\nline=[{line}]\nlast=[{last_line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]"  # noqa
                 )
             writeln(filename, line)
         else:
@@ -275,7 +354,7 @@ def handle_one_vehicle(vehicle, number_of_vehicles):
     else:
         if D:
             dbg(
-                f"Writing2:\nline=[{line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]"  # noqa pylint:disable=line-too-long
+                f"Writing2:\nline=[{line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]"  # noqa
             )
         writeln(filename, line)
     today_daily_stats = handle_daily_stats(vehicle, number_of_vehicles)
@@ -318,7 +397,7 @@ def handle_vehicles():
             number_of_vehicles = len(manager.vehicles)
             error = False
             for _, vehicle in manager.vehicles.items():
-                error = handle_one_vehicle(vehicle, number_of_vehicles)
+                error = handle_one_vehicle(manager, vehicle, number_of_vehicles)
                 if error:  # something gone wrong, exit loop
                     break
 

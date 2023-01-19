@@ -108,28 +108,29 @@ for kindex in range(1, len(sys.argv)):
 
 if KEYWORD_ERROR or arg_has("help"):
     print(
-        "Usage: python summary.py [trip] [day] [week] [month] [year] [sheetupdate] [vin=VIN]"  # noqa pylint:disable=line-too-long
+        "Usage: python summary.py [trip] [day] [week] [month] [year] [sheetupdate] [vin=VIN]"  # noqa
     )
     exit()
 
 
 CURRENT_DAY_STR = datetime.now().strftime("%Y-%m-%d")
-INPUT_CSV_FILENAME = Path("monitor.csv")
+MONITOR_CSV_FILENAME = Path("monitor.csv")
 LASTRUN_FILENAME = Path("monitor.lastrun")
 OUTPUT_SPREADSHEET_NAME = "hyundai-kia-connect-monitor"
-SUMMARY_CSV_FILENAME = Path("summary.charge.csv")
-SUMMARY_CSV_FILE = None
-SUMMARY_CSV_LAST_LINE = ""
+CHARGE_CSV_FILENAME = Path("summary.charge.csv")
+TRIP_CSV_FILENAME = Path("summary.trip.csv")
+CHARGE_CSV_FILE = None
 
 LENCHECK = 1
 VIN = get_vin_arg()
 if VIN != "":
-    INPUT_CSV_FILENAME = Path(f"monitor.{VIN}.csv")
+    MONITOR_CSV_FILENAME = Path(f"monitor.{VIN}.csv")
     LASTRUN_FILENAME = Path(f"monitor.{VIN}.lastrun")
     OUTPUT_SPREADSHEET_NAME = f"monitor.{VIN}"
-    SUMMARY_CSV_FILENAME = Path(f"summary.charge.{VIN}.csv")
+    CHARGE_CSV_FILENAME = Path(f"summary.charge.{VIN}.csv")
+    TRIP_CSV_FILENAME = Path("summary.trip.{VIN}.csv")
     LENCHECK = 2
-_ = D and dbg(f"INPUT_CSV_FILE: {INPUT_CSV_FILENAME.name}")
+_ = D and dbg(f"INPUT_CSV_FILE: {MONITOR_CSV_FILENAME.name}")
 
 TRIP = len(sys.argv) == LENCHECK or arg_has("trip") and not arg_has("-trip")
 DAY = len(sys.argv) == LENCHECK or arg_has("day") or arg_has("-trip")
@@ -138,6 +139,7 @@ MONTH = len(sys.argv) == LENCHECK or arg_has("month") or arg_has("-trip")
 YEAR = len(sys.argv) == LENCHECK or arg_has("year") or arg_has("-trip")
 SHEETUPDATE = arg_has("sheetupdate")
 if SHEETUPDATE:
+    TRIP = True
     DAY = True
     WEEK = True
     MONTH = True
@@ -202,8 +204,9 @@ T_TRIP = 4
 # number of days passed in this year
 DAY_COUNTER = 0
 
-# Initializing a queue with maximum size of 50
-LAST_OUTPUT_QUEUE = deque(maxlen=50)
+# Initializing a queue with maximum size
+LAST_OUTPUT_QUEUE_MAX_LEN = 122
+LAST_OUTPUT_QUEUE = deque(maxlen=LAST_OUTPUT_QUEUE_MAX_LEN)
 
 
 def init(current_day, odo, soc, volt12):
@@ -270,7 +273,7 @@ def print_output_and_update_queue(output):
 
 def split_output_to_sheet_list(text):
     """split output to sheet list"""
-    result = [x.strip() for x in text.split(",") if x != ""]
+    result = [x.strip() for x in text.split(",")]
     if len(result) == 22:  # swap Range and Address
         tmp = result[20]
         result[20] = result[21]
@@ -280,11 +283,11 @@ def split_output_to_sheet_list(text):
 
 def print_output_queue():
     """print output queue"""
-    last_row = 75
+    last_row = LAST_OUTPUT_QUEUE_MAX_LEN + 25  # start on row 25
     array = []
     formats = []
     qlen = len(LAST_OUTPUT_QUEUE)
-    current_row = last_row - (50 - qlen)
+    current_row = last_row - (LAST_OUTPUT_QUEUE_MAX_LEN - qlen)
 
     # print queue entries in reverse order, so in spreadsheet latest is first
     for queue_output in LAST_OUTPUT_QUEUE:
@@ -333,7 +336,7 @@ def print_output_queue():
 
 def print_header_and_update_queue():
     """print header and update queue"""
-    output = f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%,AVG,MIN,MAX, 12V%,AVG,MIN,MAX, #charges,   #trips, Address, EV range"  # noqa pylint:disable=line-too-long
+    output = f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%,AVG,MIN,MAX, 12V%,AVG,MIN,MAX, #charges,   #trips, Address, EV range"  # noqa
     print_output_and_update_queue(output)
 
 
@@ -364,16 +367,77 @@ def get_splitted_list_item(the_list, index):
     return [items[0].strip(), items[1].strip()]
 
 
-def write_summary_csv(line):
-    """write summary csv"""
-    global SUMMARY_CSV_LAST_LINE  # pylint:disable=global-statement
-    if SUMMARY_CSV_LAST_LINE == "" or line[0:11] > SUMMARY_CSV_LAST_LINE[0:11]:
-        _ = D and dbg(f"{SUMMARY_CSV_FILENAME}:[{line}]")
-        SUMMARY_CSV_FILE.write(line)
-        SUMMARY_CSV_FILE.write("\n")
-        SUMMARY_CSV_LAST_LINE = line
-    else:
-        _ = D and dbg(f"Skipping {SUMMARY_CSV_FILENAME}:[{line}]")
+if not MONITOR_CSV_FILENAME.is_file():
+    log(f"ERROR: file does not exist: {MONITOR_CSV_FILENAME}")
+    sys.exit(-1)
+
+MONITOR_CSV_FILE = MONITOR_CSV_FILENAME.open("r", encoding="utf-8")
+MONITOR_CSV_FILE_EOL = False
+MONITOR_CSV_READ_AHEAD_LINE = ""
+MONITOR_CSV_READ_DONE_ONCE = False
+
+
+def get_next_monitor_csv_line() -> str:
+    """
+    get_next_monitor_csv_line
+
+    Returns empty string if EOF
+    Can also be called when already EOF encountered (again empty line returned)
+    Skips empty lines
+    Skips header lines
+    Skips lines without ,
+    Skips identical lines
+    Skips identical lines, where only the datetime is different
+    Does fill INPUT_CSV_READ_AHEAD_LINE (for external use)
+    """
+    global MONITOR_CSV_FILE_EOL, MONITOR_CSV_READ_AHEAD_LINE, MONITOR_CSV_READ_DONE_ONCE  # noqa pylint:disable=global-statement
+
+    while not MONITOR_CSV_FILE_EOL:
+        if MONITOR_CSV_READ_DONE_ONCE:  # read 1 line
+            line = MONITOR_CSV_READ_AHEAD_LINE
+            MONITOR_CSV_READ_AHEAD_LINE = MONITOR_CSV_FILE.readline()
+        else:  # read 2 lines
+            MONITOR_CSV_READ_DONE_ONCE = True
+            line = MONITOR_CSV_FILE.readline()
+            MONITOR_CSV_READ_AHEAD_LINE = MONITOR_CSV_FILE.readline()
+
+        if not line:
+            MONITOR_CSV_FILE_EOL = True
+            MONITOR_CSV_READ_AHEAD_LINE = line
+            break  # finished
+
+        if line != MONITOR_CSV_READ_AHEAD_LINE:  # skip identical lines
+            line = line.strip()
+            # only lines with content and not header line
+            if line != "" and not line.startswith("datetime"):
+                index = line.find(",")
+                next_line = MONITOR_CSV_READ_AHEAD_LINE.strip()
+                read_ahead_index = next_line.find(",")
+                # skip identical lines, when only first column is the same
+                if index >= 0 and (
+                    read_ahead_index < 0 or next_line[read_ahead_index:] != line[index:]
+                ):
+                    _ = D and dbg(f"next=[{line}]")
+                    return line
+
+        _ = D and dbg(f"skip=[{line}]")
+
+    _ = D and dbg("return=[]\n")
+    return ""
+
+
+def write_charge_csv(line):
+    """write charge csv"""
+    _ = D and dbg(f"{CHARGE_CSV_FILENAME}:[{line}]")
+    CHARGE_CSV_FILE.write(line)
+    CHARGE_CSV_FILE.write("\n")
+
+
+def write_trip_csv(line):
+    """write trip csv"""
+    _ = D and dbg(f"{TRIP_CSV_FILENAME}:[{line}]")
+    TRIP_CSV_FILE.write(line)
+    TRIP_CSV_FILE.write("\n")
 
 
 def print_summary(prefix, current, values, split, factor):
@@ -422,7 +486,7 @@ def print_summary(prefix, current, values, split, factor):
         kwh_per_km_mi_str = "       0.0"
         cost_str = "      0.00"
     if t_discharged_perc < 0:
-        if discharged_kwh < -MIN_CONSUMPTION_DISCHARGE_KWH:  # skip inaccurate
+        if TRIP or discharged_kwh < -MIN_CONSUMPTION_DISCHARGE_KWH:  # skip inaccurate
             cost = discharged_kwh * -AVERAGE_COST_PER_KWH
             cost_str = f"{cost:10.2f}"
             km_mi_per_kwh = safe_divide(delta_odo, -discharged_kwh)
@@ -457,30 +521,33 @@ def print_summary(prefix, current, values, split, factor):
         ev_range = to_int(split[EV_RANGE])
 
     if DAY and charged_kwh > 3.0 and "DAY " in prefix:
-        _ = D and dbg(f"Charged kwh: {charged_kwh:.1f}")
         splitted = prefix.split(",")
         if len(splitted) > 2:
             date = splitted[1].strip()
-            if D:
-                dbg(f"Date=[{date}] Current Day string=[{CURRENT_DAY_STR}]")
-            if date != CURRENT_DAY_STR:
-                line = f"{date}, {odo:.1f}, {charged_kwh:.1f}, {t_soc_charged}"
-                write_summary_csv(line)
+            write_charge_csv(f"{date}, {odo:.1f}, {charged_kwh:.1f}, {t_soc_charged}")
+
+    if TRIP and "TRIP " in prefix:
+        splitted = prefix.split(",")
+        if len(splitted) > 2:
+            date = splitted[1].strip()
+            time_str = splitted[2].strip()
+            write_trip_csv(
+                f"{date} {time_str}, {odo:.1f}, {delta_odo:.1f}, {discharged_kwh:.1f}, {charged_kwh:.1f}"  # noqa
+            )
 
     if SHEETUPDATE and prefix.startswith("SHEET"):
         km_mi_per_kwh_str = km_mi_per_kwh_str.strip()
         kwh_per_km_mi_str = kwh_per_km_mi_str.strip()
         cost_str = cost_str.strip()
         prefix = prefix.replace("SHEET ", "")
-        last_line = get_last_line(INPUT_CSV_FILENAME)
-        last_update_datetime = datetime.fromtimestamp(
-            LASTRUN_FILENAME.stat().st_mtime
-        )
+        last_line = get_last_line(MONITOR_CSV_FILENAME)
+        last_update_datetime = datetime.fromtimestamp(LASTRUN_FILENAME.stat().st_mtime)
         day_info = last_update_datetime.strftime("%Y-%m-%d %H:%M %a")
 
         lastrun_lines = []
-        with LASTRUN_FILENAME.open("r", encoding="utf-8") as lastrun_file:
-            lastrun_lines = lastrun_file.readlines()
+        if LASTRUN_FILENAME.is_file():
+            with LASTRUN_FILENAME.open("r", encoding="utf-8") as lastrun_file:
+                lastrun_lines = lastrun_file.readlines()
 
         last_updated_at = get_splitted_list_item(lastrun_lines, 2)
         location_last_updated_at = get_splitted_list_item(lastrun_lines, 3)
@@ -496,9 +563,7 @@ def print_summary(prefix, current, values, split, factor):
                 },
                 {
                     "range": "A3:B3",
-                    "values": [
-                        ["GPS update", f"{location_last_updated_at[1]}"]
-                    ],
+                    "values": [["GPS update", f"{location_last_updated_at[1]}"]],
                 },
                 {
                     "range": "A4:B4",
@@ -530,9 +595,7 @@ def print_summary(prefix, current, values, split, factor):
                 },
                 {
                     "range": "A11:B11",
-                    "values": [
-                        [f"kWh/100{ODO_METRIC}", f"{kwh_per_km_mi_str}"]
-                    ],
+                    "values": [[f"kWh/100{ODO_METRIC}", f"{kwh_per_km_mi_str}"]],
                 },
                 {
                     "range": "A12:B12",
@@ -600,16 +663,13 @@ def print_summary(prefix, current, values, split, factor):
         )
         SHEET.batch_format(formats)
     else:
-        output = f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{location_str},{ev_range}"  # noqa pylint:disable=line-too-long
+        output = f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{location_str},{ev_range}"  # noqa
         print_output_and_update_queue(output)
 
 
 def print_summaries(current_day_values, totals, split, last):
     """print_summaries"""
     global DAY_COUNTER  # pylint:disable=global-statement
-    if D:
-        dbg(f"print_summaries: DAY_COUNTER: {DAY_COUNTER} {totals}")
-
     current_day = current_day_values[T_CURRENT_DAY]
     t_day = totals[T_DAY]
     t_week = totals[T_WEEK]
@@ -621,7 +681,6 @@ def print_summaries(current_day_values, totals, split, last):
 
     if not same_day(current_day, t_day[T_CURRENT_DAY]) or last:
         DAY_COUNTER += 1
-        _ = D and dbg(f"DAY_COUNTER increment: {DAY_COUNTER}")
         if DAY:
             day_info = t_day[T_CURRENT_DAY].strftime("%a")
             print_summary(
@@ -702,7 +761,6 @@ def print_summaries(current_day_values, totals, split, last):
         )
         if SHEETUPDATE and last:
             day_info = current_day.strftime("%a %H:%M")
-            _ = D and dbg("SHEETUPDATE: " + day_info)
             print_summary(
                 f"SHEET {day_str:10} {day_info} {DAY_COUNTER:3}d",
                 current_day_values,
@@ -718,7 +776,7 @@ def print_summaries(current_day_values, totals, split, last):
     return totals
 
 
-def keep_track_of_totals(values, split, prev_split):
+def keep_track_of_totals(values, split, prev_split, trip=False):
     """keep_track_of_totals"""
     if D:
         dbg("keep track of totals")
@@ -751,9 +809,9 @@ def keep_track_of_totals(values, split, prev_split):
         _ = D and dbg(f"negative odometer:\n{prev_split}\n{split}")
         delta_odo = 0.0
 
-    coord_changed = to_float(split[LAT]) != to_float(
-        prev_split[LAT]
-    ) or to_float(split[LON]) != to_float(prev_split[LON])
+    coord_changed = to_float(split[LAT]) != to_float(prev_split[LAT]) or to_float(
+        split[LON]
+    ) != to_float(prev_split[LON])
     moved = coord_changed or delta_odo != 0.0
 
     soc = to_int(split[SOC])
@@ -764,6 +822,34 @@ def keep_track_of_totals(values, split, prev_split):
         soc = max(soc, prev_soc)
         prev_soc = soc
         delta_soc = 0
+
+    if delta_odo > 0.0:
+        t_trips += 1
+        _ = D and dbg(f"DELTA_ODO: {delta_odo:7.1f} {t_trips}")
+        if trip:
+            # workaround that sometimes SOC is decreased in next line
+            # so the trip information shows not the correct used kWh
+            next_line = MONITOR_CSV_READ_AHEAD_LINE.strip()
+            if next_line != "":
+                next_split = next_line.split(",")
+                if len(next_split) > 8:
+                    next_date = next_split[0].split(" ")[0]
+                    next_soc = to_int(next_split[SOC])
+                    split_date = split[0].split(" ")[0]
+                    if D:
+                        print(
+                            f"split_date: {split_date}\nnext_date : {next_date}\nsplit: {split}\nnext : {next_split}\n"  # noqa
+                        )
+                    if (
+                        next_date == split_date
+                        and next_split[ODO] == split[ODO]
+                        and next_soc < soc
+                    ):
+                        # date and ODO the same, but SOC is lower, fix it
+                        _ = D and dbg(f"before soc: {soc}, delta_soc: {delta_soc}")
+                        delta_soc = next_soc - prev_soc
+                        soc = next_soc
+                        _ = D and dbg(f"after  soc: {soc}, delta_soc: {delta_soc}\n")
 
     # keep track of elapsed minutes
     current_day = parser.parse(split[DT])
@@ -792,7 +878,7 @@ def keep_track_of_totals(values, split, prev_split):
     if delta_soc != 0:
         if D:
             dbg(
-                f"Delta SOC: {delta_soc}, no_charging: {no_charging}, moved: {moved}, elapsed_minutes: {elapsed_minutes}"  # noqa pylint:disable=line-too-long
+                f"Delta SOC: {delta_soc}, no_charging: {no_charging}, moved: {moved}, elapsed_minutes: {elapsed_minutes}"  # noqa
             )
         if delta_soc > 0:  # charge +kWh
             if delta_soc <= SMALL_POSITIVE_DELTA and no_charging and not moved:
@@ -805,7 +891,7 @@ def keep_track_of_totals(values, split, prev_split):
                 if no_charging and not moved and elapsed_minutes < 120:
                     if D:
                         dbg(
-                            f"Unexpected positive delta?\n{prev_split}\n{split}"  # noqa pylint:disable=line-too-long
+                            f"Unexpected positive delta?\n{prev_split}\n{split}"  # noqa
                         )
                 t_charged_perc += delta_soc
                 t_soc_charged = soc  # remember latest soc for when charged
@@ -825,10 +911,6 @@ def keep_track_of_totals(values, split, prev_split):
     elif delta_soc > 1 and no_charging:
         t_charges += 1
         _ = D and dbg("charges: DELTA_SOC > 1: " + str(t_charges))
-
-    if delta_odo != 0.0:
-        t_trips += 1
-        _ = D and dbg(f"DELTA_ODO: {delta_odo:7.1f} {t_trips}")
 
     _ = D and dbg("    before: " + str(values))
     values = (
@@ -869,12 +951,10 @@ def handle_line(linecount, split, prev_split, totals, last):
         HIGHEST_ODO = odo
 
     current_day = parser.parse(split[DT])
-    current_day_values = init(
-        current_day, odo, to_int(split[SOC]), to_int(split[V12])
-    )
+    current_day_values = init(current_day, odo, to_int(split[SOC]), to_int(split[V12]))
     t_day = totals[T_DAY]
-    if not t_day:  # first time, fill in with initial values
-        _ = D and dbg(f"not TDAY: {t_day}")
+    if not t_day:
+        _ = D and dbg(f"not TDAY: {t_day} first time, fill in with initial values")
         totals = (
             current_day_values,
             current_day_values,
@@ -888,7 +968,7 @@ def handle_line(linecount, split, prev_split, totals, last):
         (split[LAT] != prev_split[LAT]) or (split[LON] != prev_split[LON])
     ):
         print(
-            f"Warning: timestamp wrong line {linecount}\nSPLIT: {split}\nPREV : {prev_split}"  # noqa pylint:disable=line-too-long
+            f"Warning: timestamp wrong line {linecount}\nSPLIT: {split}\nPREV : {prev_split}"  # noqa
         )
 
     t_trip = totals[T_TRIP]
@@ -907,7 +987,7 @@ def handle_line(linecount, split, prev_split, totals, last):
         if YEAR:
             t_year = keep_track_of_totals(t_year, split, prev_split)
         if TRIP:
-            t_trip = keep_track_of_totals(t_trip, split, prev_split)
+            t_trip = keep_track_of_totals(t_trip, split, prev_split, trip=True)
             if t_trip[T_TRIPS] > 0:
                 day_trip_str = current_day.strftime("%Y-%m-%d")
                 day_info = current_day.strftime("%H:%M")
@@ -948,60 +1028,47 @@ def get_last_line(filename):
 
 def summary():
     """summary of monitor.csv file"""
-    with INPUT_CSV_FILENAME.open("r", encoding="utf-8") as inputfile:
-        linecount = 0
-        prev_index = -1
-        prev_line = ""
-        prev_split = ()
-        totals = ((), (), (), (), ())
-        print_header_and_update_queue()
+    if not MONITOR_CSV_FILENAME.is_file():
+        log(f"ERROR: file does not exist: {MONITOR_CSV_FILENAME}")
+        return
 
-        for line in inputfile:
-            line = line.strip()
-            linecount += 1
-            _ = D and dbg(str(linecount) + ": LINE=[" + line + "]")
-            index = line.find(",")
-            if index <= 0 or line.startswith("datetime") or prev_line == line:
-                if D:
-                    dbg(f"Skipping line:\n{line}\n{prev_line}")
-                continue  # skip headers and lines starting or without ,
-            split = line.split(",")
-            if (
-                not totals[T_DAY]
-                or not same_day(
-                    parser.parse(split[DT]), parser.parse(prev_split[DT])
-                )
-                or prev_line[prev_index:] != line[index:]
-            ):
-                if totals[T_DAY] and not same_day(
-                    parser.parse(split[DT]), parser.parse(prev_split[DT])
-                ):
-                    # handle end of day previous day
-                    eod_line = line[0:11] + "00:00:00" + prev_line[19:]
-                    if D:
-                        dbg(f"prev_line: {prev_line}\n eod_line: {eod_line}")
-                    last_split = eod_line.split(",")
-                    totals = handle_line(
-                        linecount, last_split, prev_split, totals, False
-                    )
-                totals = handle_line(
-                    linecount, split, prev_split, totals, False
-                )
+    linecount = 0
+    prev_line = ""
+    prev_split = ()
+    totals = ((), (), (), (), ())
+    print_header_and_update_queue()
 
-            prev_index = index
-            prev_line = line
-            prev_split = split
+    while True:
+        line = get_next_monitor_csv_line()
+        if line == "":  # EOF
+            break  # finish loop
+        linecount += 1
+        _ = D and dbg(str(linecount) + ": LINE=[" + line + "]")
+        split = line.split(",")
+        if totals[T_DAY] and not same_day(
+            parser.parse(split[DT]), parser.parse(prev_split[DT])
+        ):
+            # handle end of day previous day
+            eod_line = line[0:11] + "00:00:00" + prev_line[19:]
+            if D:
+                dbg(f"prev_line: {prev_line}\n eod_line: {eod_line}")
+            last_split = eod_line.split(",")
+            totals = handle_line(linecount, last_split, prev_split, totals, False)
+        totals = handle_line(linecount, split, prev_split, totals, False)
 
-        # also compute last last day/week/month
-        _ = D and dbg("Handling last values")
-        # handle end of day for last value
-        eod_line = prev_line[0:11] + "23:59:59" + prev_line[19:]
-        last_split = eod_line.split(",")
-        _ = D and dbg(f"prev_line: {prev_line}\n eod_line: {eod_line}")
-        totals = handle_line(linecount, last_split, prev_split, totals, False)
-        # and show summaries
-        handle_line(linecount, last_split, last_split, totals, True)
-        print_header_and_update_queue()
+        prev_line = line
+        prev_split = split
+
+    # also compute last last day/week/month
+    _ = D and dbg("Handling last values")
+    # handle end of day for last value
+    eod_line = prev_line[0:11] + "23:59:59" + prev_line[19:]
+    last_split = eod_line.split(",")
+    _ = D and dbg(f"prev_line: {prev_line}\n eod_line: {eod_line}")
+    totals = handle_line(linecount, last_split, prev_split, totals, False)
+    # and show summaries
+    handle_line(linecount, last_split, last_split, totals, True)
+    print_header_and_update_queue()
 
 
 if SHEETUPDATE:
@@ -1021,17 +1088,22 @@ if SHEETUPDATE:
             time.sleep(60)
 
 
-# create header if file does not exists
-if not SUMMARY_CSV_FILENAME.is_file():
-    SUMMARY_CSV_FILENAME.touch()
-    SUMMARY_CSV_FILE = SUMMARY_CSV_FILENAME.open("a", encoding="utf-8")
-    SUMMARY_CSV_FILE.write("date, odometer, +kWh, end charged SOC%\n")
-else:
-    SUMMARY_CSV_LAST_LINE = get_last_line(SUMMARY_CSV_FILENAME.name)
-    SUMMARY_CSV_FILE = SUMMARY_CSV_FILENAME.open("a", encoding="utf-8")
+# always rewrite charge file, because input might be changed
+CHARGE_CSV_FILE = CHARGE_CSV_FILENAME.open("w", encoding="utf-8")
+write_charge_csv("date, odometer, +kWh, end charged SOC%")
+
+
+# always rewrite trip file, because input might be changed
+TRIP_CSV_FILE = None
+if TRIP:
+    TRIP_CSV_FILE = TRIP_CSV_FILENAME.open("w", encoding="utf-8")
+    write_trip_csv("date, odometer, distance, -kWh, +kWh")
 
 summary()  # do the work
-SUMMARY_CSV_FILE.close()
+MONITOR_CSV_FILE.close()
+CHARGE_CSV_FILE.close()
+if TRIP:
+    TRIP_CSV_FILE.close()
 
 if SHEETUPDATE:
     RETRIES = 2
