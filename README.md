@@ -643,42 +643,6 @@ Screenshot of Excel example using a larger summary.charged.csv:
 
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.charge.jpg)
 
-Example output "python summary.py day" when filtering on DAY:
-```
-C:\Users\Rick\git\monitor>python summary.py day
-  Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges,   #trips
-DAY     , 2022-09-17, Sat  ,  17324.2,         ,     2.8,         ,       ,          ,          ,      58, 55, 55, 58,      91, 91, 91, 91,      1  ,
-DAY     , 2022-09-18, Sun  ,  17324.2,         ,     0.7,         ,       ,          ,          ,      59, 59, 59, 60,      91, 91, 91, 91,         ,
-DAY     , 2022-09-19, Mon  ,  17330.7,      6.5,        ,         ,       ,          ,          ,      59, 60, 59, 61,      86, 88, 85, 91,         ,      2
-DAY     , 2022-09-20, Tue  ,  17378.3,     47.6,        ,     -7.0,    6.8,      14.7,      1.72,      45, 48, 45, 59,      91, 91, 87, 92,         ,      3
-DAY     , 2022-09-21, Wed  ,  17383.5,      5.2,    18.2,     -0.7,       ,          ,          ,      70, 63, 46, 70,      91, 91, 91, 92,      2  ,      2
-DAY     , 2022-09-22, Thu  ,  17383.5,         ,        ,         ,       ,          ,          ,      72, 72, 72, 72,      91, 91, 91, 91,      1  ,
-DAY     , 2022-09-23, Fri  ,  17387.1,      3.6,    20.3,     -0.7,       ,          ,          ,     100, 86, 71,100,      87, 87, 87, 88,      2  ,      2
-DAY     , 2022-09-24, Sat  ,  17794.9,    407.8,    25.9,    -66.5,    6.1,      16.3,     16.36,      42, 40,  5,100,      97, 96, 92, 98,      1  ,      5
-DAY     , 2022-09-25, Sun  ,  17794.9,         ,     5.6,         ,       ,          ,          ,      50, 50, 43, 50,      97, 97, 97, 97,         ,
-```
-
-Example output "python summary.py trip" when filtering on TRIP:
-```
-C:\Users\Rick\git\monitor>python summary.py trip
-Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%CUR,AVG,MIN,MAX, 12V%CUR,AVG,MIN,MAX, #charges, #drives
-TRIP  , 2022-09-19, 15:00,  17324.3,      0.1,        ,         ,       ,          ,          ,      61, 60, 60, 61,      85, 90, 85, 91,         ,       1
-TRIP  , 2022-09-19, 16:00,  17330.7,      6.4,        ,     -1.4,       ,          ,          ,      59, 60, 59, 59,      86, 85, 86, 86,         ,       1
-TRIP  , 2022-09-20, 08:00,  17358.9,     28.2,        ,     -4.2,    6.7,      14.9,      1.03,      53, 57, 53, 59,      91, 88, 88, 91,         ,       1
-TRIP  , 2022-09-20, 15:30,  17371.5,     12.6,        ,     -2.1,    6.0,      16.7,      0.52,      48, 50, 48, 51,      92, 90, 87, 92,         ,       1
-TRIP  , 2022-09-20, 15:58,  17378.3,      6.8,        ,     -0.7,       ,          ,          ,      47, 47, 47, 47,      91, 91, 91, 91,         ,       1
-TRIP  , 2022-09-21, 12:30,  17380.8,      2.5,     4.9,         ,       ,          ,          ,      52, 48, 46, 52,      92, 91, 91, 92,        1,       1
-TRIP  , 2022-09-21, 13:00,  17383.5,      2.7,        ,     -0.7,       ,          ,          ,      51, 51, 51, 51,      91, 91, 91, 91,         ,       1
-TRIP  , 2022-09-23, 11:21,  17385.4,      1.9,        ,     -0.7,       ,          ,          ,      71, 71, 71, 71,      88, 89, 88, 88,         ,       1
-TRIP  , 2022-09-23, 12:00,  17387.1,      1.7,     0.7,         ,       ,          ,          ,      72, 71, 72, 72,      87, 87, 87, 87,        1,       1
-TRIP  , 2022-09-24, 09:57,  17390.8,      3.7,        ,     -0.7,       ,          ,          ,      99,100, 99,100,      95, 94, 95, 95,         ,       1
-TRIP  , 2022-09-24, 13:21,  17589.2,    198.4,        ,    -32.9,    6.0,      16.6,      8.09,      52, 80, 52, 98,      96, 96, 92, 98,         ,       1
-TRIP  , 2022-09-24, 14:31,  17592.5,      3.3,        ,     -0.7,       ,          ,          ,      51, 51, 51, 51,      94, 95, 94, 94,         ,       1
-TRIP  , 2022-09-24, 15:23,  17597.3,      4.8,        ,     -0.7,       ,          ,          ,      50, 51, 50, 51,      96, 94, 93, 96,         ,       1
-TRIP  , 2022-09-24, 19:00,  17794.9,    197.6,        ,    -31.5,    6.3,      15.9,      7.75,       5, 30,  5, 50,      97, 95, 94, 97,        1,       1
-
-```
-
 You can redirect the standard output to a file, e.g. [summary.day.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.csv)
 ```
   Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%,AVG,MIN,MAX, 12V%,AVG,MIN,MAX, #charges,   #trips, Address, EV range
