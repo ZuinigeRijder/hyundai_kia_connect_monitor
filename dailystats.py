@@ -220,7 +220,9 @@ def reverse_read_next_summary_trip_line():
             return
         else:
             line = line.strip()
-            if line != "" and "Date" not in line:  # skip header/empty lines
+            if (
+                line != "" and "Date" not in line and "date" not in line
+            ):  # skip header/empty lines
                 _ = D and dbg(f"reverse_read_next_trip_info_line: [{line}]")
                 SUMMARY_TRIP_LAST_READ_LINE = line
                 return
@@ -248,7 +250,9 @@ def reverse_read_next_trip_info_line():
             return
         else:
             line = line.strip()
-            if line != "" and "Date" not in line:  # skip header/empty lines
+            if (
+                line != "" and "Date" not in line and "date" not in line
+            ):  # skip header/empty lines
                 _ = D and dbg(f"reverse_read_next_trip_info_line: [{line}]")
                 TRIPINFO_LAST_READ_LINE = line
                 return
@@ -276,7 +280,9 @@ def reverse_read_next_charge_line():
             return
         else:
             line = line.strip()
-            if line != "" and "date" not in line:  # skip header/empty lines
+            if (
+                line != "" and "Date" not in line and "date" not in line
+            ):  # skip header/empty lines
                 _ = D and dbg(f"reverse_read_next_charge_line: [{line}]")
                 CHARGE_LAST_READ_LINE = line
                 return
@@ -368,8 +374,12 @@ def get_trip_for_datetime(date, trip_time_start_str, trip_time_end_str):
         splitted_line = line.split(",")
         if len(splitted_line) > 3:
             trip_datetime = splitted_line[0].strip()
-            trip_date = trip_datetime.split(" ")[0]
-            trip_time = trip_datetime.split(" ")[1]
+            date_elements = trip_datetime.split(" ")
+            if len(date_elements) < 2:
+                log(f"ERROR: unexpected line: {line}")
+                continue
+            trip_date = date_elements[0]
+            trip_time = date_elements[1]
             if trip_date == date:
                 _ = D and dbg(f"trip date match: {line}")
                 if trip_time > trip_time_start_str:
