@@ -834,3 +834,7 @@ Why are summary.py consumption values not always accurate?
 - Small trips will give inaccurate consumption figures, on the IONIQ 5 1% SOC difference is 0.7 kWh difference, so I made the minimum kWh consumption configurable via summary.cfg. A Smaller battery will have better accuracy, because 1% of e.g. 27 kWh makes 0.27 kWh delta's instead of 0.7 kWh in my case
 - I have seen once that SOC was reported wrongly in monitor.csv as zero, in summary.py I corrected this when the previous SOC% was not zero and delta is greater than 5
 - Sometimes the SOC% is not yet updated by the server, while the odometer is, so the consumption figures might be incorrect for a detected trip
+
+What is the difference between dailystats.py and summary.py?
+- dailystats.py (Europe only) shows the car recorded trip info and daily stats, which are more accurate and also tries to match/show summary trip info
+- summary.py is less accurate, because it tries to determine the information between snapshots, so information can be missed, especially when longer intervals are used
