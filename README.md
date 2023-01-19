@@ -112,10 +112,14 @@ Follow the steps in this link above, here is the summary of these steps:
 - - Remember the path to the downloaded credentials json file. Also, in the next step you will need the value of client_email from this file.
 - - Move the downloaded json file to ~/.config/gspread/service_account.json. Windows users should put this file to %APPDATA%\gspread\service_account.json.
 - Setup a Google Spreasheet to be updated by sheetupdate
-- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai-kia-connect-monitor or monitor.VIN (latter if if vin=VIN is given as parameter)
-- - Go to your spreadsheet and share it with a client_email from the step above (inside service_account.json)
-- run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor or monitor.VIN spreadheet will be updated with a summary and the last 50 lines of standard output
+- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai-kia-connect-monitor or monitor.VIN (latter if vin=VIN is given as parameter)
+- - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
+- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if vin=VIN is given as parameter)
+- - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
+- run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor or monitor.VIN spreadheet will be updated with a summary and the last 122 lines of standard output
+- run "python dailystats.py sheetupdate" and if everything is correct, the monitor.dailystats or monitor.dailystats.VIN spreadheet will be updated with the last 122 lines of standard output
 - configure to run "python summary.py sheetupdate" regularly, after having run "python monitor.py"
+- configure to run "python dailystats.py sheetupdate" regularly, after having run "python summary.py sheetupdate"
 
 ---
 # monitor.py
@@ -326,6 +330,11 @@ or
 python summary.py sheetupdate vin=VIN
 ```
 
+For sheetupdate configure once gspread and a specific Google Spreadsheet:
+- [See configuration of gspread here](#configuration-of-gspread-for-python-summarypy-sheetupdate-and-python-dailystatspy-sheetupdate)
+- In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai_kia_connect_monitor or monitor.VIN (latter if vin=VIN is given as parameter)
+- Go to your spreadsheet and share it with the client_email inside service_account.json created above
+
 INPUT:
 - summary.cfg (see above)
 - monitor.csv or or monitor.VIN.csv (latter if vin=VIN is given as parameter)
@@ -375,9 +384,9 @@ Read the daily stats, trip info and charge files and represent these in a nice f
 *Note summary input information is represented using round brackets, examples: (+33.6kWh) or (11.2kWh) or (4.1km/kWh), because the other information is probably more accurate*
 
 For sheetupdate configure once gspread and a specific Google Spreadsheet:
-- - [See configuration of gspread here](#configuration-of-gspread-for-python-summarypy-sheetupdate)
-- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if if vin=VIN is given as parameter)
-- - Go to your spreadsheet and share it with the client_email inside service_account.json created above
+- [See configuration of gspread here](#configuration-of-gspread-for-python-summarypy-sheetupdate-and-python-dailystatspy-sheetupdate)
+- In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if if vin=VIN is given as parameter)
+- Go to your spreadsheet and share it with the client_email inside service_account.json created above
 
 Usage:
 ```
@@ -478,14 +487,6 @@ Add the following line in your crontab -e to run it every 15 minutes between 6 a
 
 *Note: there is a limit in the number of request per country, but 1 request per hour should not hamper using the Bluelink or UVO Connect App at the same time*
 
-I also want to update the google spreadsheets, so I adapted [run_monitor_once.sh](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/run_monitor_once.sh) to run a summary after running monitor.py.
-The last line of run_monitor_once.sh is changed into 3 lines:
-```
-/usr/bin/python -u ~/hyundai_kia_connect_monitor/monitor.py >> run_monitor_once.log 2>&1
-/usr/bin/python -u ~/hyundai_kia_connect_monitor/summary.py trip sheetupdate > run_monitor_once.summary.log 2>&1
-/usr/bin/python -u ~/hyundai_kia_connect_monitor/dailystats.py sheetupdate > run_monitor_once.dailystats.log 2>&1
-```
-
 ---
 # Examples
 
@@ -535,7 +536,6 @@ datetime, distance, distance_unit, total_consumed, regenerated_energy, engine_co
 
 Example output file [monitor.tripinfo.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/monitor.tripinfo.csv)
 ```
-datetime, distance, distance_unit, total_consumed, regenerated_energy, engine_consumption, climate_consumption, onboard_electronics_consumption, battery_care_consumption
 Date, Start time, Drive time, Idle time, Distance, Avg speed, Max speed
 20230114,132456,7,1,2,23,48
 20230114,141825,6,1,2,27,51
@@ -602,8 +602,7 @@ Screenshot of spreadsheet:
 
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_GoogleSpreadsheet.png)
 
-Example output of summary.charged.csv (larger example):
-![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.charge.csv)
+Example output of [summary.charged.csv (larger example)](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.charge.csv)
 ```
 date, odometer, +kWh, end charged SOC%
 2022-09-21, 17383.5, 15.4, 68
@@ -640,7 +639,7 @@ date, odometer, +kWh, end charged SOC%
 
 You can use summary.charged.csv also in other tools, e.g. [Excel:](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.charge.xlsx)
 
-Screenshot of Excel example using summary.charged.csv:
+Screenshot of Excel example using a larger summary.charged.csv:
 
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.charge.jpg)
 
@@ -695,7 +694,7 @@ DAY     , 2023-01-18, Wed  ,  22344.6,     10.2,        ,     -1.4,       ,     
 [Excel example using python summary.py day > summary.day.csv](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/blob/main/examples/summary.day.xlsx)
 
 Screenshot of excel example with some graphs:
-![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.png)
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.jpg)
 
 ----
 ## python dailystats.py
@@ -750,7 +749,7 @@ C:\Users\Rick\git\monitor>python dailystats.py sheetupdate
 
 
 Screenshot of spreadsheet:
-![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet)
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.png)
 
 
 ----
