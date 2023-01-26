@@ -29,6 +29,13 @@ Best of all is the fact that it does NOT drain your 12 volt battery of the car, 
 
 *Note the tool asks only for server cache updates and the car decides when to send push notifications with actual values to the server.*
 
+Example screenshots showing the results in a Google Spreadsheet:
+- DailyStats
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.png)
+
+- Summary
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_GoogleSpreadsheet.png)
+
 Run monitor.py e.g. once per hour (I use it on a Raspberry Pi and on Windows 10 with pure Python, but it will also run on Mac or a linux Operating System) and you can always check afterwards:
 - captured locations
 - odometer at specific day/hour
