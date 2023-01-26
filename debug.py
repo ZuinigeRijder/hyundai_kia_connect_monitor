@@ -19,7 +19,7 @@ PIN = monitor_settings["pin"]
 
 
 # == get_child_value =========================================================
-def get_child_value(data, key):
+def get_child_value(data: dict, key: str) -> dict:
     """get child value"""
     value = data
     for k in key.split("."):
@@ -36,7 +36,7 @@ def get_child_value(data, key):
 
 
 # == print_indent ==========================================================
-def print_indent(indent):
+def print_indent(indent: int) -> None:
     """print indent"""
     print()
     i = 0
@@ -46,7 +46,7 @@ def print_indent(indent):
 
 
 # == print_indented ==========================================================
-def print_indented(string):
+def print_indented(string: str) -> None:
     """print indented"""
     indent = 0
     for char in string:
@@ -69,7 +69,7 @@ def print_indented(string):
 
 
 # == print_info ==========================================================
-def print_info(vehicles):
+def print_info(vehicles: dict) -> None:
     """print info"""
     for key in vehicles:
         vehicle: Vehicle = vehicles[key]

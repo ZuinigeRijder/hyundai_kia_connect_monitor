@@ -1,0 +1,89 @@
+datetime, longitude, latitude, engineOn, 12V%, odometer, SOC%, charging, plugged, address, EV range
+2023-01-02 16:10:09+01:00, 5.085289, 51.690733, False, 90, 21847.1, 76, False, 0, 56; Doctor Kuyperlaan; Laageinde; Waalwijk; Noord-Brabant; Nederland; 5142 TD; Nederland, 301.0
+2023-01-02 16:38:09+01:00, 6.401586, 51.934733, False, 79, 21848.4, 76, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 294.0
+2023-01-02 16:38:09+01:00, 6.401586, 51.934733, False, 79, 20795.4, 76, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 294.0
+2023-01-02 16:38:09+01:00, 6.401586, 51.934733, False, 79, 20795.4, 76, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 294
+2023-01-02 16:38:09+01:00, 6.401586, 51.934733, False, 79, 21850.6, 76, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 294
+2023-01-03 12:22:29+01:00, 5.047222, 51.688206, False, 79, 20795.4, 74, False, 0, 29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland, 281
+2023-01-03 12:22:29+01:00, 5.047222, 51.688206, False, 79, 21857.5, 74, False, 0, 29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland, 281
+2023-01-03 13:01:32+01:00, 5.320317, 51.608242, False, 80, 20795.4, 68, False, 0, 82; Bosscheweg; Selissen; Venrode; Boxtel; Noord-Brabant; Nederland; 5283 WB; Nederland, 255
+2023-01-03 15:12:37+01:00, 6.401544, 51.934728, False, 80, 20795.4, 63, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 235
+2023-01-03 19:32:55+01:00, 6.401569, 51.934731, False, 81, 21919.9, 59, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 219
+2023-01-04 16:48:57+01:00, 6.401589, 51.934736, False, 88, 20795.4, 49, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 182
+2023-01-06 16:08:10+01:00, 6.401575, 51.934731, False, 86, 21973.1, 42, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 156
+2023-01-07 13:34:34+01:00, 6.401567, 51.934731, False, 88, 20795.4, 40, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 155
+2023-01-07 13:34:34+01:00, 6.401567, 51.934731, False, 88, 21977.2, 40, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 155
+2023-01-08 11:07:22+01:00, 5.6986, 51.244361, False, 87, 20795.4, 19, False, 0, 1; Het Dal; Parkhof; Weert; Limburg; Nederland; 6006 KV; Nederland, 67
+2023-01-08 11:42:35+01:00, 5.700392, 51.245714, False, 86, 20795.4, 20, True, 2, 115; Kerkstraat; Parkhof; Weert; Limburg; Nederland; 6006 KM; Nederland, 71
+2023-01-08 12:22:28+01:00, 5.700392, 51.245714, False, 86, 20795.4, 30, True, 2, 115; Kerkstraat; Parkhof; Weert; Limburg; Nederland; 6006 KM; Nederland, 109
+2023-01-08 13:02:50+01:00, 5.700392, 51.245714, False, 86, 20795.4, 40, True, 2, 115; Kerkstraat; Parkhof; Weert; Limburg; Nederland; 6006 KM; Nederland, 150
+2023-01-08 13:43:33+01:00, 5.700392, 51.245714, False, 86, 20795.4, 50, True, 2, 115; Kerkstraat; Parkhof; Weert; Limburg; Nederland; 6006 KM; Nederland, 190
+2023-01-08 14:23:38+01:00, 5.700392, 51.245714, False, 86, 20795.4, 60, True, 2, 115; Kerkstraat; Parkhof; Weert; Limburg; Nederland; 6006 KM; Nederland, 229
+2023-01-08 15:06:08+01:00, 5.700392, 51.245714, False, 86, 20795.4, 70, True, 2, 115; Kerkstraat; Parkhof; Weert; Limburg; Nederland; 6006 KM; Nederland, 273
+2023-01-08 15:48:33+01:00, 5.700392, 51.245714, False, 86, 20795.4, 80, True, 2, 115; Kerkstraat; Parkhof; Weert; Limburg; Nederland; 6006 KM; Nederland, 315
+2023-01-08 15:48:33+01:00, 5.700392, 51.245714, False, 86, 22055.4, 80, True, 2, 115; Kerkstraat; Parkhof; Weert; Limburg; Nederland; 6006 KM; Nederland, 315
+2023-01-08 17:13:51+01:00, 6.401567, 51.934731, False, 89, 20795.4, 70, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 265
+2023-01-08 17:13:51+01:00, 6.401567, 51.934731, False, 89, 22132.2, 70, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 265
+2023-01-10 13:24:51+01:00, 5.216653, 51.697361, False, 81, 22140.6, 67, False, 0, Boerenbond; Ovito; Vijfhoeven; Vlijmen; Heusden; Noord-Brabant; Nederland; 5251 BZ; Nederland, 249
+2023-01-10 13:41:40+01:00, 6.401575, 51.934731, False, 81, 20795.4, 65, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 240
+2023-01-10 13:41:40+01:00, 6.401575, 51.934731, False, 81, 22148.9, 65, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 240
+2023-01-10 14:58:42+01:00, 6.401614, 51.934742, False, 81, 20795.4, 63, False, 0, 7;Kwakstraat; Duckstad; Nederland; 7054; AN, 232
+2023-01-11 12:27:18+01:00, 5.135225, 51.692605, False, 81, 22157.3, 62, False, 0, 18; Leliestraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 TP; Nederland, 231
+2023-01-11 12:42:35+01:00, 6.401556, 51.934731, False, 81, 20795.4, 62, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 226
+2023-01-12 14:02:36+01:00, 5.128686, 51.934947, False, 81, 22161, 62, False, 0, 89; Canadalaan; Drunen; Heusden; Noord-Brabant; Nederland; 5152 LL; Nederland, 226
+2023-01-12 14:05:51+01:00, 5.128686, 51.934947, False, 86, 20795.4, 60, False, 0, 89; Canadalaan; Drunen; Heusden; Noord-Brabant; Nederland; 5152 LL; Nederland, 221
+2023-01-12 15:23:34+01:00, 5.129689, 51.682225, False, 85, 20795.4, 60, False, 0, 2; Canadalaan; Drunen; Heusden; Noord-Brabant; Nederland; 5152 LB; Nederland, 221
+2023-01-12 15:35:21+01:00, 6.401608, 51.934742, False, 85, 22162.2, 60, False, 0, 7;Kwakstraat; Duckstad; Nederland; 7054; AN, 221
+2023-01-12 15:46:54+01:00, 6.401608, 51.934742, False, 85, 20795.4, 60, False, 0, 7;Kwakstraat; Duckstad; Nederland; 7054; AN, 221
+2023-01-13 09:04:04+01:00, 6.401608, 51.934742, False, 85, 22162.2, 60, False, 0, 7;Kwakstraat; Duckstad; Nederland; 7054; AN, 221
+2023-01-13 10:12:13+01:00, 6.401561, 51.934731, False, 85, 22163.4, 60, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 221
+2023-01-13 10:15:25+01:00, 6.401561, 51.934731, False, 85, 22163.4, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 223
+2023-01-13 13:01:22+01:00, 6.401561, 51.934731, True, 86, 22163.4, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 223
+2023-01-13 13:16:22+01:00, 6.401561, 51.934731, True, 87, 22163.4, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 222
+2023-01-13 13:31:23+01:00, 6.401561, 51.934731, True, 88, 22163.4, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 222
+2023-01-13 13:50:26+01:00, 6.401561, 51.934731, False, 89, 22163.4, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 222
+2023-01-14 13:34:53+01:00, 5.135314, 51.687433, False, 90, 22165.5, 57, False, 0, 33; Achterstraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 BT; Nederland, 217
+2023-01-14 14:27:22+01:00, 6.401553, 51.934731, False, 89, 22167.5, 57, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 205
+2023-01-15 13:41:01+01:00, 5.698608, 51.244322, False, 93, 22244.9, 35, False, 0, 1; Het Dal; Parkhof; Weert; Limburg; Nederland; 6006 KV; Nederland, 125
+2023-01-15 17:30:04+01:00, 5.696136, 51.244042, False, 91, 22245.5, 40, True, 1, Keulerstraat; Parkhof; Weert; Limburg; Nederland; 6006 LA; Nederland, 147
+2023-01-15 17:41:04+01:00, 5.696136, 51.244042, False, 91, 22245.5, 50, True, 1, Keulerstraat; Parkhof; Weert; Limburg; Nederland; 6006 LA; Nederland, 189
+2023-01-15 18:01:29+01:00, 5.696136, 51.244042, False, 91, 22245.5, 70, True, 1, Keulerstraat; Parkhof; Weert; Limburg; Nederland; 6006 LA; Nederland, 273
+2023-01-15 18:15:07+01:00, 5.696136, 51.244042, False, 91, 22245.5, 83, False, 1, Keulerstraat; Parkhof; Weert; Limburg; Nederland; 6006 LA; Nederland, 331
+2023-01-15 19:13:56+01:00, 6.401575, 51.934731, False, 91, 22323, 83, False, 1, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 331
+2023-01-15 19:17:20+01:00, 6.401575, 51.934731, False, 95, 22323, 67, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 255
+2023-01-16 10:49:02+01:00, 5.131272, 51.678608, False, 91, 22327.1, 65, False, 0, Drunen; Heusden; Noord-Brabant; Nederland; 5151 SM; Nederland, 243
+2023-01-16 17:50:02+01:00, 6.401606, 51.934739, False, 76, 22328.6, 65, False, 0, 7;Kwakstraat; Duckstad; Nederland; 7054; AN, 241
+2023-01-17 14:54:06+01:00, 6.401578, 51.934733, False, 86, 22334.4, 63, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 228
+2023-01-18 09:39:03+01:00, 6.401578, 51.934733, True, 89, 22334.4, 61, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 209
+2023-01-18 09:50:49+01:00, 5.152414, 51.656597, False, 89, 22339.5, 59, False, 0, Giersbergen; Drunen; Heusden; Noord-Brabant; Nederland; 5151 RG; Nederland, 223
+2023-01-18 12:15:04+01:00, 6.401569, 51.934731, False, 89, 22344.6, 59, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 223
+2023-01-18 12:19:00+01:00, 6.401569, 51.934731, False, 88, 22344.6, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 202
+2023-01-20 13:44:14+01:00, 5.13245, 51.684922, False, 88, 22346.4, 58, False, 0, 70; Hugo de Grootstraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 EJ; Nederland, 202
+2023-01-20 13:47:32+01:00, 5.13245, 51.684922, False, 88, 22346.4, 57, False, 0, 70; Hugo de Grootstraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 EJ; Nederland, 197
+2023-01-20 14:12:59+01:00, 6.401758, 51.934797, False, 88, 22348.1, 55, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 182
+2023-01-21 07:24:23+01:00, 6.401758, 51.934797, False, 88, 22348.1, 80, False, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 310
+2023-01-21 10:06:35+01:00, 6.401758, 51.934797, False, 88, 22348.1, 80, True, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 310
+2023-01-21 10:16:36+01:00, 6.401758, 51.934797, False, 88, 22348.1, 79, True, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, -1
+2023-01-21 10:42:49+01:00, 5.098478, 51.688683, False, 88, 22351.7, 79, True, 2, Mortuarium; Bloemendaalweg; De Hoef; Waalwijk; Noord-Brabant; Nederland; 5142 MP; Nederland, -1
+2023-01-21 10:46:06+01:00, 5.098478, 51.688683, False, 91, 22351.7, 78, False, 0, Mortuarium; Bloemendaalweg; De Hoef; Waalwijk; Noord-Brabant; Nederland; 5142 MP; Nederland, 271
+2023-01-21 13:25:26+01:00, 6.401556, 51.934731, False, 89, 22355.2, 78, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 275
+2023-01-21 19:07:43+01:00, 5.047486, 51.688228, False, 89, 22361.9, 75, False, 0, 27; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland, 241
+2023-01-22 03:15:24+01:00, 6.401755, 51.934794, False, 88, 22369.4, 80, True, 2, 7;Kwakstraat; Duckstad; Nederland; 7054; AN, 311
+2023-01-22 06:33:55+01:00, 6.401755, 51.934794, False, 88, 22369.4, 90, True, 2, 7;Kwakstraat; Duckstad; Nederland; 7054; AN, 354
+2023-01-22 07:01:40+01:00, 6.401755, 51.934794, False, 88, 22369.4, 91, True, 2, 7;Kwakstraat; Duckstad; Nederland; 7054; AN, 360
+2023-01-22 08:39:52+01:00, 6.401755, 51.934794, False, 88, 22369.4, 95, True, 2, 7;Kwakstraat; Duckstad; Nederland; 7054; AN, 378
+2023-01-22 11:06:34+01:00, 5.683444, 53.036136, False, 94, 22567.8, 34, False, 0, 17-711; Dekamalaan; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8604 ZG; Nederland, 115
+2023-01-22 12:13:22+01:00, 5.672, 53.028564, False, 93, 22571.2, 33, False, 0, 5; Oude Oppenhuizerweg; Houkesloot; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8606 JA; Nederland, 110
+2023-01-22 12:28:33+01:00, 5.6721, 53.028639, False, 92, 22571.2, 33, False, 0, 9; Oude Oppenhuizerweg; Houkesloot; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8606 JA; Nederland, 117
+2023-01-22 12:50:56+01:00, 5.683467, 53.036128, False, 92, 22574.6, 32, False, 0, 17-711; Dekamalaan; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8604 ZG; Nederland, 106
+2023-01-22 13:43:31+01:00, 5.680997, 53.016714, False, 92, 22578, 32, False, 0, Van der Valk Hotel Sneek; 1; Burgemeester Rasterhofflaan; Houkesloot; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8606 KZ; Nederland, 106
+2023-01-22 13:46:43+01:00, 5.680997, 53.016714, False, 92, 22578, 31, False, 0, Van der Valk Hotel Sneek; 1; Burgemeester Rasterhofflaan; Houkesloot; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8606 KZ; Nederland, 104
+2023-01-22 14:34:41+01:00, 5.68318, 53.036219, False, 91, 22581.4, 30, False, 0, 17-224; Dekamalaan; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8604 ZG; Nederland, 100
+2023-01-22 15:58:56+01:00, 5.689172, 52.660933, False, 94, 22634.2, 20, True, 1, Han Stijkel; Rijksweg A6; Nagele; Noordoostpolder; Flevoland; Nederland; 8309 PE; Nederland, 63
+2023-01-22 16:12:47+01:00, 5.689172, 52.660933, False, 94, 22634.2, 52, False, 1, Han Stijkel; Rijksweg A6; Nagele; Noordoostpolder; Flevoland; Nederland; 8309 PE; Nederland, 195
+2023-01-22 16:12:47+01:00, 5.689172, 52.660933, False, 94, 22634.2, 52, False, 1, Han Stijkel; Rijksweg A6; Nagele; Noordoostpolder; Flevoland; Nederland; 8308 PE; Nederland, 195
+2023-01-22 17:14:41+01:00, 6.401936, 52.014258, False, 94, 22726, 52, False, 1, De Kroon; Waterliniedok; Nieuwegein; Utrecht; Nederland; 3433 KN; Nederland, 195
+2023-01-22 17:28:00+01:00, 6.401936, 52.014258, False, 95, 22726, 70, True, 1, De Kroon; Waterliniedok; Nieuwegein; Utrecht; Nederland; 3433 KN; Nederland, 265
+2023-01-22 17:37:28+01:00, 6.401936, 52.014258, False, 95, 22726, 90, True, 1, De Kroon; Waterliniedok; Nieuwegein; Utrecht; Nederland; 3433 KN; Nederland, 349
+2023-01-22 17:49:56+01:00, 6.401936, 52.014258, False, 95, 22726, 98, False, 1, De Kroon; Waterliniedok; Nieuwegein; Utrecht; Nederland; 3433 KN; Nederland, 383
+2023-01-22 18:42:25+01:00, 6.401569, 51.934731, False, 95, 22780.8, 86, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 320

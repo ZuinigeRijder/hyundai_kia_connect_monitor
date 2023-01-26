@@ -27,6 +27,7 @@ Note:
 How to import kml in Google Maps:
 https://www.spotzi.com/en/about/help-center/how-to-import-a-kml-into-google-maps/
 """
+from io import TextIOWrapper
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -45,7 +46,7 @@ PLUGGED = 8  # plugged
 LOCATION = 9  # location address (optional field)
 
 
-def get_vin_arg():
+def get_vin_arg() -> str:
     """get vin arg"""
     for i in range(1, len(sys.argv)):
         if "vin=" in sys.argv[i].lower():
@@ -65,25 +66,25 @@ if VIN != "":
     OUTPUT_KML_FILE = Path(f"monitor.{VIN}.kml")
 
 
-def to_float(string):
+def to_float(string: str) -> float:
     """convert to float"""
     if "None" in string:
         return 0.0
     return float(string.strip())
 
 
-def write(outputfile, line):
+def write(outputfile: TextIOWrapper, line: str) -> None:
     """write"""
     outputfile.write(line)
 
 
-def writeline(outputfile, line):
+def writeline(outputfile: TextIOWrapper, line: str) -> None:
     """writeline"""
     outputfile.write(line)
     outputfile.write("\n")
 
 
-def strip_datetime(string) -> str:
+def strip_datetime(string: str) -> str:
     """strip datetime string to make it shorter"""
     # get rid of timezone info part, so name is shorter
     string = string.strip()
@@ -102,7 +103,7 @@ def strip_datetime(string) -> str:
     return string
 
 
-def get_address(split):
+def get_address(split: list[str]) -> str:
     """get address"""
     location_str = ""
     if len(split) > 9:
@@ -111,7 +112,9 @@ def get_address(split):
     return location_str
 
 
-def write_kml(outputfile, count, items, prev_items):
+def write_kml(
+    outputfile: TextIOWrapper, count: int, items: list, prev_items: list
+) -> None:
     """write kml"""
     name = strip_datetime(items[DT]) + " "
     lon = items[LON].strip()
@@ -145,7 +148,7 @@ def write_kml(outputfile, count, items, prev_items):
     else:
         description = f"SOC:{soc:>3}% 12V:{voltage_12:>3}% ODO:{odometer:8.1f} Address: {address}"  # noqa
 
-    delta_odometer = 0
+    delta_odometer = 0.0
     if len(prev_items) > 8:
         delta_odometer = round(odometer - to_float(prev_items[ODO]), 1)
         if delta_odometer != 0.0:
@@ -165,14 +168,13 @@ def write_kml(outputfile, count, items, prev_items):
 
     print(f"{count:3}: {name:17} ({lon:8},{lat:9}) {description}")
 
-    write(outputfile, "<Placemark>")
     write(outputfile, "<name>" + name.strip() + "</name>")
     write(outputfile, "<description>" + description.strip() + "</description>")
     write(outputfile, "<Point>" + coordinates + "</Point>")
     writeline(outputfile, "</Placemark>")
 
 
-def convert():
+def convert() -> None:
     """convert csv file to kml"""
     with OUTPUT_KML_FILE.open("w", encoding="utf-8") as outputfile:
         count = 0
@@ -191,7 +193,7 @@ def convert():
             prev_engine_on = ""
             prev_charging = ""
             prev_line = ""
-            prev_items = []
+            prev_items: list[str] = []
             for line in inputfile:
                 if line.find("datetime") == 0:
                     continue  # skip this header line

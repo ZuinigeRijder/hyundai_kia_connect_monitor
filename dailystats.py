@@ -9,20 +9,21 @@ import time
 from datetime import datetime
 from pathlib import Path
 from collections import deque
+from typing import Generator
 from dateutil.relativedelta import relativedelta
 import gspread
 
 # Initializing a queue for about 30 days
 MAX_QUEUE_LEN = 122
-PRINTED_OUTPUT_QUEUE = deque(maxlen=MAX_QUEUE_LEN)
+PRINTED_OUTPUT_QUEUE: deque = deque(maxlen=MAX_QUEUE_LEN)
 
 
-def log(msg):
+def log(msg: str) -> None:
     """log a message prefixed with a date/time format yyyymmdd hh:mm:ss"""
     print(datetime.now().strftime("%Y%m%d %H:%M:%S") + ": " + msg)
 
 
-def arg_has(string):
+def arg_has(string: str) -> bool:
     """arguments has string"""
     for i in range(1, len(sys.argv)):
         if sys.argv[i].lower() == string:
@@ -33,14 +34,14 @@ def arg_has(string):
 D = arg_has("debug")
 
 
-def dbg(line):
+def dbg(line: str) -> bool:
     """print line if debugging"""
     if D:
         print(line)
     return D  # just to make a lazy evaluation expression possible
 
 
-def get_vin_arg():
+def get_vin_arg() -> str:
     """get vin argument"""
     for i in range(1, len(sys.argv)):
         if "vin=" in sys.argv[i].lower():
@@ -53,14 +54,14 @@ def get_vin_arg():
     return ""
 
 
-def safe_divide(numerator, denumerator):
+def safe_divide(numerator: float, denumerator: float) -> float:
     """safe_divide"""
     if denumerator == 0.0:
         return 1.0
     return numerator / denumerator
 
 
-def to_int(string):
+def to_int(string: str) -> int:
     """convert to int"""
     if "None" in string:
         return -1
@@ -68,7 +69,7 @@ def to_int(string):
     return int(split[0].strip())
 
 
-def to_float(string):
+def to_float(string: str) -> float:
     """convert to float"""
     if "None" in string:
         return 0.0
@@ -133,12 +134,12 @@ TOTAL_ELECTRONICS = 0
 TOTAL_BATTERY_CARE = 0
 
 
-def float_to_string(input_value):
+def float_to_string(input_value: float) -> str:
     """float to string without trailing zero"""
     return (f"{input_value:9.1f}").rstrip("0").rstrip(".")
 
 
-def get_last_line(filename):
+def get_last_line(filename: str) -> str:
     """get last line of filename"""
     last_line = ""
     filename_file = Path(filename)
@@ -155,7 +156,7 @@ def get_last_line(filename):
     return last_line
 
 
-def get_last_date(filename):
+def get_last_date(filename: str) -> str:
     """get last date of filename"""
     last_date = "20000101"  # millenium
     last_line = get_last_line(filename)
@@ -165,7 +166,7 @@ def get_last_date(filename):
     return last_date
 
 
-def read_reverse_order(file_name):
+def read_reverse_order(file_name: str) -> Generator[str, None, None]:
     """read in reverse order"""
     # Open file for reading in binary mode
     with open(file_name, "rb") as read_obj:
@@ -207,7 +208,7 @@ else:
     SUMMARY_TRIP_EOF = True
 
 
-def reverse_read_next_summary_trip_line():
+def reverse_read_next_summary_trip_line() -> None:
     """reverse_read_next_trip_info_line"""
     global SUMMARY_TRIP_EOF, SUMMARY_TRIP_LAST_READ_LINE  # noqa pylint:disable=global-statement
     stop_value = None
@@ -237,7 +238,7 @@ else:
     TRIPINFO_EOF = True
 
 
-def reverse_read_next_trip_info_line():
+def reverse_read_next_trip_info_line() -> None:
     """reverse_read_next_trip_info_line"""
     global TRIPINFO_EOF, TRIPINFO_LAST_READ_LINE  # noqa pylint:disable=global-statement
     stop_value = None
@@ -267,7 +268,7 @@ else:
     CHARGE_EOF = True
 
 
-def reverse_read_next_charge_line():
+def reverse_read_next_charge_line() -> None:
     """reverse_read_next_charge_line"""
     global CHARGE_EOF, CHARGE_LAST_READ_LINE  # noqa pylint:disable=global-statement
     stop_value = None
@@ -288,13 +289,13 @@ def reverse_read_next_charge_line():
                 return
 
 
-def split_output_to_sheet_list(text):
+def split_output_to_sheet_list(text: str) -> list[list[str]]:
     """split output to sheet list"""
     result = [x.strip() for x in text.split(",")]
     return [result]
 
 
-def increment_totals(line):
+def increment_totals(line: str) -> None:
     """handle line"""
     _ = D and dbg(f"handle_line: {line}")
     global TOTAL_DAYS, TOTAL_UNIT, TOTAL_DISTANCE, TOTAL_CONSUMED, TOTAL_REGENERATED, TOTAL_ENGINE, TOTAL_CLIMATE, TOTAL_ELECTRONICS, TOTAL_BATTERY_CARE  # noqa pylint:disable=global-statement
@@ -323,7 +324,7 @@ def increment_totals(line):
 COLUMN_WIDTHS = [11, 17, 15, 10, 10, 10, 11]
 
 
-def print_output(output):
+def print_output(output: str) -> None:
     """print output"""
     split = output.split(",")
     for i in range(len(split)):  # pylint:disable=consider-using-enumerate
@@ -335,7 +336,7 @@ def print_output(output):
         PRINTED_OUTPUT_QUEUE.append(output)
 
 
-def get_charge_for_date(date):
+def get_charge_for_date(date: str) -> str:
     """get_charge_for_date"""
     charge = ""
     while not CHARGE_EOF:
@@ -359,36 +360,56 @@ def get_charge_for_date(date):
     return charge
 
 
-def get_trip_for_datetime(date, trip_time_start_str, trip_time_end_str):
+def get_trip_for_datetime(
+    date: str, trip_time_start_str: str, trip_time_end_str: str
+) -> tuple[int, float]:
     """get_trip_for_datetime"""
-    # global D
+    match = False
     matched_time = ""
     distance = 0
     kwh_consumed = 0.0
     kwh_charged = 0.0
-    # D = True
     if D:
         print(f"get_trip_for_datetime: {date} {trip_time_start_str}{trip_time_end_str}")
-    while not SUMMARY_TRIP_EOF:
+    while not match and not SUMMARY_TRIP_EOF:
         line = SUMMARY_TRIP_LAST_READ_LINE
         splitted_line = line.split(",")
         if len(splitted_line) > 3:
             trip_datetime = splitted_line[0].strip()
             date_elements = trip_datetime.split(" ")
             if len(date_elements) < 2:
-                log(f"ERROR: unexpected line: {line}")
+                log(f"Warning: skipping unexpected line: {line}")
+                reverse_read_next_summary_trip_line()
                 continue
             trip_date = date_elements[0]
             trip_time = date_elements[1]
             if trip_date == date:
                 _ = D and dbg(f"trip date match: {line}")
                 if trip_time > trip_time_start_str:
-                    matched_time = trip_time
-                    distance = to_float(splitted_line[2])
-                    kwh_consumed = to_float(splitted_line[3])
-                    kwh_charged = to_float(splitted_line[4])
-                    reverse_read_next_summary_trip_line()
-                    break  # possible match
+                    _ = D and dbg(
+                        f"Match: {trip_time} > {trip_time_start_str}{trip_time_end_str}"
+                    )
+                    delta_seconds = (
+                        datetime.strptime(trip_time, "%H:%M")
+                        - datetime.strptime(trip_time_end_str, "-%H:%M")
+                    ).total_seconds()
+                    if abs(delta_seconds) < 3600:
+                        matched_time = trip_time
+                        distance = to_int(splitted_line[2])
+                        kwh_consumed = to_float(splitted_line[3])
+                        kwh_charged = to_float(splitted_line[4])
+                        match = True
+                    else:
+                        if D:
+                            print(
+                                f"##### delta seconds: {delta_seconds} {date} {trip_time_start_str}{trip_time_end_str} {trip_time}"  # noqa
+                            )
+
+                else:
+                    _ = D and dbg(
+                        f"Skip : {trip_time} <= {trip_time_start_str}{trip_time_end_str}"  # noqa
+                    )
+                    break  # finished
             elif trip_date < date:
                 _ = D and dbg(f"trip_date {trip_date} < {date}: {line}")
                 break  # finished
@@ -400,21 +421,20 @@ def get_trip_for_datetime(date, trip_time_start_str, trip_time_end_str):
         print(
             f"get_trip_for_datetime=({date} {trip_time_start_str}{trip_time_end_str})={matched_time}, {distance}, {kwh_consumed}, {kwh_charged}"  # noqa
         )
-    # D = False
     return distance, kwh_consumed
 
 
 def print_tripinfo(
-    date_org,
-    header,
-    charge,
-    start_time,
-    drive_time,
-    idle_time,
-    distance,
-    avg_speed,
-    max_speed,
-):
+    date_org: str,
+    header: bool,
+    charge: str,
+    start_time: str,
+    drive_time: str,
+    idle_time: str,
+    distance: str,
+    avg_speed: str,
+    max_speed: str,
+) -> None:
     """print_tripinfo"""
     if header:
         print_output(
@@ -448,7 +468,7 @@ def print_tripinfo(
     )
 
 
-def print_day_trip_info(date_org):
+def print_day_trip_info(date_org: str) -> None:
     """print stats"""
     charge = get_charge_for_date(date_org)
     date = date_org.replace("-", "")
@@ -483,16 +503,16 @@ def print_day_trip_info(date_org):
 
 
 def print_stats(
-    date,
-    total_charge,
-    distance,
-    consumed,
-    regenerated,
-    engine,
-    climate,
-    electronics,
-    batterycare,
-):
+    date: str,
+    total_charge: float,
+    distance: int,
+    consumed: int,
+    regenerated: int,
+    engine: int,
+    climate: int,
+    electronics: int,
+    batterycare: int,
+) -> None:
     """print stats"""
     regenerated_perc = safe_divide(regenerated * 100, consumed)
     engine_perc = safe_divide(engine * 100, consumed)
@@ -525,7 +545,7 @@ def print_stats(
         print_output(f"(+{total_charge:.1f}kWh)")
 
 
-def compute_total_charge():
+def compute_total_charge() -> float:
     """compute_total_charge"""
     total_charge = 0.0
     if CHARGE_CSV_FILE.is_file():
@@ -544,7 +564,7 @@ def compute_total_charge():
     return total_charge
 
 
-def summary(today_daily_stats_line):
+def summary(today_daily_stats_line: str) -> None:
     """summary of monitor.dailystats.csv file"""
     if today_daily_stats_line != "":
         increment_totals(today_daily_stats_line)
@@ -576,7 +596,7 @@ def summary(today_daily_stats_line):
     print_output(",,,,,,")  # empty line/row
 
 
-def reverse_print_dailystats_one_line(line):
+def reverse_print_dailystats_one_line(line: str) -> None:
     """reverse print dailystats one line"""
     line = line.strip()
     _ = D and dbg(f"line={line}")
@@ -589,7 +609,7 @@ def reverse_print_dailystats_one_line(line):
         date = date[0:4] + "-" + date[4:6] + "-" + date[6:]
     print_stats(
         date,
-        "",
+        0.0,
         to_int(val[DISTANCE]),
         to_int(val[CONSUMED]),
         to_int(val[REGENERATED]),
@@ -603,7 +623,7 @@ def reverse_print_dailystats_one_line(line):
     print_output(",,,,,,")  # empty line/row
 
 
-def reverse_print_dailystats(today_daily_stats_line):
+def reverse_print_dailystats(today_daily_stats_line: str) -> None:
     """reverse print dailystats"""
     if today_daily_stats_line != "":
         reverse_print_dailystats_one_line(today_daily_stats_line)
@@ -612,7 +632,7 @@ def reverse_print_dailystats(today_daily_stats_line):
             reverse_print_dailystats_one_line(line)
 
 
-def print_output_queue():
+def print_output_queue() -> None:
     """print output queue"""
     array = []
     formats = []

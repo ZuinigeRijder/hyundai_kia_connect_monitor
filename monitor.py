@@ -32,6 +32,7 @@ e.g. with Excel:
 """
 import sys
 import os
+import io
 import configparser
 import traceback
 import time
@@ -39,11 +40,11 @@ import logging
 from pathlib import Path
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from hyundai_kia_connect_api import VehicleManager
+from hyundai_kia_connect_api import VehicleManager, Vehicle, exceptions
 
 
 # == arg_has =================================================================
-def arg_has(string):
+def arg_has(string: str) -> bool:
     """arguments has string"""
     for i in range(1, len(sys.argv)):
         if sys.argv[i].lower() == string:
@@ -85,19 +86,19 @@ LANGUAGE = monitor_settings["language"]
 
 
 # == subroutines =============================================================
-def dbg(line):
+def dbg(line: str) -> bool:
     """print line if debugging"""
     if D:
         print(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ": " + line)
     return D  # just to make a lazy evaluation expression possible
 
 
-def log(msg):
+def log(msg: str) -> None:
     """log a message prefixed with a date/time format yyyymmdd hh:mm:ss"""
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ": " + msg)
 
 
-def to_int(string):
+def to_int(string: str) -> int:
     """convert to int"""
     if "None" in string:
         return -1
@@ -105,7 +106,7 @@ def to_int(string):
     return int(split[0].strip())
 
 
-def writeln(filename, string):
+def writeln(filename: str, string: str) -> None:
     """append line at monitor text file with end of line character"""
     _ = D and dbg(string)
     monitor_csv_file = Path(filename)
@@ -123,7 +124,7 @@ def writeln(filename, string):
         file.write("\n")
 
 
-def get_last_line(filename):
+def get_last_line(filename: str) -> str:
     """get last line of filename"""
     last_line = ""
     filename_file = Path(filename)
@@ -140,7 +141,7 @@ def get_last_line(filename):
     return last_line
 
 
-def get_last_date(last_line):
+def get_last_date(last_line: str) -> str:
     """get last date of last_line"""
     last_date = "20000101"  # millenium
     if last_line.startswith("20"):  # year starts with 20
@@ -149,7 +150,7 @@ def get_last_date(last_line):
     return last_date
 
 
-def handle_daily_stats(vehicle, number_of_vehicles):
+def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> str:
     """handle daily stats"""
     daily_stats = vehicle.daily_stats
     if len(daily_stats) == 0:
@@ -210,7 +211,9 @@ def handle_daily_stats(vehicle, number_of_vehicles):
     return today_stats
 
 
-def write_last_run(vehicle, number_of_vehicles, vehicle_stats):
+def write_last_run(
+    vehicle: Vehicle, number_of_vehicles: int, vehicle_stats: list[str]
+) -> None:
     """write last run"""
     filename = "monitor.lastrun"
     vin = vehicle.VIN
@@ -233,8 +236,13 @@ def write_last_run(vehicle, number_of_vehicles, vehicle_stats):
 
 
 def handle_day_trip_info(
-    manager, vehicle, file, month_trip_info, last_date, last_hhmmss
-):
+    manager: VehicleManager,
+    vehicle: Vehicle,
+    file: io.TextIOWrapper,
+    month_trip_info,
+    last_date: str,
+    last_hhmmss: str,
+) -> tuple[str, str]:
     """handle_day_trip_info"""
     for day in month_trip_info.day_list:
         yyyymmdd = day.yyyymmdd
@@ -260,7 +268,9 @@ def handle_day_trip_info(
     return last_date, last_hhmmss
 
 
-def handle_trip_info(manager, vehicle, number_of_vehicles):
+def handle_trip_info(
+    manager: VehicleManager, vehicle: Vehicle, number_of_vehicles: int
+) -> None:
     """Handle trip info"""
     now = datetime.now()
     filename = "monitor.tripinfo.csv"
@@ -307,7 +317,9 @@ def handle_trip_info(manager, vehicle, number_of_vehicles):
                 )
 
 
-def handle_one_vehicle(manager, vehicle, number_of_vehicles):
+def handle_one_vehicle(
+    manager: VehicleManager, vehicle: Vehicle, number_of_vehicles: int
+) -> bool:
     """handle one vehicle and return if error occurred"""
     try:
         handle_trip_info(manager, vehicle, number_of_vehicles)
@@ -368,14 +380,38 @@ def handle_one_vehicle(manager, vehicle, number_of_vehicles):
     return False
 
 
-def sleep(retries):
+def sleep(retries: int) -> None:
     """sleep when retries > 0"""
     if retries > 0:
         log("Sleeping a minute")
         time.sleep(60)
 
 
-def handle_vehicles():
+def handle_exception(ex: Exception, retries: int, stacktrace=False) -> int:
+    """
+    If an error is found, an exception is raised.
+    retCode known values:
+    - S: success
+    - F: failure
+    resCode / resMsg known values:
+    - 0000: no error
+    - 4004: "Duplicate request"
+    - 4081: "Request timeout"
+    - 5031: "Unavailable remote control - Service Temporary Unavailable"
+    - 5091: "Exceeds number of requests"
+    - 5921: "No Data Found v2 - No Data Found v2"
+    - 9999: "Undefined Error - Response timeout"
+    """
+    exception_str = str(ex)
+    log(f"Exception: {exception_str}")
+    if stacktrace and "Service Temporary Unavailable" not in exception_str:
+        traceback.print_exc()
+    retries -= 1
+    sleep(retries)
+    return retries
+
+
+def handle_vehicles() -> None:
     """handle vehicles"""
     retries = 2
     while retries > 0:
@@ -406,11 +442,27 @@ def handle_vehicles():
                 sleep(retries)
             else:
                 retries = 0  # successfully end while loop
+        except exceptions.AuthenticationError as ex:
+            retries = handle_exception(ex, retries)
+        except exceptions.RateLimitingError as ex:
+            retries = handle_exception(ex, retries)
+        except exceptions.NoDataFound as ex:
+            retries = handle_exception(ex, retries)
+        except exceptions.DuplicateRequestError as ex:
+            retries = handle_exception(ex, retries)
+        except exceptions.RequestTimeoutError as ex:
+            retries = handle_exception(ex, retries)
+        # Not yet available, so workaround for now in handle_exception
+        # except exceptions.ServiceTemporaryUnavailable as ex:
+        #    retries = handle_exception(ex, retries)
+        except exceptions.InvalidAPIResponseError as ex:
+            retries = handle_exception(ex, retries, True)
+        except exceptions.APIError as ex:
+            retries = handle_exception(ex, retries, True)
+        except exceptions.HyundaiKiaException as ex:
+            retries = handle_exception(ex, retries, True)
         except Exception as ex:  # pylint: disable=broad-except
-            log("Exception: " + str(ex))
-            traceback.print_exc()
-            retries -= 1
-            sleep(retries)
+            retries = handle_exception(ex, retries, True)
 
 
 handle_vehicles()  # do the work
