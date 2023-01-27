@@ -574,7 +574,7 @@ def print_tripinfo(
         consumption = f"({km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh)"
 
     print_output(
-        f"{kwh},{trip_time_str},{consumption},{distance}{TOTAL_UNIT},{avg_speed}{TOTAL_UNIT}/{TR.hour},{max_speed}{TOTAL_UNIT}/{TR.hour},{idle_time} min"  # noqa
+        f"{kwh},{trip_time_str},{consumption},{distance}{TOTAL_UNIT},{avg_speed}{TOTAL_UNIT}/{TR.hour},{max_speed}{TOTAL_UNIT}/{TR.hour},{idle_time}min"  # noqa
     )
 
 

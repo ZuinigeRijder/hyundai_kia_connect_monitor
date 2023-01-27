@@ -16,27 +16,11 @@ set SED="tests\unxutils_sed.exe"
 
 echo ###### Current directory: %CD%
 
+call :CLEAN_INPUT
 
-echo ################## cleaning INPUT #############
-del /Q *.tmp
-del /Q *.dump
-del /Q test.*
-IF EXIST summary.charge.csv del /Q summary.charge.csv
-IF EXIST summary.trip.csv del /Q summary.trip.csv
-IF EXIST monitor.kml del /Q monitor.kml
+call :RUN_MYPY
 
-echo ################## running mypy #############
-mypy monitor.py | egrep -v "^Found|hyundai_kia_connect_api"
-mypy summary.py | egrep -v "^Found|gspread|: note:"
-mypy dailystats.py | egrep -v "^Found|gspread|: note:|: error: Argument 1 to .next."
-mypy kml.py | egrep -v "^Success"
-mypy shrink.py | egrep -v "^Success"
-mypy debug.py | egrep -v "^Found|hyundai_kia_connect_api"
-
-
-echo ################## copying  INPUT #############
-copy /Y tests\INPUT\* .
-
+call :COPY_INPUT
 
 call :CHECK_SUMMARY trip test.summary.logtrip
 call :CHECK_DAILYSTATS "" test.dailystats.logtrip
@@ -54,11 +38,41 @@ call :CHECK_KML
 
 call :CHECK_SHRINK
 
+call :CLEAN_INPUT
+
 goto :EOF
+
+:CLEAN_INPUT
+echo ################## cleaning INPUT #############
+del /Q *.tmp
+del /Q *.dump
+del /Q test.*
+IF EXIST summary.charge.csv del /Q summary.charge.csv
+IF EXIST summary.trip.csv del /Q summary.trip.csv
+IF EXIST monitor.kml del /Q monitor.kml
+
+exit /B
+
+:COPY_INPUT
+echo ################## copying INPUT ##############
+copy /Y tests\INPUT\* .
+
+exit /B
+
+:RUN_MYPY
+echo ################## running mypy ###############
+mypy monitor.py | egrep -v "^Found|hyundai_kia_connect_api"
+mypy summary.py | egrep -v "^Found|gspread|: note:"
+mypy dailystats.py | egrep -v "^Found|gspread|: note:|: error: Argument 1 to .next."
+mypy kml.py | egrep -v "^Success"
+mypy shrink.py | egrep -v "^Success"
+mypy debug.py | egrep -v "^Found|hyundai_kia_connect_api"
+
+exit /B
 
 rem #######################
 :CHECK_SHRINK
-echo ################## python shrink.py #############
+echo ################## python shrink.py ###########
 call python shrink.py
 call :CHECK_FILE shrinked_monitor.csv shrinked_monitor.csv
 
