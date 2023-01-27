@@ -28,9 +28,9 @@ How to import kml in Google Maps:
 https://www.spotzi.com/en/about/help-center/how-to-import-a-kml-into-google-maps/
 """
 from io import TextIOWrapper
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from monitor_utils import get_vin_arg, to_float
 
 
 # indexes to splitted monitor.csv items
@@ -45,32 +45,12 @@ CHARGING = 7  # charging
 PLUGGED = 8  # plugged
 LOCATION = 9  # location address (optional field)
 
-
-def get_vin_arg() -> str:
-    """get vin arg"""
-    for i in range(1, len(sys.argv)):
-        if "vin=" in sys.argv[i].lower():
-            vin = sys.argv[i]
-            vin = vin.replace("vin=", "")
-            vin = vin.replace("VIN=", "")
-            return vin
-
-    return ""
-
-
 INPUT_CSV_FILE = Path("monitor.csv")
 OUTPUT_KML_FILE = Path("monitor.kml")
 VIN = get_vin_arg()
 if VIN != "":
     INPUT_CSV_FILE = Path(f"monitor.{VIN}.csv")
     OUTPUT_KML_FILE = Path(f"monitor.{VIN}.kml")
-
-
-def to_float(string: str) -> float:
-    """convert to float"""
-    if "None" in string:
-        return 0.0
-    return float(string.strip())
 
 
 def write(outputfile: TextIOWrapper, line: str) -> None:

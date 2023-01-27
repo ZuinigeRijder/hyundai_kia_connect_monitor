@@ -4,7 +4,6 @@ Simple Python3 script to make a summary of monitor.csv
 """
 from io import TextIOWrapper
 import sys
-import os
 import configparser
 import traceback
 import time
@@ -14,20 +13,21 @@ from pathlib import Path
 from collections import deque
 import gspread
 from dateutil import parser
-
-
-def log(msg: str) -> None:
-    """log a message prefixed with a date/time format yyyymmdd hh:mm:ss"""
-    print(datetime.now().strftime("%Y%m%d %H:%M:%S") + ": " + msg)
-
-
-def arg_has(string: str) -> bool:
-    """arguments has string"""
-    for i in range(1, len(sys.argv)):
-        if sys.argv[i].lower() == string:
-            return True
-    return False
-
+from monitor_utils import (
+    log,
+    arg_has,
+    get_vin_arg,
+    safe_divide,
+    to_int,
+    to_float,
+    is_true,
+    same_year,
+    same_month,
+    same_week,
+    same_day,
+    float_to_string,
+    get_last_line,
+)
 
 D = arg_has("debug")
 
@@ -37,54 +37,6 @@ def dbg(line: str) -> bool:
     if D:
         print(line)
     return D  # just to make a lazy evaluation expression possible
-
-
-def get_vin_arg() -> str:
-    """get vin argument"""
-    for i in range(1, len(sys.argv)):
-        if "vin=" in sys.argv[i].lower():
-            vin = sys.argv[i]
-            vin = vin.replace("vin=", "")
-            vin = vin.replace("VIN=", "")
-            _ = D and dbg(f"VIN = {vin}")
-            return vin
-
-    return ""
-
-
-def safe_divide(numerator: float, denumerator: float) -> float:
-    """safe_divide"""
-    if denumerator == 0.0:
-        return 1.0
-    return numerator / denumerator
-
-
-def to_int(string: str) -> int:
-    """convert to int"""
-    if "None" in string:
-        return -1
-    split = string.split(".")  # get rid of decimal part
-    return int(split[0].strip())
-
-
-def to_float(string: str) -> float:
-    """convert to float"""
-    if "None" in string:
-        return 0.0
-    return float(string.strip())
-
-
-def is_true(string: str) -> bool:
-    """return if string is true (True or not 0 digit)"""
-    if "None" in string:
-        return False
-    tmp = string.strip().lower()
-    if tmp == "true":
-        return True
-    elif tmp == "false":
-        return False
-    else:
-        return tmp.isdigit() and tmp != "0"
 
 
 KEYWORD_LIST = [
@@ -247,34 +199,6 @@ def init(current_day: datetime, odo: float, soc: int, volt12: int) -> Totals:
     return totals
 
 
-def same_year(d_1: datetime, d_2: datetime) -> bool:
-    """return if same year"""
-    return d_1.year == d_2.year
-
-
-def same_month(d_1: datetime, d_2: datetime) -> bool:
-    """return if same month"""
-    if d_1.month != d_2.month:
-        return False
-    return d_1.year == d_2.year
-
-
-def same_week(d_1: datetime, d_2: datetime) -> bool:
-    """return if same week"""
-    if d_1.isocalendar().week != d_2.isocalendar().week:
-        return False
-    return d_1.year == d_2.year
-
-
-def same_day(d_1: datetime, d_2: datetime) -> bool:
-    """return if same day"""
-    if d_1.day != d_2.day:
-        return False
-    if d_1.month != d_2.month:
-        return False
-    return d_1.year == d_2.year
-
-
 def print_output_and_update_queue(output: str) -> None:
     """print output and update queue"""
     if SHEETUPDATE:
@@ -349,11 +273,6 @@ def print_header_and_update_queue() -> None:
     """print header and update queue"""
     output = f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%,AVG,MIN,MAX, 12V%,AVG,MIN,MAX, #charges,   #trips, Address, EV range"  # noqa
     print_output_and_update_queue(output)
-
-
-def float_to_string(input_value: float) -> str:
-    """float to string without trailing zero"""
-    return (f"{input_value:9.1f}").rstrip("0").rstrip(".")
 
 
 def get_address(split: list[str]) -> str:
@@ -435,22 +354,6 @@ def get_next_monitor_csv_line() -> str:
 
     _ = D and dbg("return=[]\n")
     return ""
-
-
-def get_last_line(filename: Path) -> str:
-    """get last line of filename"""
-    last_line = ""
-    if filename.is_file():
-        with open(filename.name, "rb") as file:
-            try:
-                file.seek(-2, os.SEEK_END)
-                while file.read(1) != b"\n":
-                    file.seek(-2, os.SEEK_CUR)
-            except OSError:
-                file.seek(0)
-            last_line = file.readline().decode().strip()
-            _ = D and dbg(f"{filename} last_line: [{last_line}]")
-    return last_line
 
 
 def write_charge_csv(line: str) -> None:

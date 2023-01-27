@@ -2,36 +2,30 @@
 """
 Simple Python3 script to make a dailystats overview
 """
-import configparser
 from dataclasses import dataclass
 import sys
-import os
 import traceback
 import time
 from datetime import datetime
 from pathlib import Path
 from collections import deque
-from typing import Generator
 from dateutil.relativedelta import relativedelta
 import gspread
+from monitor_utils import (
+    log,
+    arg_has,
+    get_vin_arg,
+    safe_divide,
+    to_int,
+    to_float,
+    read_reverse_order,
+    read_translations,
+    get_translation,
+)
 
 # Initializing a queue for about 30 days
 MAX_QUEUE_LEN = 122
 PRINTED_OUTPUT_QUEUE: deque = deque(maxlen=MAX_QUEUE_LEN)
-
-
-def log(msg: str) -> None:
-    """log a message prefixed with a date/time format yyyymmdd hh:mm:ss"""
-    print(datetime.now().strftime("%Y%m%d %H:%M:%S") + ": " + msg)
-
-
-def arg_has(string: str) -> bool:
-    """arguments has string"""
-    for i in range(1, len(sys.argv)):
-        if sys.argv[i].lower() == string:
-            return True
-    return False
-
 
 D = arg_has("debug")
 
@@ -41,46 +35,6 @@ def dbg(line: str) -> bool:
     if D:
         print(line)
     return D  # just to make a lazy evaluation expression possible
-
-
-def get_vin_arg() -> str:
-    """get vin argument"""
-    for i in range(1, len(sys.argv)):
-        if "vin=" in sys.argv[i].lower():
-            vin = sys.argv[i]
-            vin = vin.replace("vin=", "")
-            vin = vin.replace("VIN=", "")
-            _ = D and dbg(f"VIN = {vin}")
-            return vin
-
-    return ""
-
-
-def safe_divide(numerator: float, denumerator: float) -> float:
-    """safe_divide"""
-    if denumerator == 0.0:
-        return 1.0
-    return numerator / denumerator
-
-
-def to_int(string: str) -> int:
-    """convert to int"""
-    if "None" in string:
-        return -1
-    split = string.split(".")  # get rid of decimal part
-    return int(split[0].strip())
-
-
-def to_float(string: str) -> float:
-    """convert to float"""
-    if "None" in string:
-        return 0.0
-    return float(string.strip())
-
-
-def float_to_string(input_value: float) -> str:
-    """float to string without trailing zero"""
-    return (f"{input_value:9.1f}").rstrip("0").rstrip(".")
 
 
 KEYWORD_LIST = ["help", "sheetupdate", "debug"]
@@ -101,7 +55,6 @@ if KEYWORD_ERROR or arg_has("help"):
 SHEETUPDATE = arg_has("sheetupdate")
 OUTPUT_SPREADSHEET_NAME = "monitor.dailystats"
 
-TRANSLATIONS_CSV_FILE = Path("monitor.translations.csv")
 DAILYSTATS_CSV_FILE = Path("monitor.dailystats.csv")
 TRIPINFO_CSV_FILE = Path("monitor.tripinfo.csv")
 CHARGE_CSV_FILE = Path("summary.charge.csv")
@@ -141,60 +94,13 @@ TOTAL_CLIMATE = 0
 TOTAL_ELECTRONICS = 0
 TOTAL_BATTERY_CARE = 0
 
-parser = configparser.ConfigParser()
-parser.read("monitor.cfg")
-monitor_settings = dict(parser.items("monitor"))
-LANGUAGE = monitor_settings["language"].lower().strip()
-
-
-def read_translations() -> dict:
-    """read translations"""
-    translations: dict = {}
-    with TRANSLATIONS_CSV_FILE.open("r", encoding="utf-8") as inputfile:
-        linecount = 0
-        column = 1
-        language = "en"
-        for line in inputfile:
-            linecount += 1
-            split = line.split(",")
-            if len(split) < 15:
-                log(f"Error: unexpected translation csvline {linecount}: {line}")
-                continue
-            key = split[0]
-            translation = split[1]
-            if linecount == 1:
-                continue  # skip first line
-            elif linecount == 2:
-                # determine column index
-                for index, value in enumerate(split):
-                    if value.lower() == LANGUAGE:
-                        column = index
-                        language = LANGUAGE
-                        _ = D and dbg(f"translation {language} column = {column}")
-                        break
-            else:
-                current = split[column].strip()
-                if current != "":
-                    translation = current
-
-            _ = D and dbg(f"[{key}]={language}: [{translation}]")
-            translations[key] = translation
-    return translations
-
-
 TRANSLATIONS_HELPER: dict[str, str] = read_translations()
 COLUMN_WIDTHS = [13, 17, 15, 10, 10, 10, 10]
 
 
-def get_translation(text: str, index_column_widths: int) -> str:
-    """get translation"""
-    if text in TRANSLATIONS_HELPER:
-        translation = TRANSLATIONS_HELPER[text]
-        # print(f"found translation: {translation}")
-    else:
-        print(f"fallback translation: {text}")
-        translation = text
-
+def get_translation_and_update_width(text: str, index_column_widths: int) -> str:
+    """get_translation_and_update_width"""
+    translation = get_translation(TRANSLATIONS_HELPER, text)
     if len(translation) + 2 > COLUMN_WIDTHS[index_column_widths]:
         COLUMN_WIDTHS[index_column_widths] = len(translation) + 2
 
@@ -225,19 +131,19 @@ class Translations:
 def fill_translations() -> Translations:
     """fill translations"""
     translations = Translations(
-        totals=get_translation("Totals", 0),
-        recuperation=get_translation("Recuperation", 1),
-        consumption=get_translation("Consumption", 2),
-        engine=get_translation("Engine", 3),
-        climate=get_translation("Climate", 4),
-        electronic_devices=get_translation("Electronic devices", 5),
-        battery_care=get_translation("Battery Care", 6),
-        trip=get_translation("Trip", 1),
-        distance=get_translation("Distance", 3),
-        average_speed=get_translation("Average speed", 4),
-        max_speed=get_translation("Max speed", 5),
-        idle_time=get_translation("Idle time", 6),
-        hour=get_translation("hour", 5),
+        totals=get_translation_and_update_width("Totals", 0),
+        recuperation=get_translation_and_update_width("Recuperation", 1),
+        consumption=get_translation_and_update_width("Consumption", 2),
+        engine=get_translation_and_update_width("Engine", 3),
+        climate=get_translation_and_update_width("Climate", 4),
+        electronic_devices=get_translation_and_update_width("Electronic devices", 5),
+        battery_care=get_translation_and_update_width("Battery Care", 6),
+        trip=get_translation_and_update_width("Trip", 1),
+        distance=get_translation_and_update_width("Distance", 3),
+        average_speed=get_translation_and_update_width("Average speed", 4),
+        max_speed=get_translation_and_update_width("Max speed", 5),
+        idle_time=get_translation_and_update_width("Idle time", 6),
+        hour=get_translation_and_update_width("hour", 5),
     )
     _ = D and dbg(f"Column widths: {COLUMN_WIDTHS}")
     return translations
@@ -248,68 +154,8 @@ TR = fill_translations()  # TR contains translations dataclass
 
 def get_weekday_translation(weekday_string: str) -> str:
     """get weekday translation"""
-    weekday = get_translation(weekday_string, 1)
+    weekday = get_translation_and_update_width(weekday_string, 1)
     return weekday
-
-
-def get_last_line(filename: str) -> str:
-    """get last line of filename"""
-    last_line = ""
-    filename_file = Path(filename)
-    if filename_file.is_file():
-        with open(filename, "rb") as file:
-            try:
-                file.seek(-2, os.SEEK_END)
-                while file.read(1) != b"\n":
-                    file.seek(-2, os.SEEK_CUR)
-            except OSError:
-                file.seek(0)
-            last_line = file.readline().decode()
-            _ = D and dbg(f"{filename} last_line: [{last_line}]")
-    return last_line
-
-
-def get_last_date(filename: str) -> str:
-    """get last date of filename"""
-    last_date = "20000101"  # millenium
-    last_line = get_last_line(filename)
-    if last_line.startswith("20"):  # year starts with 20
-        last_date = last_line.split(",")[0].strip()
-    _ = D and dbg(f"{filename} last_date: [{last_date}]")
-    return last_date
-
-
-def read_reverse_order(file_name: str) -> Generator[str, None, None]:
-    """read in reverse order"""
-    # Open file for reading in binary mode
-    with open(file_name, "rb") as read_obj:
-        # Move the cursor to the end of the file
-        read_obj.seek(0, os.SEEK_END)
-        # Get the current position of pointer i.e eof
-        pointer_location = read_obj.tell()
-        # Create a buffer to keep the last read line
-        buffer = bytearray()
-        # Loop till pointer reaches the top of the file
-        while pointer_location >= 0:
-            # Move the file pointer to the location pointed by pointer_location
-            read_obj.seek(pointer_location)
-            # Shift pointer location by -1
-            pointer_location = pointer_location - 1
-            # read that byte / character
-            new_byte = read_obj.read(1)
-            # If the read byte is newline character then one line is read
-            if new_byte == b"\n":
-                # Fetch the line from buffer and yield it
-                yield buffer.decode()[::-1]
-                # Reinitialize the byte array to save next line
-                buffer = bytearray()
-            else:
-                # If last read character is not eol then add it in buffer
-                buffer.extend(new_byte)
-        # If there is still data in buffer, then it is first line.
-        if len(buffer) > 0:
-            # Yield the first line too
-            yield buffer.decode()[::-1]
 
 
 SUMMARY_TRIP_EOF = False
@@ -646,7 +492,7 @@ def print_stats(
         weekday_string = now.strftime("%a")
         tr_weekday = get_weekday_translation(weekday_string)
         date_time = now.strftime("%Y-%m-%d %H:%M")
-        tr_last_run = get_translation("Last run", 0)
+        tr_last_run = get_translation_and_update_width("Last run", 0)
         print_output(f"{tr_last_run},{date_time} {tr_weekday},,,,,")
         print_output(",,,,,,")  # empty line/row
 

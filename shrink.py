@@ -12,20 +12,8 @@ Usage:
 python shrink.py [vin=VIN]
 
 """
-import sys
 from pathlib import Path
-
-
-def get_vin_arg():
-    """get vin arg"""
-    for i in range(1, len(sys.argv)):
-        if "vin=" in sys.argv[i].lower():
-            vin = sys.argv[i]
-            vin = vin.replace("vin=", "")
-            vin = vin.replace("VIN=", "")
-            return vin
-
-    return ""
+from monitor_utils import get_vin_arg
 
 
 INPUT_CSV_FILE = Path("monitor.csv")
