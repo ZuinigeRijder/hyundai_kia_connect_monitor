@@ -84,7 +84,7 @@ rem backup original monitor.csg
 copy /Y monitor.cfg monitor.cfg.backup >NUL
 
 rem no translation yet for summary, so just run once
-call :CHECK_SUMMARY trip test.summary.logtrip
+call :CHECK_SUMMARY "" test.summary.log
 
 for %%x in (nl de fr it es sv no da fi pt pl cs sk hu en) do (
     echo # language: %%x
