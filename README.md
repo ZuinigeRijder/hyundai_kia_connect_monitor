@@ -2,6 +2,7 @@
 - [Introduction](#introduction-hyundai_kia_connect_monitor)
 - [How to install python, packages and hyundai_connect_monitor](#how-to-install-python-packages-and-hyundai_connect_monitor)
 - [configuration of gspread for "python summary.py sheetupdate" and "python dailystats.py sheetupdate"](#configuration-of-gspread-for-python-summarypy-sheetupdate-and-python-dailystatspy-sheetupdate)
+- [Translations](#Translations)
 - [monitor.py](#monitorpy)
 - [summary.py](#summarypy)
 - [summary.py sheetupdate](#summarypy-sheetupdate)
@@ -16,6 +17,7 @@
 - - [python dailystats.py](#python-dailystatspy)
 - - [python kml.py](#python-kmlpy)
 - - [python shrink.py](#python-shrinkpy)
+- [Development Environment](#Development-Environment)
 - [FAQ](#FAQ)
 
 ---
@@ -127,6 +129,19 @@ Follow the steps in this link above, here is the summary of these steps:
 - run "python dailystats.py sheetupdate" and if everything is correct, the monitor.dailystats or monitor.dailystats.VIN spreadheet will be updated with the last 122 lines of standard output
 - configure to run "python summary.py sheetupdate" regularly, after having run "python monitor.py"
 - configure to run "python dailystats.py sheetupdate" regularly, after having run "python summary.py sheetupdate"
+
+---
+# Translations
+There are translations available for the following tools (only the standard output and sheetupdate, not the other generated csv files):
+- dailystats.py
+- summary.py (future update)
+
+Remarks:
+- The configured language in monitor.cfg is used for the translations, see monitor.cfg in [monitor.py](#monitorpy).
+- Translations are inside monitor.translations.xlsx for easier Unicode editing and are saved in monitor.translations.csv as comma separated csv file in UTF-8 format, so unicode characters are preserved.
+- All the supported languages have been translated with Google Translate and German is checked/corrected by a goingelectric.de user (thanks)
+- Polish, Czech, Slovak, Hungarian are not translated, feel free to provide translations for those languages
+- If (some) translations are not correct, please submit an issue with the proposed corrections, but be careful to provide them as unicode text, preferably using monitor.translations.xlsx
 
 ---
 # monitor.py
@@ -722,6 +737,22 @@ C:\Users\Rick\git\monitor>python dailystats.py sheetupdate
 Screenshot of spreadsheet:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.png)
 
+Example translations of standard ouptut (only first line is not the finally translated one):
+- ["en" English](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.dailystats.en.logtrip)
+- ["de" German](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.dailystats.de.logtrip)
+- ["fr" French](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.dailystats.fr.logtrip)
+- ["it" Italian](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.dailystats.it.logtrip)
+- ["es" Spanish](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.dailystats.es.logtrip)
+- ["sv" Swedish](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.dailystats.sv.logtrip)
+- ["nl" Dutch](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.dailystats.nl.logtrip)
+- ["no" Norwegian](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.dailystats.no.logtrip)
+- "cs" Czech (no translation yet)
+- "sk" Slovak (no translation yet)
+- "hu" Hungarian (no translation yet)
+- ["da" Danish](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.dailystats.da.logtrip)
+- "pl" Polish (no translation yet)
+- ["fi" Finnish](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.dailystats.fi.logtrip)
+- ["pt" Portuguese](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.dailystats.pt.logtrip)
 
 ----
 ## python kml.py
@@ -817,11 +848,36 @@ datetime, longitude, latitude, engineOn, 12V%, odometer, SOC%, charging, plugged
 Because monitor.py is now only adding lines when they are different, the difference is in this example only one line.
 
 ----
+# Development Environment
+- I develop on Windows 10 and the tools are run on my Raspberry Pi, with python 3.9.*
+- on Windows 10 I use the free Visual Studio Code version with python plugins.
+- configured pylint and flake8 for static checking
+- files are saved with Black with the default linelength of 88
+- flake8 linelength is set to value of 88, same as Black
+- pylint linelength has been set to 999, because flake8 already complains about that
+- source code sometimes suppresses warnings
+- source code has type hints, which are manually checked with mypy
+- tests are checking results on larger input data with expected output
+- I did not use classes (for now), but created smaller tools, which can be combined together
+- to optimize running the tools, I use the following lazy evaluation pattern when no debug (D is False) is executed:
+```
+_ = D and dbg(f"some formatting")
+```
+- because D evaluates to False the formatting evaluation and calling dbg() method is not executed
+
+----
 # FAQ
+
+How often should I run the tools:
+- this depends on your usage pattern
+- if you are only interested in daily statistics and trip info from the car, you only need to run monitor.py and dailystats.py once a day, because it will retrieve the daily stats and trip stats from the server
+- if you want to capture charging sessions, then you need to run monitor.py before the charging session and after the charging session, if you only charge in the night, then twice is sufficient (in the evening once before charging and in the morning once before leaving with the car)
+- if you also want to catch trip consumption figures and charging sessions during the day with summary.py, you need to run monitor.py as often as is allowed with the API call limit, e.g. I run monitor.py once per 15 minutes between 6:00 and 22:00
 
 Why are regularly exceptions thrown when running monitor.py?
 - The hyundai_kia_connect_api gives regularly exceptions, [see this issue 62](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/issues/62#issuecomment-1280045102)
 - The retry mechanism (wait one minute and retry twice) seems a good workaround
+- When generic exceptions occur, a stacktrace will be printed too, to better pinpoint the problem
 
 What happens if the number of calls allowed per day have been exceeded?
 - an exception will be thrown and no entry will appear in monitor.csv

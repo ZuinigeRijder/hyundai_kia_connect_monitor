@@ -37,6 +37,7 @@ mypy debug.py | egrep -v "^Found|hyundai_kia_connect_api"
 echo ################## copying  INPUT #############
 copy /Y tests\INPUT\* .
 
+
 call :CHECK_SUMMARY trip test.summary.logtrip
 call :CHECK_DAILYSTATS "" test.dailystats.logtrip
 
@@ -46,6 +47,8 @@ call :CHECK_DAILYSTATS "" test.dailystats.logday
 
 call :CHECK_SUMMARY sheetupdate test.summary.log
 call :CHECK_DAILYSTATS sheetupdate test.dailystats.log
+
+call :CHECK_TRANSLATIONS
 
 call :CHECK_KML
 
@@ -73,6 +76,29 @@ call :CHECK_FILE monitor.kml.tmp monitor.kml
 
 EXIT /B
 
+
+rem #######################
+:CHECK_TRANSLATIONS
+
+rem backup original monitor.csg
+copy /Y monitor.cfg monitor.cfg.backup >NUL
+
+rem no translation yet for summary, so just run once
+call :CHECK_SUMMARY trip test.summary.logtrip
+
+for %%x in (nl de fr it es sv no da fi pt pl cs sk hu en) do (
+    echo # language: %%x
+    %SED% -e "s?language = .*?language = %%x?" monitor.cfg > monitor.cfg.%%x.tmp
+    copy /Y monitor.cfg.%%x.tmp monitor.cfg >NUL
+ 
+    call :CHECK_DAILYSTATS "" test.dailystats.%%x.logtrip
+)
+
+rem restore original monitor.csg
+copy /Y monitor.cfg.backup monitor.cfg >NUL
+
+exit /B
+
 rem #######################
 :CHECK_DAILYSTATS
 set args=%1
@@ -83,7 +109,7 @@ echo ################## python dailystats.py %args% ^> %output% #############
 call python dailystats.py %args% > %output%
 
 rem the first line of the file will be different so change the first line of both files
-%SED% -e "1s?^  Last run 20.*?  Last run 20.....?" %output% > %output%.tmp
+%SED% -e "1s?20..-..-.. ..:...*?20yy-mm-dd hh:mm WWW?" %output% > %output%.tmp
 
 call :CHECK_FILE %output%.tmp %output%
 

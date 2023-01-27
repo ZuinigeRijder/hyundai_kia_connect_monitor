@@ -2,6 +2,8 @@
 """
 Simple Python3 script to make a dailystats overview
 """
+import configparser
+from dataclasses import dataclass
 import sys
 import os
 import traceback
@@ -76,6 +78,11 @@ def to_float(string: str) -> float:
     return float(string.strip())
 
 
+def float_to_string(input_value: float) -> str:
+    """float to string without trailing zero"""
+    return (f"{input_value:9.1f}").rstrip("0").rstrip(".")
+
+
 KEYWORD_LIST = ["help", "sheetupdate", "debug"]
 KEYWORD_ERROR = False
 for kindex in range(1, len(sys.argv)):
@@ -94,6 +101,7 @@ if KEYWORD_ERROR or arg_has("help"):
 SHEETUPDATE = arg_has("sheetupdate")
 OUTPUT_SPREADSHEET_NAME = "monitor.dailystats"
 
+TRANSLATIONS_CSV_FILE = Path("monitor.translations.csv")
 DAILYSTATS_CSV_FILE = Path("monitor.dailystats.csv")
 TRIPINFO_CSV_FILE = Path("monitor.tripinfo.csv")
 CHARGE_CSV_FILE = Path("summary.charge.csv")
@@ -133,10 +141,115 @@ TOTAL_CLIMATE = 0
 TOTAL_ELECTRONICS = 0
 TOTAL_BATTERY_CARE = 0
 
+parser = configparser.ConfigParser()
+parser.read("monitor.cfg")
+monitor_settings = dict(parser.items("monitor"))
+LANGUAGE = monitor_settings["language"].lower().strip()
 
-def float_to_string(input_value: float) -> str:
-    """float to string without trailing zero"""
-    return (f"{input_value:9.1f}").rstrip("0").rstrip(".")
+
+def read_translations() -> dict:
+    """read translations"""
+    translations: dict = {}
+    with TRANSLATIONS_CSV_FILE.open("r", encoding="utf-8") as inputfile:
+        linecount = 0
+        column = 1
+        language = "en"
+        for line in inputfile:
+            linecount += 1
+            split = line.split(",")
+            if len(split) < 15:
+                log(f"Error: unexpected translation csvline {linecount}: {line}")
+                continue
+            key = split[0]
+            translation = split[1]
+            if linecount == 1:
+                continue  # skip first line
+            elif linecount == 2:
+                # determine column index
+                for index, value in enumerate(split):
+                    if value.lower() == LANGUAGE:
+                        column = index
+                        language = LANGUAGE
+                        _ = D and dbg(f"translation {language} column = {column}")
+                        break
+            else:
+                current = split[column].strip()
+                if current != "":
+                    translation = current
+
+            _ = D and dbg(f"[{key}]={language}: [{translation}]")
+            translations[key] = translation
+    return translations
+
+
+TRANSLATIONS_HELPER: dict[str, str] = read_translations()
+COLUMN_WIDTHS = [13, 17, 15, 10, 10, 10, 10]
+
+
+def get_translation(text: str, index_column_widths: int) -> str:
+    """get translation"""
+    if text in TRANSLATIONS_HELPER:
+        translation = TRANSLATIONS_HELPER[text]
+        # print(f"found translation: {translation}")
+    else:
+        print(f"fallback translation: {text}")
+        translation = text
+
+    if len(translation) + 2 > COLUMN_WIDTHS[index_column_widths]:
+        COLUMN_WIDTHS[index_column_widths] = len(translation) + 2
+
+    return translation
+
+
+@dataclass
+class Translations:
+    """Translations"""
+
+    totals: str
+    recuperation: str
+    consumption: str
+    engine: str
+    climate: str
+    electronic_devices: str
+    battery_care: str
+
+    trip: str
+    distance: str
+    average_speed: str
+    max_speed: str
+    idle_time: str
+
+    hour: str
+
+
+def fill_translations() -> Translations:
+    """fill translations"""
+    translations = Translations(
+        totals=get_translation("Totals", 0),
+        recuperation=get_translation("Recuperation", 1),
+        consumption=get_translation("Consumption", 2),
+        engine=get_translation("Engine", 3),
+        climate=get_translation("Climate", 4),
+        electronic_devices=get_translation("Electronic devices", 5),
+        battery_care=get_translation("Battery Care", 6),
+        trip=get_translation("Trip", 1),
+        distance=get_translation("Distance", 3),
+        average_speed=get_translation("Average speed", 4),
+        max_speed=get_translation("Max speed", 5),
+        idle_time=get_translation("Idle time", 6),
+        hour=get_translation("hour", 5),
+    )
+    _ = D and dbg(f"Column widths: {COLUMN_WIDTHS}")
+    return translations
+
+
+TR = fill_translations()  # TR contains translations dataclass
+
+
+def get_weekday_translation(weekday_string: str) -> str:
+    """get weekday translation"""
+    weekday = get_translation(weekday_string, 1)
+    return weekday
 
 
 def get_last_line(filename: str) -> str:
@@ -321,9 +434,6 @@ def increment_totals(line: str) -> None:
     TOTAL_BATTERY_CARE += battery_care
 
 
-COLUMN_WIDTHS = [11, 17, 15, 10, 10, 10, 11]
-
-
 def print_output(output: str) -> None:
     """print output"""
     split = output.split(",")
@@ -438,7 +548,7 @@ def print_tripinfo(
     """print_tripinfo"""
     if header:
         print_output(
-            f"{charge}, Trip,,Distance, Avg speed, Max speed, Idle time"  # noqa
+            f"{charge}, {TR.trip},,{TR.distance}, {TR.average_speed}, {TR.max_speed}, {TR.idle_time}"  # noqa
         )
     trip_time_start_str = start_time[0:2] + ":" + start_time[2:4]
     trip_time_date = datetime.strptime(trip_time_start_str, "%H:%M")
@@ -464,7 +574,7 @@ def print_tripinfo(
         consumption = f"({km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh)"
 
     print_output(
-        f"{kwh},{trip_time_str},{consumption},{distance}{TOTAL_UNIT},{avg_speed}{TOTAL_UNIT}/h,{max_speed}{TOTAL_UNIT}/h,{idle_time} min"  # noqa
+        f"{kwh},{trip_time_str},{consumption},{distance}{TOTAL_UNIT},{avg_speed}{TOTAL_UNIT}/{TR.hour},{max_speed}{TOTAL_UNIT}/{TR.hour},{idle_time} min"  # noqa
     )
 
 
@@ -529,12 +639,20 @@ def print_stats(
     electronics_kwh = electronics / 1000
     battery_care_kwh = batterycare / 1000
 
+    totals = f"{date}"
     if date == "Totals":
-        lastrun = datetime.now().strftime("%Y-%m-%d %H:%M %a")
-        print_output(f"Last run,{lastrun},,,,,")
+        totals = TR.totals
+        now = datetime.now()
+        weekday_string = now.strftime("%a")
+        tr_weekday = get_weekday_translation(weekday_string)
+        date_time = now.strftime("%Y-%m-%d %H:%M")
+        tr_last_run = get_translation("Last run", 0)
+        print_output(f"{tr_last_run},{date_time} {tr_weekday},,,,,")
         print_output(",,,,,,")  # empty line/row
 
-    print_output(f"{date},Regen,Consumption,Engine,Climate,Electr.,BatteryCare")
+    print_output(
+        f"{totals},{TR.recuperation},{TR.consumption},{TR.engine},{TR.climate},{TR.electronic_devices},{TR.battery_care}"  # noqa
+    )
     print_output(
         f"{consumed_kwh:.1f}kWh,{regenerated_kwh:.1f}kWh,{km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh,{engine_kwh:.1f}kWh,{climate_kwh:.1f}kWh,{electronics_kwh:.1f}kWh,{battery_care_kwh:.1f}kWh"  # noqa
     )
@@ -642,7 +760,7 @@ def print_output_queue() -> None:
         _ = D and dbg(f"write row: {current_row} {queue_output}")
         list_output = split_output_to_sheet_list(queue_output)
         array.append({"range": f"A{current_row}:G{current_row}", "values": list_output})
-        if "Regen" in queue_output or "Trip" in queue_output:
+        if TR.recuperation in queue_output or TR.totals in queue_output:
             formats.append(
                 {
                     "range": f"A{current_row}:G{current_row}",
