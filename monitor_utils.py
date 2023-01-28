@@ -160,6 +160,42 @@ def read_reverse_order(file_name: str) -> Generator[str, None, None]:
             yield buffer.decode()[::-1]
 
 
+def read_reverse_order_init(path: Path) -> tuple[bool, str, Generator[str, None, None]]:
+    """ "read_reverse_order_init"""
+    eof = False
+    last_read_line = ""
+    if path.is_file():
+        reverse_order_iterator = read_reverse_order(path.name)
+        return eof, last_read_line, reverse_order_iterator
+    else:
+        eof = True
+        # avoid mypy type error
+        empty_list: list[str] = []
+        return eof, last_read_line, (item for item in empty_list)
+
+
+def reverse_read_next_line(
+    reverse_order_generator: Generator[str, None, None],
+    eof: bool,
+    last_read_line: str,
+) -> tuple[bool, str]:
+    """reverse_read_next_line"""
+    stop_value = None
+    while not eof:
+        line = next(reverse_order_generator, stop_value)
+        if line is stop_value:
+            eof = True
+            last_read_line = ""
+        else:
+            line = line.strip()
+            if (
+                line != "" and "Date" not in line and "date" not in line
+            ):  # skip header/empty lines
+                last_read_line = line
+                return eof, last_read_line
+    return eof, last_read_line
+
+
 def read_translations() -> dict:
     """read translations"""
     translations: dict = {}

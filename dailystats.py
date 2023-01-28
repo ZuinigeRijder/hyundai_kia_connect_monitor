@@ -21,6 +21,8 @@ from monitor_utils import (
     read_reverse_order,
     read_translations,
     get_translation,
+    reverse_read_next_line,
+    read_reverse_order_init,
 )
 
 # Initializing a queue for about 30 days
@@ -94,16 +96,20 @@ TOTAL_CLIMATE = 0
 TOTAL_ELECTRONICS = 0
 TOTAL_BATTERY_CARE = 0
 
-TRANSLATIONS_HELPER: dict[str, str] = read_translations()
+TR_HELPER: dict[str, str] = read_translations()
 COLUMN_WIDTHS = [13, 17, 15, 10, 10, 10, 10]
+
+
+def update_width(text: str, index_column_widths: int) -> None:
+    """update width"""
+    if len(text) + 2 > COLUMN_WIDTHS[index_column_widths]:
+        COLUMN_WIDTHS[index_column_widths] = len(text) + 2
 
 
 def get_translation_and_update_width(text: str, index_column_widths: int) -> str:
     """get_translation_and_update_width"""
-    translation = get_translation(TRANSLATIONS_HELPER, text)
-    if len(translation) + 2 > COLUMN_WIDTHS[index_column_widths]:
-        COLUMN_WIDTHS[index_column_widths] = len(translation) + 2
-
+    translation = get_translation(TR_HELPER, text)
+    update_width(translation, index_column_widths)
     return translation
 
 
@@ -125,11 +131,19 @@ class Translations:
     max_speed: str
     idle_time: str
 
-    hour: str
+    per_hour: str
 
 
 def fill_translations() -> Translations:
     """fill translations"""
+    per_hour = get_translation_and_update_width("per hour", 5)
+    avg_speed = (
+        get_translation(TR_HELPER, "Average speed") + f" {TOTAL_UNIT}/{per_hour}"
+    )
+    max_speed = get_translation(TR_HELPER, "Max speed") + f" {TOTAL_UNIT}/{per_hour}"
+    update_width(avg_speed, 4)
+    update_width(max_speed, 5)
+
     translations = Translations(
         totals=get_translation_and_update_width("Totals", 0),
         recuperation=get_translation_and_update_width("Recuperation", 1),
@@ -140,10 +154,10 @@ def fill_translations() -> Translations:
         battery_care=get_translation_and_update_width("Battery Care", 6),
         trip=get_translation_and_update_width("Trip", 1),
         distance=get_translation_and_update_width("Distance", 3),
-        average_speed=get_translation_and_update_width("Average speed", 4),
-        max_speed=get_translation_and_update_width("Max speed", 5),
+        average_speed=avg_speed,
+        max_speed=max_speed,
         idle_time=get_translation_and_update_width("Idle time", 6),
-        hour=get_translation_and_update_width("hour", 5),
+        per_hour=per_hour,
     )
     _ = D and dbg(f"Column widths: {COLUMN_WIDTHS}")
     return translations
@@ -158,94 +172,47 @@ def get_weekday_translation(weekday_string: str) -> str:
     return weekday
 
 
-SUMMARY_TRIP_EOF = False
-SUMMARY_TRIP_LAST_READ_LINE = ""
-SUMMARY_TRIP_READ_REVERSE_ORDER = None
-if SUMMARY_TRIP_CSV_FILE.is_file():
-    SUMMARY_TRIP_READ_REVERSE_ORDER = read_reverse_order(SUMMARY_TRIP_CSV_FILE.name)
-else:
-    SUMMARY_TRIP_EOF = True
+(
+    SUMMARY_TRIP_EOF,
+    SUMMARY_TRIP_LAST_READ_LINE,
+    SUMMARY_TRIP_READ_REVERSE_ORDER,
+) = read_reverse_order_init(SUMMARY_TRIP_CSV_FILE)
+
+(
+    TRIPINFO_EOF,
+    TRIPINFO_LAST_READ_LINE,
+    TRIPINFO_READ_REVERSE_ORDER,
+) = read_reverse_order_init(TRIPINFO_CSV_FILE)
+
+(
+    CHARGE_EOF,
+    CHARGE_LAST_READ_LINE,
+    CHARGE_READ_REVERSE_ORDER,
+) = read_reverse_order_init(CHARGE_CSV_FILE)
 
 
 def reverse_read_next_summary_trip_line() -> None:
-    """reverse_read_next_trip_info_line"""
+    """reverse_read_next_summary_trip_line"""
     global SUMMARY_TRIP_EOF, SUMMARY_TRIP_LAST_READ_LINE  # noqa pylint:disable=global-statement
-    stop_value = None
-    while not SUMMARY_TRIP_EOF:
-        line = next(SUMMARY_TRIP_READ_REVERSE_ORDER, stop_value)
-        if line is stop_value:
-            SUMMARY_TRIP_EOF = True
-            SUMMARY_TRIP_LAST_READ_LINE = ""
-            _ = D and dbg("reverse_read_next_trip_info_line: EOF")
-            return
-        else:
-            line = line.strip()
-            if (
-                line != "" and "Date" not in line and "date" not in line
-            ):  # skip header/empty lines
-                _ = D and dbg(f"reverse_read_next_trip_info_line: [{line}]")
-                SUMMARY_TRIP_LAST_READ_LINE = line
-                return
-
-
-TRIPINFO_EOF = False
-TRIPINFO_LAST_READ_LINE = ""
-TRIPINFO_READ_REVERSE_ORDER = None
-if TRIPINFO_CSV_FILE.is_file():
-    TRIPINFO_READ_REVERSE_ORDER = read_reverse_order(TRIPINFO_CSV_FILE.name)
-else:
-    TRIPINFO_EOF = True
+    SUMMARY_TRIP_EOF, SUMMARY_TRIP_LAST_READ_LINE = reverse_read_next_line(
+        SUMMARY_TRIP_READ_REVERSE_ORDER, SUMMARY_TRIP_EOF, SUMMARY_TRIP_LAST_READ_LINE
+    )
 
 
 def reverse_read_next_trip_info_line() -> None:
     """reverse_read_next_trip_info_line"""
     global TRIPINFO_EOF, TRIPINFO_LAST_READ_LINE  # noqa pylint:disable=global-statement
-    stop_value = None
-    while not TRIPINFO_EOF:
-        line = next(TRIPINFO_READ_REVERSE_ORDER, stop_value)
-        if line is stop_value:
-            TRIPINFO_EOF = True
-            TRIPINFO_LAST_READ_LINE = ""
-            _ = D and dbg("reverse_read_next_trip_info_line: EOF")
-            return
-        else:
-            line = line.strip()
-            if (
-                line != "" and "Date" not in line and "date" not in line
-            ):  # skip header/empty lines
-                _ = D and dbg(f"reverse_read_next_trip_info_line: [{line}]")
-                TRIPINFO_LAST_READ_LINE = line
-                return
-
-
-CHARGE_EOF = False
-CHARGE_LAST_READ_LINE = ""
-CHARGE_READ_REVERSE_ORDER = None
-if CHARGE_CSV_FILE.is_file():
-    CHARGE_READ_REVERSE_ORDER = read_reverse_order(CHARGE_CSV_FILE.name)
-else:
-    CHARGE_EOF = True
+    TRIPINFO_EOF, TRIPINFO_LAST_READ_LINE = reverse_read_next_line(
+        TRIPINFO_READ_REVERSE_ORDER, TRIPINFO_EOF, TRIPINFO_LAST_READ_LINE
+    )
 
 
 def reverse_read_next_charge_line() -> None:
     """reverse_read_next_charge_line"""
     global CHARGE_EOF, CHARGE_LAST_READ_LINE  # noqa pylint:disable=global-statement
-    stop_value = None
-    while not CHARGE_EOF:
-        line = next(CHARGE_READ_REVERSE_ORDER, stop_value)
-        if line is stop_value:
-            CHARGE_EOF = True
-            CHARGE_LAST_READ_LINE = ""
-            _ = D and dbg("reverse_read_next_charge_line: EOF")
-            return
-        else:
-            line = line.strip()
-            if (
-                line != "" and "Date" not in line and "date" not in line
-            ):  # skip header/empty lines
-                _ = D and dbg(f"reverse_read_next_charge_line: [{line}]")
-                CHARGE_LAST_READ_LINE = line
-                return
+    CHARGE_EOF, CHARGE_LAST_READ_LINE = reverse_read_next_line(
+        CHARGE_READ_REVERSE_ORDER, CHARGE_EOF, CHARGE_LAST_READ_LINE
+    )
 
 
 def split_output_to_sheet_list(text: str) -> list[list[str]]:
@@ -420,7 +387,7 @@ def print_tripinfo(
         consumption = f"({km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh)"
 
     print_output(
-        f"{kwh},{trip_time_str},{consumption},{distance}{TOTAL_UNIT},{avg_speed}{TOTAL_UNIT}/{TR.hour},{max_speed}{TOTAL_UNIT}/{TR.hour},{idle_time}min"  # noqa
+        f"{kwh},{trip_time_str},{consumption},{distance}{TOTAL_UNIT},{avg_speed}{TOTAL_UNIT}/{TR.per_hour},{max_speed}{TOTAL_UNIT}/{TR.per_hour},{idle_time}min"  # noqa
     )
 
 

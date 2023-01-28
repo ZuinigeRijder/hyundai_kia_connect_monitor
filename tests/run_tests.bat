@@ -61,6 +61,7 @@ exit /B
 
 :RUN_MYPY
 echo ################## running mypy ###############
+mypy monitor_utils.py | egrep -v "^Success"
 mypy monitor.py | egrep -v "^Found|hyundai_kia_connect_api"
 mypy summary.py | egrep -v "^Found|gspread|: note:"
 mypy dailystats.py | egrep -v "^Found|gspread|: note:|: error: Argument 1 to .next."
