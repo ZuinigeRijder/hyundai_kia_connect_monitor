@@ -16,6 +16,12 @@ set SED="tests\unxutils_sed.exe"
 
 echo ###### Current directory: %CD%
 
+rem backup original monitor.cfg
+copy /Y monitor.cfg monitor.cfg.backup >NUL
+
+%SED% -e "s?language = .*?language = en?" monitor.cfg > monitor.cfg.en.tmp
+copy /Y monitor.cfg.en.tmp monitor.cfg >NUL
+
 call :CLEAN_INPUT
 
 call :RUN_MYPY
@@ -39,6 +45,9 @@ call :CHECK_KML
 call :CHECK_SHRINK
 
 call :CLEAN_INPUT
+
+rem restore original monitor.cfg
+copy /Y monitor.cfg.backup monitor.cfg >NUL
 
 goto :EOF
 
@@ -94,10 +103,7 @@ EXIT /B
 
 rem #######################
 :CHECK_TRANSLATIONS
-
-rem backup original monitor.csg
-copy /Y monitor.cfg monitor.cfg.backup >NUL
-
+    
 rem no translation yet for summary, so just run once
 call :CHECK_SUMMARY "" test.summary.log
 
@@ -109,7 +115,7 @@ for %%x in (nl de fr it es sv no da fi pt pl cs sk hu en) do (
     call :CHECK_DAILYSTATS "" test.dailystats.%%x.logtrip
 )
 
-rem restore original monitor.csg
+rem restore original monitor.cfg
 copy /Y monitor.cfg.backup monitor.cfg >NUL
 
 exit /B

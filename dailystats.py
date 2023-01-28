@@ -97,7 +97,7 @@ TOTAL_ELECTRONICS = 0
 TOTAL_BATTERY_CARE = 0
 
 TR_HELPER: dict[str, str] = read_translations()
-COLUMN_WIDTHS = [13, 17, 15, 10, 10, 10, 10]
+COLUMN_WIDTHS = [13, 13, 15, 10, 10, 10, 10]
 
 
 def update_width(text: str, index_column_widths: int) -> None:
