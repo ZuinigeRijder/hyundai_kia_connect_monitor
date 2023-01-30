@@ -621,8 +621,13 @@ Also the 12 Volt battery is shown. Here the mapping of percentage to volt for a 
 
 
 Screenshot of spreadsheet:
-
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_GoogleSpreadsheet.png)
+
+Dutch screenshot of spreadsheet:
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_GoogleSpreadsheet.nl.png)
+
+German screenshot of spreadsheet:
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_GoogleSpreadsheet.de.png)
 
 Example output of [summary.charged.csv (larger example)](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.charge.csv)
 ```
@@ -736,6 +741,12 @@ C:\Users\Rick\git\monitor>python dailystats.py sheetupdate
 
 Screenshot of spreadsheet:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.png)
+
+Dutch screenshot of spreadsheet:
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.nl.png)
+
+German screenshot of spreadsheet:
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.de.png)
 
 **Example translations of standard output (only first line is not the finally translated one, your browser might not display the unicode characters correct):**
 - ["en" English](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.dailystats.en.logtrip)
