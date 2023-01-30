@@ -569,7 +569,11 @@ def print_output_queue() -> None:
         _ = D and dbg(f"write row: {current_row} {queue_output}")
         list_output = split_output_to_sheet_list(queue_output)
         array.append({"range": f"A{current_row}:G{current_row}", "values": list_output})
-        if TR.recuperation in queue_output or TR.totals in queue_output:
+        if (
+            TR.recuperation in queue_output
+            or TR.totals in queue_output
+            or TR.trip in queue_output
+        ):
             formats.append(
                 {
                     "range": f"A{current_row}:G{current_row}",
