@@ -134,7 +134,7 @@ Follow the steps in this link above, here is the summary of these steps:
 # Translations
 There are translations available for the following tools (only the standard output and sheetupdate, not the other generated csv files):
 - dailystats.py
-- summary.py (future update)
+- summary.py
 
 Remarks:
 - The configured language in monitor.cfg is used for the translations, see monitor.cfg in [monitor.py](#monitorpy).

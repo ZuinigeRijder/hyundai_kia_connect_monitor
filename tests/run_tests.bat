@@ -103,14 +103,13 @@ EXIT /B
 
 rem #######################
 :CHECK_TRANSLATIONS
-    
-rem no translation yet for summary, so just run once
-call :CHECK_SUMMARY "" test.summary.log
 
 for %%x in (nl de fr it es sv no da fi pt pl cs sk hu en) do (
     echo # language: %%x
     %SED% -e "s?language = .*?language = %%x?" monitor.cfg > monitor.cfg.%%x.tmp
     copy /Y monitor.cfg.%%x.tmp monitor.cfg >NUL
+ 
+    call :CHECK_SUMMARY "" test.summary.%%x.log
  
     call :CHECK_DAILYSTATS "" test.dailystats.%%x.logtrip
 )
@@ -130,7 +129,7 @@ echo ################## python dailystats.py %args% ^> %output% #############
 call python dailystats.py %args% > %output%
 
 rem the first line of the file will be different so change the first line of both files
-%SED% -e "1s?20..-..-.. ..:...*?20yy-mm-dd hh:mm WWW?" %output% > %output%.tmp
+%SED% -e "1s?20..-..-.. *..:...*?20yy-mm-dd hh:mm WWW?" %output% > %output%.tmp
 
 call :CHECK_FILE %output%.tmp %output%
 

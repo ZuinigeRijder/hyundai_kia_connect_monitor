@@ -23,11 +23,12 @@ from monitor_utils import (
     get_translation,
     reverse_read_next_line,
     read_reverse_order_init,
+    split_output_to_sheet_list,
 )
 
 # Initializing a queue for about 30 days
 MAX_QUEUE_LEN = 122
-PRINTED_OUTPUT_QUEUE: deque = deque(maxlen=MAX_QUEUE_LEN)
+PRINTED_OUTPUT_QUEUE: deque[str] = deque(maxlen=MAX_QUEUE_LEN)
 
 D = arg_has("debug")
 
@@ -97,13 +98,13 @@ TOTAL_ELECTRONICS = 0
 TOTAL_BATTERY_CARE = 0
 
 TR_HELPER: dict[str, str] = read_translations()
-COLUMN_WIDTHS = [13, 13, 15, 10, 10, 10, 10]
+COLUMN_WIDTHS = [11, 12, 14, 8, 9, 9, 8]
 
 
 def update_width(text: str, index_column_widths: int) -> None:
     """update width"""
-    if len(text) + 2 > COLUMN_WIDTHS[index_column_widths]:
-        COLUMN_WIDTHS[index_column_widths] = len(text) + 2
+    if len(text) + 1 > COLUMN_WIDTHS[index_column_widths]:
+        COLUMN_WIDTHS[index_column_widths] = len(text) + 1
 
 
 def get_translation_and_update_width(text: str, index_column_widths: int) -> str:
@@ -215,12 +216,6 @@ def reverse_read_next_charge_line() -> None:
     )
 
 
-def split_output_to_sheet_list(text: str) -> list[list[str]]:
-    """split output to sheet list"""
-    result = [x.strip() for x in text.split(",")]
-    return [result]
-
-
 def increment_totals(line: str) -> None:
     """handle line"""
     _ = D and dbg(f"handle_line: {line}")
@@ -251,7 +246,7 @@ def print_output(output: str) -> None:
     """print output"""
     split = output.split(",")
     for i in range(len(split)):  # pylint:disable=consider-using-enumerate
-        text = split[i].center(COLUMN_WIDTHS[i])
+        text = split[i].rjust(COLUMN_WIDTHS[i])
         print(text, end="")
     print("")
 
@@ -361,7 +356,7 @@ def print_tripinfo(
     """print_tripinfo"""
     if header:
         print_output(
-            f"{charge}, {TR.trip},,{TR.distance}, {TR.average_speed}, {TR.max_speed}, {TR.idle_time}"  # noqa
+            f"{charge},{TR.trip},,{TR.distance},{TR.average_speed},{TR.max_speed},{TR.idle_time}"  # noqa
         )
     trip_time_start_str = start_time[0:2] + ":" + start_time[2:4]
     trip_time_date = datetime.strptime(trip_time_start_str, "%H:%M")
@@ -456,11 +451,12 @@ def print_stats(
     if date == "Totals":
         totals = TR.totals
         now = datetime.now()
-        weekday_string = now.strftime("%a")
-        tr_weekday = get_weekday_translation(weekday_string)
-        date_time = now.strftime("%Y-%m-%d %H:%M")
+        weekday_str = now.strftime("%a")
+        tr_weekday = get_weekday_translation(weekday_str)
+        date_str = now.strftime("%Y-%m-%d")
+        time_str = now.strftime("%H:%M")
         tr_last_run = get_translation_and_update_width("Last run", 0)
-        print_output(f"{tr_last_run},{date_time} {tr_weekday},,,,,")
+        print_output(f"{tr_last_run},{date_str},{time_str},{tr_weekday},,,")
         print_output(",,,,,,")  # empty line/row
 
     print_output(
@@ -578,7 +574,7 @@ def print_output_queue() -> None:
                 {
                     "range": f"A{current_row}:G{current_row}",
                     "format": {
-                        "horizontalAlignment": "CENTER",
+                        "horizontalAlignment": "RIGHT",
                         "textFormat": {
                             "bold": True,
                             "underline": True,
@@ -592,7 +588,7 @@ def print_output_queue() -> None:
                 {
                     "range": f"A{current_row}:G{current_row}",
                     "format": {
-                        "horizontalAlignment": "CENTER",
+                        "horizontalAlignment": "RIGHT",
                         "textFormat": {
                             "bold": False,
                             "underline": False,

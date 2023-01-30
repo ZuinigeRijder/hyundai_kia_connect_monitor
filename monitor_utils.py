@@ -103,6 +103,12 @@ def same_day(d_1: datetime, d_2: datetime) -> bool:
     return d_1.year == d_2.year
 
 
+def split_output_to_sheet_list(text: str) -> list[list[str]]:
+    """split output to sheet list"""
+    result = [x.strip() for x in text.split(",")]
+    return [result]
+
+
 def get_last_line(filename: Path) -> str:
     """get last line of filename"""
     last_line = ""

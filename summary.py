@@ -27,6 +27,9 @@ from monitor_utils import (
     same_day,
     float_to_string,
     get_last_line,
+    read_translations,
+    get_translation,
+    split_output_to_sheet_list,
 )
 
 D = arg_has("debug")
@@ -135,7 +138,7 @@ DAY_COUNTER = 0
 
 # Initializing a queue with maximum size
 LAST_OUTPUT_QUEUE_MAX_LEN = 122
-LAST_OUTPUT_QUEUE: deque = deque(maxlen=LAST_OUTPUT_QUEUE_MAX_LEN)
+LAST_OUTPUT_QUEUE: deque[str] = deque(maxlen=LAST_OUTPUT_QUEUE_MAX_LEN)
 
 
 @dataclass
@@ -171,6 +174,68 @@ class GrandTotals:
     trip: Totals
 
 
+@dataclass
+class Translations:
+    """Translations"""
+
+    last_run: str
+    period: str
+    date: str
+    info: str
+    odometer: str
+    delta: str
+    cost: str
+    soc_perc: str
+    avg: str
+    min: str
+    max: str
+    volt12_perc: str
+    charges: str
+    trips: str
+    ev_range: str
+    address: str
+    vehicle_upd: str
+    gps_update: str
+    last_entry: str
+    last_address: str
+    driven: str
+
+
+TR_HELPER: dict[str, str] = read_translations()
+
+
+def fill_translations() -> Translations:
+    """fill translations"""
+
+    translations = Translations(
+        last_run=get_translation(TR_HELPER, "Last run"),
+        period=get_translation(TR_HELPER, "Period"),
+        date=get_translation(TR_HELPER, "Date"),
+        info=get_translation(TR_HELPER, "Info"),
+        odometer=get_translation(TR_HELPER, "Odometer"),
+        delta=get_translation(TR_HELPER, "Delta"),
+        cost=get_translation(TR_HELPER, "Cost"),
+        soc_perc=get_translation(TR_HELPER, "soc perc"),
+        avg=get_translation(TR_HELPER, "AVG"),
+        min=get_translation(TR_HELPER, "MIN"),
+        max=get_translation(TR_HELPER, "MAX"),
+        volt12_perc=get_translation(TR_HELPER, "12volt perc"),
+        charges=get_translation(TR_HELPER, "#charges"),
+        trips=get_translation(TR_HELPER, "#trips"),
+        ev_range=get_translation(TR_HELPER, "EV range"),
+        address=get_translation(TR_HELPER, "Address"),
+        vehicle_upd=get_translation(TR_HELPER, "Vehicle upd"),
+        gps_update=get_translation(TR_HELPER, "GPS update"),
+        last_entry=get_translation(TR_HELPER, "Last entry"),
+        last_address=get_translation(TR_HELPER, "Last address"),
+        driven=get_translation(TR_HELPER, "Driven"),
+    )
+    return translations
+
+
+TR = fill_translations()  # TR contains translations dataclass
+
+
 def init(current_day: datetime, odo: float, soc: int, volt12: int) -> Totals:
     """init Totals with initial values"""
     # current_day, odo, charged_perc, discharged_perc, charges, trips,
@@ -199,21 +264,74 @@ def init(current_day: datetime, odo: float, soc: int, volt12: int) -> Totals:
     return totals
 
 
+COLUMN_WIDTHS = [13, 10, 5, 7, 8, 8, 8, 5, 5, 8, 3, 3, 3, 3, 3, 3, 3, 3, 6, 6, 4, 99]
+
+
 def print_output_and_update_queue(output: str) -> None:
     """print output and update queue"""
+    total_line = ""
+    split = output.split(",")
+    for i in range(len(split)):  # pylint:disable=consider-using-enumerate
+        string = split[i].strip()
+        if i == 0 and string != TR.period:
+            string = get_translation(TR_HELPER, string)
+        elif i == 2 and split[0].startswith("DAY "):
+            string = get_translation(TR_HELPER, string)
+        if len(string) > COLUMN_WIDTHS[i]:
+            COLUMN_WIDTHS[i] = len(string)
+        if i > 20:
+            text = string.ljust(COLUMN_WIDTHS[i])
+        else:
+            text = string.rjust(COLUMN_WIDTHS[i])
+        total_line += text
+        total_line += ", "
+    print(total_line)
+
     if SHEETUPDATE:
-        LAST_OUTPUT_QUEUE.append(output)
-    print(output)
+        LAST_OUTPUT_QUEUE.append(total_line)
 
 
-def split_output_to_sheet_list(text: str) -> list[list[str]]:
-    """split output to sheet list"""
-    result = [x.strip() for x in text.split(",")]
-    if len(result) == 22:  # swap Range and Address
-        tmp = result[20]
-        result[20] = result[21]
-        result[21] = tmp
-    return [result]
+def sheet_append_first_rows(row_a: str, row_b: str) -> None:
+    """sheet_append_first_rows"""
+    row_a_values = row_a.split(",")
+    row_b_values = row_b.split(",")
+    len_a = len(row_a_values)
+    len_b = len(row_b_values)
+    if len_a != len_b:
+        log(f"ERROR: sheet_append_first_rows, length A {len_a} != length B {len_b}")
+        return  # nothing to do
+
+    array = []
+    for index, value in enumerate(row_a_values):
+        row_a_value = value.strip()
+        row_b_value = row_b_values[index].strip()
+        row = index + 1
+        if D:
+            string_a = row_a_value.ljust(25)
+            print(f"{string_a} {row_b_value}")
+        array.append(
+            {
+                "range": f"A{row}:B{row}",
+                "values": [[row_a_value, row_b_value]],
+            }
+        )
+    SHEET.batch_update(array)
+
+    formats = []
+    formats.append(
+        {
+            "range": "A1:A23",
+            "format": {
+                "horizontalAlignment": "LEFT",
+                "textFormat": {
+                    "bold": True,
+                    "underline": True,
+                    "italic": True,
+                },
+            },
+        }
+    )
+    SHEET.batch_format(formats)
 
 
 def print_output_queue() -> None:
@@ -235,34 +353,37 @@ def print_output_queue() -> None:
                 "values": list_output,
             }
         )
-        if "Period" in queue_output:
-            formats.append(
-                {
-                    "range": f"A{current_row}:W{current_row}",
-                    "format": {
-                        "horizontalAlignment": "CENTER",
-                        "textFormat": {
-                            "bold": True,
-                            "underline": True,
-                            "italic": True,
-                        },
-                    },
-                }
-            )
+        if TR.period in queue_output:
+            textformat = {
+                "bold": True,
+                "underline": True,
+                "italic": True,
+            }
         else:
-            formats.append(
-                {
-                    "range": f"A{current_row}:W{current_row}",
-                    "format": {
-                        "horizontalAlignment": "CENTER",
-                        "textFormat": {
-                            "bold": False,
-                            "underline": False,
-                            "italic": False,
-                        },
-                    },
-                }
-            )
+            textformat = {
+                "bold": False,
+                "underline": False,
+                "italic": False,
+            }
+
+        formats.append(
+            {
+                "range": f"A{current_row}:U{current_row}",
+                "format": {
+                    "horizontalAlignment": "RIGHT",
+                    "textFormat": textformat,
+                },
+            }
+        )
+        formats.append(
+            {
+                "range": f"V{current_row}:V{current_row}",
+                "format": {
+                    "horizontalAlignment": "LEFT",
+                    "textFormat": textformat,
+                },
+            }
+        )
     if len(array) > 0:
         SHEET.batch_update(array)
     if len(formats) > 0:
@@ -271,7 +392,7 @@ def print_output_queue() -> None:
 
 def print_header_and_update_queue() -> None:
     """print header and update queue"""
-    output = f"  Period, date      , info , odometer, delta {ODO_METRIC},    +kWh,     -kWh, {ODO_METRIC}/kWh, kWh/100{ODO_METRIC}, cost {COST_CURRENCY}, SOC%,AVG,MIN,MAX, 12V%,AVG,MIN,MAX, #charges,   #trips, Address, EV range"  # noqa
+    output = f"{TR.period},{TR.date},{TR.info},{TR.odometer},{TR.delta} {ODO_METRIC},+kWh,-kWh,{ODO_METRIC}/kWh,kWh/100{ODO_METRIC},{TR.cost} {COST_CURRENCY},{TR.soc_perc},{TR.avg},{TR.min},{TR.max},{TR.volt12_perc},{TR.avg},{TR.min},{TR.max},{TR.charges},{TR.trips},{TR.ev_range},{TR.address}"  # noqa
     print_output_and_update_queue(output)
 
 
@@ -472,9 +593,11 @@ def print_summary(
         kwh_per_km_mi_str = kwh_per_km_mi_str.strip()
         cost_str = cost_str.strip()
         prefix = prefix.replace("SHEET ", "")
-        last_line = get_last_line(MONITOR_CSV_FILENAME)
-        last_update_datetime = datetime.fromtimestamp(LASTRUN_FILENAME.stat().st_mtime)
-        day_info = last_update_datetime.strftime("%Y-%m-%d %H:%M %a")
+        last_line = get_last_line(MONITOR_CSV_FILENAME).replace(",", ";")
+        last_run_datetime = datetime.fromtimestamp(LASTRUN_FILENAME.stat().st_mtime)
+        last_run_dt = last_run_datetime.strftime("%Y-%m-%d %H:%M ") + get_translation(
+            TR_HELPER, last_run_datetime.strftime("%a")
+        )
 
         lastrun_lines = []
         if LASTRUN_FILENAME.is_file():
@@ -483,119 +606,15 @@ def print_summary(
 
         last_updated_at = get_splitted_list_item(lastrun_lines, 2)
         location_last_updated_at = get_splitted_list_item(lastrun_lines, 3)
-        SHEET.batch_update(
-            [
-                {
-                    "range": "A1:B1",
-                    "values": [["Last run", f"{day_info}"]],
-                },
-                {
-                    "range": "A2:B2",
-                    "values": [["Vehicle upd", f"{last_updated_at[1]}"]],
-                },
-                {
-                    "range": "A3:B3",
-                    "values": [["GPS update", f"{location_last_updated_at[1]}"]],
-                },
-                {
-                    "range": "A4:B4",
-                    "values": [["Last entry", f"{last_line}"]],
-                },
-                {
-                    "range": "A5:B5",
-                    "values": [["Last address", f"{location_str}"]],
-                },
-                {
-                    "range": "A6:B6",
-                    "values": [[f"Odometer {ODO_METRIC}", f"{odo:.1f}"]],
-                },
-                {
-                    "range": "A7:B7",
-                    "values": [[f"Driven {ODO_METRIC}", f"{delta_odo:.1f}"]],
-                },
-                {
-                    "range": "A8:B8",
-                    "values": [["+kWh", f"{charged_kwh:.1f}"]],
-                },
-                {
-                    "range": "A9:B9",
-                    "values": [["-kWh", f"{discharged_kwh:.1f}"]],
-                },
-                {
-                    "range": "A10:B10",
-                    "values": [[f"{ODO_METRIC}/kWh", f"{km_mi_per_kwh_str}"]],
-                },
-                {
-                    "range": "A11:B11",
-                    "values": [[f"kWh/100{ODO_METRIC}", f"{kwh_per_km_mi_str}"]],
-                },
-                {
-                    "range": "A12:B12",
-                    "values": [[f"Cost {COST_CURRENCY}", f"{cost_str}"]],
-                },
-                {
-                    "range": "A13:B13",
-                    "values": [["Current SOC%", f"{t_soc_cur}"]],
-                },
-                {
-                    "range": "A14:B14",
-                    "values": [["Average SOC%", f"{t_soc_avg}"]],
-                },
-                {
-                    "range": "A15:B15",
-                    "values": [["Min SOC%", f"{t_soc_min}"]],
-                },
-                {
-                    "range": "A16:B16",
-                    "values": [["Max SOC%", f"{t_soc_max}"]],
-                },
-                {
-                    "range": "A17:B17",
-                    "values": [["Current 12V%", f"{t_volt12_cur}"]],
-                },
-                {
-                    "range": "A18:B18",
-                    "values": [["Average 12V%", f"{t_volt12_avg}"]],
-                },
-                {
-                    "range": "A19:B19",
-                    "values": [["Min 12V%", f"{t_volt12_min}"]],
-                },
-                {
-                    "range": "A20:B20",
-                    "values": [["Max 12V%", f"{t_volt12_max}"]],
-                },
-                {
-                    "range": "A21:B21",
-                    "values": [["#Charges", f"{t_charges}"]],
-                },
-                {
-                    "range": "A22:B22",
-                    "values": [["#Trips", f"{t_trips}"]],
-                },
-                {
-                    "range": "A23:B23",
-                    "values": [["EV range", f"{ev_range}"]],
-                },
-            ]
-        )
-        formats = []
-        formats.append(
-            {
-                "range": "A1:A23",
-                "format": {
-                    "horizontalAlignment": "RIGHT",
-                    "textFormat": {
-                        "bold": True,
-                        "underline": True,
-                        "italic": True,
-                    },
-                },
-            }
-        )
-        SHEET.batch_format(formats)
+        last_upd_dt = last_updated_at[1]
+        location_last_upd_dt = location_last_updated_at[1]
+
+        row_a = f"{TR.last_run},{TR.vehicle_upd},{TR.gps_update},{TR.last_entry},{TR.last_address},{TR.odometer} {ODO_METRIC},{TR.driven} {ODO_METRIC},+kWh,-kWh,{ODO_METRIC}/kWh,kWh/100{ODO_METRIC},{TR.cost} {COST_CURRENCY},{TR.soc_perc},{TR.avg} {TR.soc_perc},{TR.min} {TR.soc_perc},{TR.max} {TR.soc_perc},{TR.volt12_perc},{TR.avg} {TR.volt12_perc},{TR.min} {TR.volt12_perc},{TR.max} {TR.volt12_perc},{TR.charges},{TR.trips},{TR.ev_range}"  # noqa
+        row_b = f"{last_run_dt},{last_upd_dt},{location_last_upd_dt},{last_line},{location_str},{odo:.1f},{delta_odo:.1f},{charged_kwh:.1f},{discharged_kwh:.1f},{km_mi_per_kwh_str},{kwh_per_km_mi_str},{cost_str},{t_soc_cur},{t_soc_avg},{t_soc_min},{t_soc_max},{t_volt12_cur},{t_volt12_avg},{t_volt12_min},{t_volt12_max},{t_charges},{t_trips},{ev_range}"  # noqa
+        sheet_append_first_rows(row_a, row_b)
+
     else:
-        output = f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{location_str},{ev_range}"  # noqa
+        output = f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{ev_range},{location_str}"  # noqa
         print_output_and_update_queue(output)
 
 
