@@ -25,11 +25,11 @@ from monitor_utils import (
     same_month,
     same_week,
     same_day,
-    float_to_string,
     get_last_line,
     read_translations,
     get_translation,
     split_output_to_sheet_list,
+    float_to_string_no_trailing_zero,
 )
 
 D = arg_has("debug")
@@ -491,6 +491,22 @@ def write_trip_csv(line: str) -> None:
     TRIP_CSV_FILE.write("\n")
 
 
+def show_zero_values_float(value: float) -> str:
+    """show_zero_values_float"""
+    string = ""
+    if SHOW_ZERO_VALUES or value != 0.0:
+        string = f"{value:.1f}"
+    return string
+
+
+def show_zero_values_float_no_trailing_zero(value: float) -> str:
+    """show_zero_values_float_no_trailing_zero"""
+    string = ""
+    if SHOW_ZERO_VALUES or value != 0.0:
+        string = float_to_string_no_trailing_zero(value)
+    return string
+
+
 def print_summary(
     prefix: str, current: Totals, values: Totals, split: list[str], factor: float
 ) -> None:
@@ -505,15 +521,9 @@ def print_summary(
         return  # bad line
 
     delta_odo = round(odo - values.odo, 1) * factor
-    odo_str = ""
-    if odo != 0.0:
-        odo_str = f"{odo:9.1f}"
-    t_charged_perc = values.charged_perc * factor
-    if t_charged_perc < 0:
-        t_charged_perc = 0
-    t_discharged_perc = values.discharged_perc * factor
-    if t_discharged_perc > 0:
-        t_discharged_perc = 0
+    odo_str = show_zero_values_float(odo)
+    t_charged_perc = max(0.0, values.charged_perc * factor)
+    t_discharged_perc = min(0.0, values.discharged_perc * factor)
     t_charges = values.charges * factor
     t_trips = values.trips * factor
 
@@ -535,38 +545,27 @@ def print_summary(
     kwh_per_km_mi_str = ""
     cost_str = ""
     if SHOW_ZERO_VALUES:
-        km_mi_per_kwh_str = "    0.0"
-        kwh_per_km_mi_str = "       0.0"
-        cost_str = "      0.00"
+        km_mi_per_kwh_str = "0.0"
+        kwh_per_km_mi_str = "0.0"
+        cost_str = "0.00"
     if t_discharged_perc < 0:
         if TRIP or discharged_kwh < -MIN_CONSUMPTION_DISCHARGE_KWH:  # skip inaccurate
             cost = discharged_kwh * -AVERAGE_COST_PER_KWH
-            cost_str = f"{cost:10.2f}"
+            cost_str = f"{cost:.2f}"
             km_mi_per_kwh = safe_divide(delta_odo, -discharged_kwh)
-            km_mi_per_kwh_str = f"{km_mi_per_kwh:7.1f}"
+            km_mi_per_kwh_str = f"{km_mi_per_kwh:.1f}"
             if km_mi_per_kwh > 0.0:
                 kwh_per_km_mi = safe_divide(100, km_mi_per_kwh)
-                kwh_per_km_mi_str = f"{kwh_per_km_mi:10.1f}"
+                kwh_per_km_mi_str = f"{kwh_per_km_mi:.1f}"
     else:
         # do not show positive discharges
         t_discharged_perc = 0
 
-    delta_odo_str = ""
-    if SHOW_ZERO_VALUES or delta_odo != 0.0:
-        delta_odo_str = f"{delta_odo:9.1f}"
-    charged_kwh_str = ""
-    if SHOW_ZERO_VALUES or charged_kwh != 0.0:
-        charged_kwh_str = f"{charged_kwh:8.1f}"
-    discharged_kwh_str = ""
-    if SHOW_ZERO_VALUES or discharged_kwh != 0.0:
-        discharged_kwh_str = f"{discharged_kwh:9.1f}"
-    t_charges_str = ""
-    if SHOW_ZERO_VALUES or t_charges != 0:
-        t_charges_str = float_to_string(t_charges)
-    t_trips_str = ""
-    if SHOW_ZERO_VALUES or t_trips != 0:
-        t_trips_str = float_to_string(t_trips)
-
+    delta_odo_str = show_zero_values_float(delta_odo)
+    charged_kwh_str = show_zero_values_float(charged_kwh)
+    discharged_kwh_str = show_zero_values_float(discharged_kwh)
+    t_charges_str = show_zero_values_float_no_trailing_zero(t_charges)
+    t_trips_str = show_zero_values_float_no_trailing_zero(t_trips)
     location_str = get_address(split)
 
     ev_range = -1
@@ -589,32 +588,25 @@ def print_summary(
             )
 
     if SHEETUPDATE and prefix.startswith("SHEET "):
-        km_mi_per_kwh_str = km_mi_per_kwh_str.strip()
-        kwh_per_km_mi_str = kwh_per_km_mi_str.strip()
-        cost_str = cost_str.strip()
         prefix = prefix.replace("SHEET ", "")
         last_line = get_last_line(MONITOR_CSV_FILENAME).replace(",", ";")
         last_run_datetime = datetime.fromtimestamp(LASTRUN_FILENAME.stat().st_mtime)
         last_run_dt = last_run_datetime.strftime("%Y-%m-%d %H:%M ") + get_translation(
             TR_HELPER, last_run_datetime.strftime("%a")
         )
-
         lastrun_lines = []
         if LASTRUN_FILENAME.is_file():
             with LASTRUN_FILENAME.open("r", encoding="utf-8") as lastrun_file:
                 lastrun_lines = lastrun_file.readlines()
-
         last_updated_at = get_splitted_list_item(lastrun_lines, 2)
         location_last_updated_at = get_splitted_list_item(lastrun_lines, 3)
         last_upd_dt = last_updated_at[1]
         location_last_upd_dt = location_last_updated_at[1]
-
         row_a = f"{TR.last_run},{TR.vehicle_upd},{TR.gps_update},{TR.last_entry},{TR.last_address},{TR.odometer} {ODO_METRIC},{TR.driven} {ODO_METRIC},+kWh,-kWh,{ODO_METRIC}/kWh,kWh/100{ODO_METRIC},{TR.cost} {COST_CURRENCY},{TR.soc_perc},{TR.avg} {TR.soc_perc},{TR.min} {TR.soc_perc},{TR.max} {TR.soc_perc},{TR.volt12_perc},{TR.avg} {TR.volt12_perc},{TR.min} {TR.volt12_perc},{TR.max} {TR.volt12_perc},{TR.charges},{TR.trips},{TR.ev_range}"  # noqa
         row_b = f"{last_run_dt},{last_upd_dt},{location_last_upd_dt},{last_line},{location_str},{odo:.1f},{delta_odo:.1f},{charged_kwh:.1f},{discharged_kwh:.1f},{km_mi_per_kwh_str},{kwh_per_km_mi_str},{cost_str},{t_soc_cur},{t_soc_avg},{t_soc_min},{t_soc_max},{t_volt12_cur},{t_volt12_avg},{t_volt12_min},{t_volt12_max},{t_charges},{t_trips},{ev_range}"  # noqa
         sheet_append_first_rows(row_a, row_b)
-
     else:
-        output = f"{prefix:18},{odo_str:9},{delta_odo_str:9},{charged_kwh_str:8},{discharged_kwh_str:9},{km_mi_per_kwh_str:7},{kwh_per_km_mi_str:10},{cost_str:10},{t_soc_cur:8},{t_soc_avg:3},{t_soc_min:3},{t_soc_max:3},{t_volt12_cur:8},{t_volt12_avg:3},{t_volt12_min:3},{t_volt12_max:3},{t_charges_str:9},{t_trips_str:9},{ev_range},{location_str}"  # noqa
+        output = f"{prefix},{odo_str},{delta_odo_str},{charged_kwh_str},{discharged_kwh_str},{km_mi_per_kwh_str},{kwh_per_km_mi_str},{cost_str},{t_soc_cur},{t_soc_avg},{t_soc_min},{t_soc_max},{t_volt12_cur},{t_volt12_avg},{t_volt12_min},{t_volt12_max},{t_charges_str},{t_trips_str},{ev_range},{location_str}"  # noqa
         print_output_and_update_queue(output)
 
 
@@ -637,7 +629,7 @@ def print_summaries(
         if DAY:
             day_info = t_day.current_day.strftime("%a")
             print_summary(
-                f"DAY     , {day_str}, {day_info:5}",
+                f"DAY     , {day_str}, {day_info}",
                 current_day_values,
                 t_day,
                 split,
@@ -649,7 +641,7 @@ def print_summaries(
     if WEEK and (not same_week(current_day, t_week.current_day) or last):
         weeknr = t_week.current_day.strftime("%W")
         print_summary(
-            f"WEEK    , {day_str:10}, WK {weeknr:2}",
+            f"WEEK    , {day_str}, WK {weeknr}",
             current_day_values,
             t_week,
             split,
@@ -660,7 +652,7 @@ def print_summaries(
     if MONTH and (not same_month(current_day, t_month.current_day) or last):
         month_info = t_month.current_day.strftime("%b")
         print_summary(
-            f"MONTH   , {day_str:10}, {month_info:5}",
+            f"MONTH   , {day_str}, {month_info}",
             current_day_values,
             t_month,
             split,
@@ -670,7 +662,7 @@ def print_summaries(
     if YEAR and (not same_year(current_day, t_year.current_day) or last):
         year = t_year.current_day.strftime("%Y")
         print_summary(
-            f"YEAR    , {day_str:10}, {year:5}",
+            f"YEAR    , {day_str}, {year}",
             current_day_values,
             t_year,
             split,
@@ -678,35 +670,35 @@ def print_summaries(
         )
         trips = t_year.trips
         print_summary(
-            f"TRIPAVG , {day_str:10}, {trips:3}t ",
+            f"TRIPAVG , {day_str}, {trips}t ",
             current_day_values,
             t_year,
             split,
             safe_divide(1, trips),
         )
         print_summary(
-            f"DAYAVG  , {day_str:10}, {DAY_COUNTER:3}d ",
+            f"DAYAVG  , {day_str}, {DAY_COUNTER}d ",
             current_day_values,
             t_year,
             split,
             safe_divide(1, DAY_COUNTER),
         )
         print_summary(
-            f"WEEKAVG , {day_str:10}, {DAY_COUNTER:3}d ",
+            f"WEEKAVG , {day_str}, {DAY_COUNTER}d ",
             current_day_values,
             t_year,
             split,
             safe_divide(7, DAY_COUNTER),
         )
         print_summary(
-            f"MONTHAVG, {day_str:10}, {DAY_COUNTER:3}d ",
+            f"MONTHAVG, {day_str}, {DAY_COUNTER}d ",
             current_day_values,
             t_year,
             split,
             safe_divide(365 / 12, DAY_COUNTER),
         )
         print_summary(
-            f"YEARLY  , {day_str:10}, {DAY_COUNTER:3}d ",
+            f"YEARLY  , {day_str}, {DAY_COUNTER}d ",
             current_day_values,
             t_year,
             split,
@@ -715,7 +707,7 @@ def print_summaries(
         if SHEETUPDATE and last:
             day_info = current_day.strftime("%a %H:%M")
             print_summary(
-                f"SHEET {day_str:10} {day_info} {DAY_COUNTER:3}d",
+                f"SHEET {day_str} {day_info} {DAY_COUNTER}d",
                 current_day_values,
                 t_year,
                 split,
@@ -759,11 +751,7 @@ def keep_track_of_totals(
     t_volt12_max = values.volt12_max
     t_soc_charged = values.soc_charged
 
-    delta_odo = odo - prev_odo
-    if delta_odo < 0.0:
-        _ = D and dbg(f"negative odometer:\n{prev_split}\n{split}")
-        delta_odo = 0.0
-
+    delta_odo = max(0.0, odo - prev_odo)
     coord_changed = to_float(split[LAT]) != to_float(prev_split[LAT]) or to_float(
         split[LON]
     ) != to_float(prev_split[LON])
@@ -780,7 +768,7 @@ def keep_track_of_totals(
 
     if delta_odo > 0.0:
         t_trips += 1
-        _ = D and dbg(f"DELTA_ODO: {delta_odo:7.1f} {t_trips}")
+        _ = D and dbg(f"DELTA_ODO: {delta_odo:.1f} {t_trips}")
         if trip:
             # workaround that sometimes SOC is decreased in next line
             # so the trip information shows not the correct used kWh
@@ -953,7 +941,7 @@ def handle_line(
                 day_trip_str = current_day.strftime("%Y-%m-%d")
                 day_info = current_day.strftime("%H:%M")
                 print_summary(
-                    f"TRIP    , {day_trip_str:10}, {day_info:5}",
+                    f"TRIP    , {day_trip_str}, {day_info}",
                     current_day_values,
                     t_trip,
                     split,

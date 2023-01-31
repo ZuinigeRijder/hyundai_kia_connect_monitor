@@ -57,9 +57,9 @@ def to_float(string: str) -> float:
     return float(string.strip())
 
 
-def float_to_string(input_value: float) -> str:
+def float_to_string_no_trailing_zero(input_value: float) -> str:
     """float to string without trailing zero"""
-    return (f"{input_value:9.1f}").rstrip("0").rstrip(".")
+    return (f"{input_value:.1f}").rstrip("0").rstrip(".")
 
 
 def is_true(string: str) -> bool:
