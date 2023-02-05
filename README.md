@@ -1,8 +1,7 @@
-# index
-- [Introduction](#introduction-hyundai_kia_connect_monitor)
-- [How to install python, packages and hyundai_connect_monitor](#how-to-install-python-packages-and-hyundai_connect_monitor)
+- [Introduction hyundai\_kia\_connect\_monitor](#introduction-hyundai_kia_connect_monitor)
+- [How to install python, packages and hyundai\_connect\_monitor](#how-to-install-python-packages-and-hyundai_connect_monitor)
 - [configuration of gspread for "python summary.py sheetupdate" and "python dailystats.py sheetupdate"](#configuration-of-gspread-for-python-summarypy-sheetupdate-and-python-dailystatspy-sheetupdate)
-- [Translations](#Translations)
+- [Translations](#translations)
 - [monitor.py](#monitorpy)
 - [summary.py](#summarypy)
 - [summary.py sheetupdate](#summarypy-sheetupdate)
@@ -10,15 +9,15 @@
 - [kml.py](#kmlpy)
 - [shrink.py](#shrinkpy)
 - [debug.py](#debugpy)
-- [Raspberry Pi configuration](#raspberry-pi-configuration)
+- [Raspberry pi configuration](#raspberry-pi-configuration)
 - [Examples](#examples)
-- - [monitor.csv](#monitorcsv)
-- - [python summary.py](#python-summarypy)
-- - [python dailystats.py](#python-dailystatspy)
-- - [python kml.py](#python-kmlpy)
-- - [python shrink.py](#python-shrinkpy)
-- [Development Environment](#Development-Environment)
-- [FAQ](#FAQ)
+  - [monitor.csv](#monitorcsv)
+  - [python summary.py](#python-summarypy)
+  - [python dailystats.py](#python-dailystatspy)
+  - [python kml.py](#python-kmlpy)
+  - [python shrink.py](#python-shrinkpy)
+- [Development Environment](#development-environment)
+- [FAQ](#faq)
 
 ---
 # Introduction hyundai_kia_connect_monitor
@@ -27,6 +26,9 @@ Determining afterwards your private and/or business trips and information about 
 Best of all is the fact that it does NOT drain your 12 volt battery of the car, because it only uses the cached server information!
 
 [This video shows why it is important to avoid awakening the car for actual values.](https://youtu.be/rpLWEe-2aUU?t=121)
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=rpLWEe-2aUU" target="_blank"><img src="http://img.youtube.com/vi/rpLWEe-2aUU/0.jpg" alt="IONIQ 5 Quicklynks BM2 battery monitor 12 volt battery 3 days" width="240" height="180" border="10" /></a>
+
 30 nov 6:10 a refresh via the Bluelink App has been done and you see a dip from 12.92 Volt to 12.42 Volt for a moment and then back to 12.83 Volt.
 
 *Note the tool asks only for server cache updates and the car decides when to send push notifications with actual values to the server.*
