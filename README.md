@@ -151,7 +151,7 @@ Follow the steps in this link above, here is the summary of these steps:
 - Setup a Google Spreasheet to be updated by sheetupdate
 - - In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai-kia-connect-monitor or monitor.VIN (latter if vin=VIN is given as parameter)
 - - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
-- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google spreadsheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and change e.g. diagram titels into your own language.
+- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google spreadsheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and change e.g. diagram titles into your own language.
 - - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
 - run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor or monitor.VIN spreadheet will be updated with a summary and the last 122 lines of standard output
 - run "python dailystats.py sheetupdate" and if everything is correct, the monitor.dailystats or monitor.dailystats.VIN spreadheet will be updated with the last 122 lines of standard output
@@ -435,7 +435,7 @@ Read the daily stats, trip info and charge files and represent these in a nice f
 
 For sheetupdate configure once gspread and a specific Google Spreadsheet:
 - [See configuration of gspread here](#configuration-of-gspread-for-python-summarypy-sheetupdate-and-python-dailystatspy-sheetupdate)
-- In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google spreadsheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and e.g. change diagram titels into your own language.
+- In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google spreadsheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and e.g. change diagram titles into your own language.
 - Go to your spreadsheet and share it with the client_email inside service_account.json created above
 
 Usage:
