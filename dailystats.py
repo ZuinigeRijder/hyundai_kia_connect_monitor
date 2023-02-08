@@ -3,6 +3,7 @@
 Simple Python3 script to make a dailystats overview
 """
 from dataclasses import dataclass
+import re
 import sys
 import traceback
 import time
@@ -16,6 +17,7 @@ from monitor_utils import (
     arg_has,
     get_vin_arg,
     safe_divide,
+    split_output_to_sheet_float_list,
     to_int,
     to_float,
     read_reverse_order,
@@ -87,15 +89,7 @@ CLIMATE = 6
 ELECTRONICS = 7
 BATTERY_CARE = 8
 
-TOTAL_DAYS = 0
 TOTAL_UNIT = "km"
-TOTAL_DISTANCE = 0
-TOTAL_CONSUMED = 0
-TOTAL_REGENERATED = 0
-TOTAL_ENGINE = 0
-TOTAL_CLIMATE = 0
-TOTAL_ELECTRONICS = 0
-TOTAL_BATTERY_CARE = 0
 
 TR_HELPER: dict[str, str] = read_translations()
 COLUMN_WIDTHS = [11, 12, 14, 8, 9, 9, 8]
@@ -216,8 +210,18 @@ def reverse_read_next_charge_line() -> None:
     )
 
 
-def increment_totals(line: str) -> None:
-    """handle line"""
+TOTAL_DAYS = 0
+TOTAL_DISTANCE = 0
+TOTAL_CONSUMED = 0
+TOTAL_REGENERATED = 0
+TOTAL_ENGINE = 0
+TOTAL_CLIMATE = 0
+TOTAL_ELECTRONICS = 0
+TOTAL_BATTERY_CARE = 0
+
+
+def increment_dailystats_totals(line: str) -> None:
+    """increment_dailystats_totals"""
     _ = D and dbg(f"handle_line: {line}")
     global TOTAL_DAYS, TOTAL_UNIT, TOTAL_DISTANCE, TOTAL_CONSUMED, TOTAL_REGENERATED, TOTAL_ENGINE, TOTAL_CLIMATE, TOTAL_ELECTRONICS, TOTAL_BATTERY_CARE  # noqa pylint:disable=global-statement
     split = line.split(",")
@@ -240,6 +244,31 @@ def increment_totals(line: str) -> None:
     TOTAL_CLIMATE += climate
     TOTAL_ELECTRONICS += electronics
     TOTAL_BATTERY_CARE += battery_care
+
+
+TOTAL_TRIPINFO_DRIVE_TIME = 0
+TOTAL_TRIPINFO_IDLE_TIME = 0
+TOTAL_TRIPINFO_DISTANCE = 0
+TOTAL_TRIPINFO_AVERAGE_SPEED = 0
+TOTAL_TRIPINFO_MAX_SPEED = 0
+
+
+def increment_tripinfo_totals(line: str) -> None:
+    """increment_tripinfo_totals"""
+    _ = D and dbg(f"handle_line: {line}")
+    global TOTAL_TRIPINFO_DRIVE_TIME, TOTAL_TRIPINFO_IDLE_TIME, TOTAL_TRIPINFO_DISTANCE, TOTAL_TRIPINFO_AVERAGE_SPEED, TOTAL_TRIPINFO_MAX_SPEED  # noqa pylint:disable=global-statement
+    split = line.split(",")
+    drive_time = to_int(split[2])
+    idle_time = to_int(split[3])
+    distance = to_int(split[4])
+    avg_speed = to_int(split[5])
+    max_speed = to_int(split[6])
+
+    TOTAL_TRIPINFO_DRIVE_TIME += drive_time
+    TOTAL_TRIPINFO_IDLE_TIME += idle_time
+    TOTAL_TRIPINFO_DISTANCE += distance
+    TOTAL_TRIPINFO_AVERAGE_SPEED += drive_time * avg_speed
+    TOTAL_TRIPINFO_MAX_SPEED = max(TOTAL_TRIPINFO_MAX_SPEED, max_speed)
 
 
 def print_output(output: str) -> None:
@@ -280,11 +309,11 @@ def get_charge_for_date(date: str) -> str:
 
 def get_trip_for_datetime(
     date: str, trip_time_start_str: str, trip_time_end_str: str
-) -> tuple[int, float]:
+) -> tuple[float, float]:
     """get_trip_for_datetime"""
     match = False
     matched_time = ""
-    distance = 0
+    distance = 0.0
     kwh_consumed = 0.0
     kwh_charged = 0.0
     if D:
@@ -313,7 +342,7 @@ def get_trip_for_datetime(
                     ).total_seconds()
                     if abs(delta_seconds) < 3600:
                         matched_time = trip_time
-                        distance = to_int(splitted_line[2])
+                        distance = to_float(splitted_line[2])
                         kwh_consumed = to_float(splitted_line[3])
                         kwh_charged = to_float(splitted_line[4])
                         match = True
@@ -358,17 +387,24 @@ def print_tripinfo(
         print_output(
             f"{charge},{TR.trip},,{TR.distance},{TR.average_speed},{TR.max_speed},{TR.idle_time}"  # noqa
         )
-    trip_time_start_str = start_time[0:2] + ":" + start_time[2:4]
-    trip_time_date = datetime.strptime(trip_time_start_str, "%H:%M")
-    trip_time_end = trip_time_date + relativedelta(minutes=to_int(drive_time))
-    trip_time_end_str = trip_time_end.strftime("-%H:%M")
-    trip_time_str = trip_time_start_str + trip_time_end_str
+    if start_time == "":  # totals line
+        trip_time_str = f"{drive_time}min"
+        distance_summary_trip = 0.0
+        kwh_consumed = 0.0
+    else:
+        trip_time_start_str = start_time[0:2] + ":" + start_time[2:4]
+        trip_time_date = datetime.strptime(trip_time_start_str, "%H:%M")
+        trip_time_end = trip_time_date + relativedelta(minutes=to_int(drive_time))
+        trip_time_end_str = trip_time_end.strftime("-%H:%M")
+        trip_time_str = trip_time_start_str + trip_time_end_str
 
-    # match with summary.tripinfo.csv and return kwh_consumed
-    distance_summary_trip, kwh_consumed = get_trip_for_datetime(
-        date_org, trip_time_start_str, trip_time_end_str
-    )
-    kwh_consumed = abs(kwh_consumed)
+        # match with summary.tripinfo.csv and return kwh_consumed
+        distance_summary_trip, kwh_consumed = get_trip_for_datetime(
+            date_org, trip_time_start_str, trip_time_end_str
+        )
+
+    if kwh_consumed < 0.0:
+        kwh_consumed = -kwh_consumed
     kwh = ""
     consumption = ""
     if distance_summary_trip == 0.0:  # just user other distance
@@ -376,7 +412,7 @@ def print_tripinfo(
     else:
         consumption = f"({distance_summary_trip:.1f}{TOTAL_UNIT})"
 
-    if kwh_consumed > 0:
+    if kwh_consumed > 0.0:
         kwh = f"({kwh_consumed:.1f}kWh)"
         km_mi_per_kwh = safe_divide(distance_summary_trip, kwh_consumed)
         consumption = f"({km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh)"
@@ -420,9 +456,8 @@ def print_day_trip_info(date_org: str) -> None:
         print_output(f"{charge},,,,,")  # still print charge
 
 
-def print_stats(
+def print_dailystats(
     date: str,
-    total_charge: float,
     distance: int,
     consumed: int,
     regenerated: int,
@@ -468,8 +503,6 @@ def print_stats(
     print_output(
         f"{distance}{TOTAL_UNIT},{regenerated_perc:.1f}%,{kwh_per_km_mi:.1f}kWh/100{TOTAL_UNIT},{engine_perc:.0f}%,{climate_perc:.1f}%,{electronics_perc:.1f}%,{battery_care_perc:.1f}%"  # noqa
     )
-    if date == "Totals":
-        print_output(f"(+{total_charge:.1f}kWh)")
 
 
 def compute_total_charge() -> float:
@@ -491,10 +524,10 @@ def compute_total_charge() -> float:
     return total_charge
 
 
-def summary(today_daily_stats_line: str) -> None:
+def summary_dailystats(today_daily_stats_line: str) -> None:
     """summary of monitor.dailystats.csv file"""
     if today_daily_stats_line != "":
-        increment_totals(today_daily_stats_line)
+        increment_dailystats_totals(today_daily_stats_line)
     if DAILYSTATS_CSV_FILE.is_file():
         with DAILYSTATS_CSV_FILE.open("r", encoding="utf-8") as inputfile:
             linecount = 0
@@ -506,12 +539,10 @@ def summary(today_daily_stats_line: str) -> None:
                 if index <= 0 or line.startswith("date"):
                     _ = D and dbg(f"Skipping line:\n{line}")
                 else:
-                    increment_totals(line)
+                    increment_dailystats_totals(line)
 
-    total_charge = compute_total_charge()
-    print_stats(
+    print_dailystats(
         "Totals",
-        total_charge,
         TOTAL_DISTANCE,
         TOTAL_CONSUMED,
         TOTAL_REGENERATED,
@@ -519,6 +550,36 @@ def summary(today_daily_stats_line: str) -> None:
         TOTAL_CLIMATE,
         TOTAL_ELECTRONICS,
         TOTAL_BATTERY_CARE,
+    )
+
+
+def summary_tripinfo() -> None:
+    """summary_tripinfo"""
+    if TRIPINFO_CSV_FILE.is_file():
+        with TRIPINFO_CSV_FILE.open("r", encoding="utf-8") as inputfile:
+            linecount = 0
+            for line in inputfile:
+                line = line.strip()
+                linecount += 1
+                _ = D and dbg(str(linecount) + ": LINE=[" + line + "]")
+                index = line.find(",")
+                if index <= 0 or line.startswith("Date"):
+                    _ = D and dbg(f"Skipping line:\n{line}")
+                else:
+                    increment_tripinfo_totals(line)
+
+    total_charge = compute_total_charge()
+    average_speed = round(TOTAL_TRIPINFO_AVERAGE_SPEED / TOTAL_TRIPINFO_DRIVE_TIME)
+    print_tripinfo(
+        date_org="",
+        header=True,
+        charge=f"(+{total_charge:.1f}kWh)",
+        start_time="",
+        drive_time=f"{TOTAL_TRIPINFO_DRIVE_TIME}",
+        idle_time=f"{TOTAL_TRIPINFO_IDLE_TIME}",
+        distance=f"{TOTAL_TRIPINFO_DISTANCE}",
+        avg_speed=f"{average_speed}",
+        max_speed=f"{TOTAL_TRIPINFO_MAX_SPEED}",
     )
     print_output(",,,,,,")  # empty line/row
 
@@ -534,9 +595,8 @@ def reverse_print_dailystats_one_line(line: str) -> None:
     date = val[DATE].strip()
     if len(date) == 8:
         date = date[0:4] + "-" + date[4:6] + "-" + date[6:]
-    print_stats(
+    print_dailystats(
         date,
-        0.0,
         to_int(val[DISTANCE]),
         to_int(val[CONSUMED]),
         to_int(val[REGENERATED]),
@@ -559,48 +619,115 @@ def reverse_print_dailystats(today_daily_stats_line: str) -> None:
             reverse_print_dailystats_one_line(line)
 
 
+def get_format(range_str: str, special: bool):
+    """get_format"""
+    result = {
+        "range": range_str,
+        "format": {
+            "horizontalAlignment": "RIGHT",
+            "textFormat": {
+                "bold": special,
+                "underline": special,
+                "italic": special,
+            },
+        },
+    }
+    return result
+
+
 def print_output_queue() -> None:
     """print output queue"""
-    array = []
+    array: list[dict] = []
     formats = []
-    current_row = 0
+    row = 0
+    # copy daily
+    cd_row = 2
+    cd_header = False
+    cd_date = ""
+    # copy trip
+    ct_row = 25
+    ct_header = False
+    ct_header_printed = False
+    ct_day_change = True
+    ct_date = ""
+    array.append({"range": "N1", "values": [[f"{TOTAL_UNIT}/kWh"]]})
     for queue_output in PRINTED_OUTPUT_QUEUE:
-        current_row += 1
-        _ = D and dbg(f"write row: {current_row} {queue_output}")
-        list_output = split_output_to_sheet_list(queue_output)
-        array.append({"range": f"A{current_row}:G{current_row}", "values": list_output})
+        row += 1
+        _ = D and dbg(f"write row: {row} {queue_output}")
+        values = split_output_to_sheet_list(queue_output)
+        array.append({"range": f"A{row}:G{row}", "values": values})
         if (
             TR.recuperation in queue_output
             or TR.totals in queue_output
             or TR.trip in queue_output
         ):
-            formats.append(
-                {
-                    "range": f"A{current_row}:G{current_row}",
-                    "format": {
-                        "horizontalAlignment": "RIGHT",
-                        "textFormat": {
-                            "bold": True,
-                            "underline": True,
-                            "italic": True,
-                        },
-                    },
-                }
-            )
+            formats.append(get_format(f"A{row}:G{row}", True))
+            if TR.recuperation in queue_output:
+                ct_header = False
+                ct_day_change = True
+                cd_date = queue_output.split(",")[0].strip()
+                ct_date = cd_date
+                if not cd_header:
+                    cd_row += 1
+                    array.append({"range": f"O{cd_row}:U{cd_row}", "values": values})
+                    formats.append(get_format(f"N{cd_row}:U{cd_row}", False))
+                    cd_header = True
+
+            if TR.trip in queue_output:
+                if not ct_header and not ct_header_printed:
+                    ct_header_printed = True
+                    values[0][0] = ""  # clear consumption
+                    ct_row += 1
+                    array.append({"range": f"O{ct_row}:U{ct_row}", "values": values})
+                    formats.append(get_format(f"N{ct_row}:U{ct_row}", False))
+                ct_header = True
+
         else:
-            formats.append(
-                {
-                    "range": f"A{current_row}:G{current_row}",
-                    "format": {
-                        "horizontalAlignment": "RIGHT",
-                        "textFormat": {
-                            "bold": False,
-                            "underline": False,
-                            "italic": False,
-                        },
-                    },
-                }
-            )
+            formats.append(get_format(f"A{row}:G{row}", False))
+            if cd_date != "":
+                # dailystats
+                cd_row += 1
+                tmp = re.sub(r"[^0-9.,]", "", queue_output)
+                floats = split_output_to_sheet_float_list(tmp)
+                array.append({"range": f"O{cd_row}:U{cd_row}", "values": floats})
+                array.append({"range": f"N{cd_row}", "values": [[cd_date]]})
+                formats.append(get_format(f"N{cd_row}:U{cd_row}", False))
+                cd_date = ""
+            else:
+                if ct_header and queue_output != ",,,,,,":
+                    # tripinfo
+                    ct_row += 1
+                    trip = [ct_date, 0, "", 0, 0, 0, 0]  # clear consumption
+                    tmp = re.sub(r"[^0-9.,:-]", "", queue_output)
+                    entry = split_output_to_sheet_list(tmp)[0]
+                    trip_time = entry[1]
+                    if ":" in trip_time:
+                        # only the first entry of a day should contain date
+                        if not ct_day_change:
+                            trip[0] = trip_time.split("-")[0]  # only start time
+                        else:
+                            trip[0] = ct_date + " " + trip_time.split("-")[0]
+                        ct_day_change = False
+                        # replace time range with elapsed minutes
+                        strip = trip_time.split("-")
+                        delta_min = round(
+                            (
+                                datetime.strptime(strip[1], "%H:%M")
+                                - datetime.strptime(strip[0], "%H:%M")
+                            ).total_seconds()
+                            / 60
+                        )
+                        if delta_min < 0:
+                            delta_min += 24 * 60
+                        trip[1] = delta_min
+                    elif trip_time.isdigit():
+                        trip[1] = int(entry[1])  # convert to int
+
+                    for i in range(3, 7):
+                        trip[i] = int(entry[i])
+
+                    array.append({"range": f"O{ct_row}:U{ct_row}", "values": [trip]})
+                    formats.append(get_format(f"N{ct_row}:U{ct_row}", False))
 
     if len(array) > 0:
         SHEET.batch_update(array)
@@ -616,7 +743,7 @@ if SHEETUPDATE:
             gc = gspread.service_account()
             spreadsheet = gc.open(OUTPUT_SPREADSHEET_NAME)
             SHEET = spreadsheet.sheet1
-            SHEET.clear()
+            SHEET.batch_clear(["A:G", "N:V"])
             RETRIES = 0
         except Exception as ex:  # pylint: disable=broad-except
             log("Exception: " + str(ex))
@@ -633,7 +760,8 @@ if LASTRUN_FILE.is_file():
         if len(lastrun_lines) > 5:
             TODAY_DAILY_STATS_LINE = lastrun_lines[5].strip()
 
-summary(TODAY_DAILY_STATS_LINE)  # do the total summary first
+summary_dailystats(TODAY_DAILY_STATS_LINE)  # do the total dailystats summary first
+summary_tripinfo()  # then the total tripinfo
 reverse_print_dailystats(TODAY_DAILY_STATS_LINE)  # and then dailystats
 
 if SHEETUPDATE:

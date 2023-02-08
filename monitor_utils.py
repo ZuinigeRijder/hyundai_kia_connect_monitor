@@ -109,6 +109,12 @@ def split_output_to_sheet_list(text: str) -> list[list[str]]:
     return [result]
 
 
+def split_output_to_sheet_float_list(text: str) -> list[list[float]]:
+    """split output to sheet float list"""
+    result = [float(x.strip()) for x in text.split(",")]
+    return [result]
+
+
 def get_last_line(filename: Path) -> str:
     """get last line of filename"""
     last_line = ""

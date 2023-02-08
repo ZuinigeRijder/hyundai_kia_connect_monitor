@@ -3,7 +3,8 @@
      Totals Recuperation   Consumption   Engine  Climate  Electr. Batt.Care
    163.9kWh      21.9kWh     5.6km/kWh 141.1kWh   7.5kWh  14.9kWh    0.4kWh
       913km        13.3% 18.0kWh/100km      86%     4.6%     9.1%      0.2%
-(+161.7kWh)
+(+161.7kWh)         Trip               Distance Avg km/h Max km/h      Idle
+                 1034min                  913km   60km/h  108km/h    162min
                                                                            
  2023-01-22 Recuperation   Consumption   Engine  Climate  Electr. Batt.Care
     74.6kWh       4.1kWh     5.6km/kWh  66.2kWh   3.5kWh   4.5kWh    0.4kWh

@@ -25,6 +25,29 @@ Automatic trip administration tools for Hyundai Bluelink or Kia UVO Connect user
 Determining afterwards your private and/or business trips and information about those trips and usage of the car.
 Best of all is the fact that it does NOT drain your 12 volt battery of the car, because it only uses the cached server information!
 
+[Here a video](http://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U) with some nice diagrams in Google Spreadsheet, showing:
+
+Daily Statistics:
+- Total
+- Recuperation
+- Consumption
+- Engine
+- Climate
+- Electric devices
+- Battery Care
+
+Trip information:
+- Totals
+- Trip Start Time
+- Trip End Time
+- Matched consumption or distance figures from summary.py between round brackets
+- Distance
+- Average speed
+- Maximum speed
+- Idle minutes
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U" target="_blank"><img src="http://img.youtube.com/vi/W5syq4uqo7U/0.jpg" alt="monitor.dailystats Google Spreadsheet" width="240" height="180" border="10" /></a>
+
 [This video shows why it is important to avoid awakening the car for actual values.](https://youtu.be/rpLWEe-2aUU?t=121)
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=rpLWEe-2aUU" target="_blank"><img src="http://img.youtube.com/vi/rpLWEe-2aUU/0.jpg" alt="IONIQ 5 Quicklynks BM2 battery monitor 12 volt battery 3 days" width="240" height="180" border="10" /></a>
@@ -36,6 +59,9 @@ Best of all is the fact that it does NOT drain your 12 volt battery of the car, 
 Example screenshots showing the results in a Google Spreadsheet:
 - DailyStats
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.png)
+
+- DailyStats in browser with nice diagrams
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.Browser.jpg)
 
 - Summary
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_GoogleSpreadsheet.png)
@@ -125,7 +151,7 @@ Follow the steps in this link above, here is the summary of these steps:
 - Setup a Google Spreasheet to be updated by sheetupdate
 - - In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai-kia-connect-monitor or monitor.VIN (latter if vin=VIN is given as parameter)
 - - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
-- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if vin=VIN is given as parameter)
+- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google spreadsheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and change e.g. diagram titels into your own language.
 - - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
 - run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor or monitor.VIN spreadheet will be updated with a summary and the last 122 lines of standard output
 - run "python dailystats.py sheetupdate" and if everything is correct, the monitor.dailystats or monitor.dailystats.VIN spreadheet will be updated with the last 122 lines of standard output
@@ -409,7 +435,7 @@ Read the daily stats, trip info and charge files and represent these in a nice f
 
 For sheetupdate configure once gspread and a specific Google Spreadsheet:
 - [See configuration of gspread here](#configuration-of-gspread-for-python-summarypy-sheetupdate-and-python-dailystatspy-sheetupdate)
-- In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if if vin=VIN is given as parameter)
+- In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google spreadsheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and e.g. change diagram titels into your own language.
 - Go to your spreadsheet and share it with the client_email inside service_account.json created above
 
 Usage:
@@ -740,6 +766,11 @@ C:\Users\Rick\git\monitor>python dailystats.py sheetupdate
   (0.7kWh)    13:24-13:31     (3.0km/kWh)     2km      23km/h    48km/h     1 min
 ```
 
+Video of spreadsheet:
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U" target="_blank"><img src="http://img.youtube.com/vi/W5syq4uqo7U/0.jpg" alt="monitor.dailystats Google Spreadsheet" width="240" height="180" border="10" /></a>
+
+Screenshot in browser with nice diagrams:
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.Browser.jpg)
 
 Screenshot of spreadsheet:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.png)
