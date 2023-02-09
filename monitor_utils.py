@@ -7,6 +7,7 @@ import sys
 import os
 from datetime import datetime
 from pathlib import Path
+import time
 from typing import Generator
 
 
@@ -33,6 +34,15 @@ def get_vin_arg() -> str:
             return vin
 
     return ""
+
+
+def sleep(retries: int) -> int:
+    """sleep when retries > 0"""
+    if retries > 0:
+        retries -= 1
+        log("Sleeping a minute")
+        time.sleep(60)
+    return retries
 
 
 def safe_divide(numerator: float, denumerator: float) -> float:

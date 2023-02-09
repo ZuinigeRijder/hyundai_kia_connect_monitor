@@ -6,7 +6,6 @@ from dataclasses import dataclass
 import re
 import sys
 import traceback
-import time
 from datetime import datetime
 from pathlib import Path
 from collections import deque
@@ -17,6 +16,7 @@ from monitor_utils import (
     arg_has,
     get_vin_arg,
     safe_divide,
+    sleep,
     split_output_to_sheet_float_list,
     to_int,
     to_float,
@@ -748,9 +748,7 @@ if SHEETUPDATE:
         except Exception as ex:  # pylint: disable=broad-except
             log("Exception: " + str(ex))
             traceback.print_exc()
-            RETRIES -= 1
-            log("Sleeping a minute")
-            time.sleep(60)
+            RETRIES = sleep(RETRIES)
 
 
 TODAY_DAILY_STATS_LINE = ""
@@ -773,6 +771,4 @@ if SHEETUPDATE:
         except Exception as ex:  # pylint: disable=broad-except
             log("Exception: " + str(ex))
             traceback.print_exc()
-            RETRIES -= 1
-            log("Sleeping a minute")
-            time.sleep(60)
+            RETRIES = sleep(RETRIES)

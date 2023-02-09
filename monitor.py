@@ -31,26 +31,15 @@ e.g. with Excel:
 - visited places
 """
 import sys
-import os
 import io
 import configparser
 import traceback
-import time
 import logging
 from pathlib import Path
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from hyundai_kia_connect_api import VehicleManager, Vehicle, exceptions
-
-
-# == arg_has =================================================================
-def arg_has(string: str) -> bool:
-    """arguments has string"""
-    for i in range(1, len(sys.argv)):
-        if sys.argv[i].lower() == string:
-            return True
-
-    return False
+from monitor_utils import arg_has, get_last_date, get_last_line, log, sleep, to_int
 
 
 # keep forceupdate and cacheupdate as keyword, but do nothing with them
@@ -93,19 +82,6 @@ def dbg(line: str) -> bool:
     return D  # just to make a lazy evaluation expression possible
 
 
-def log(msg: str) -> None:
-    """log a message prefixed with a date/time format yyyymmdd hh:mm:ss"""
-    print(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ": " + msg)
-
-
-def to_int(string: str) -> int:
-    """convert to int"""
-    if "None" in string:
-        return -1
-    split = string.split(".")  # get rid of decimal part
-    return int(split[0].strip())
-
-
 def writeln(filename: str, string: str) -> None:
     """append line at monitor text file with end of line character"""
     _ = D and dbg(string)
@@ -122,32 +98,6 @@ def writeln(filename: str, string: str) -> None:
             )
         file.write(string)
         file.write("\n")
-
-
-def get_last_line(filename: str) -> str:
-    """get last line of filename"""
-    last_line = ""
-    filename_file = Path(filename)
-    if filename_file.is_file():
-        with open(filename, "rb") as file:
-            try:
-                file.seek(-2, os.SEEK_END)
-                while file.read(1) != b"\n":
-                    file.seek(-2, os.SEEK_CUR)
-            except OSError:
-                file.seek(0)
-            last_line = file.readline().decode().strip()
-            _ = D and dbg(f"{filename} last_line: [{last_line}]")
-    return last_line
-
-
-def get_last_date(last_line: str) -> str:
-    """get last date of last_line"""
-    last_date = "20000101"  # millenium
-    if last_line.startswith("20"):  # year starts with 20
-        last_date = last_line.split(",")[0].strip()
-    _ = D and dbg(f"{last_line} last_date: [{last_date}]")
-    return last_date
 
 
 def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> str:
@@ -380,13 +330,6 @@ def handle_one_vehicle(
     return False
 
 
-def sleep(retries: int) -> None:
-    """sleep when retries > 0"""
-    if retries > 0:
-        log("Sleeping a minute")
-        time.sleep(60)
-
-
 def handle_exception(ex: Exception, retries: int, stacktrace=False) -> int:
     """
     If an error is found, an exception is raised.
@@ -406,8 +349,7 @@ def handle_exception(ex: Exception, retries: int, stacktrace=False) -> int:
     log(f"Exception: {exception_str}")
     if stacktrace and "Service Temporary Unavailable" not in exception_str:
         traceback.print_exc()
-    retries -= 1
-    sleep(retries)
+    retries = sleep(retries)
     return retries
 
 

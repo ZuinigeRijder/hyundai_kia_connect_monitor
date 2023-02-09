@@ -6,7 +6,6 @@ from io import TextIOWrapper
 import sys
 import configparser
 import traceback
-import time
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -18,6 +17,7 @@ from monitor_utils import (
     arg_has,
     get_vin_arg,
     safe_divide,
+    sleep,
     to_int,
     to_float,
     is_true,
@@ -1016,9 +1016,7 @@ if SHEETUPDATE:
         except Exception as ex:  # pylint: disable=broad-except
             log("Exception: " + str(ex))
             traceback.print_exc()
-            RETRIES -= 1
-            log("Sleeping a minute")
-            time.sleep(60)
+            RETRIES = sleep(RETRIES)
 
 
 # always rewrite charge file, because input might be changed
@@ -1044,6 +1042,4 @@ if SHEETUPDATE:
         except Exception as ex:  # pylint: disable=broad-except
             log("Exception: " + str(ex))
             traceback.print_exc()
-            RETRIES -= 1
-            log("Sleeping a minute")
-            time.sleep(60)
+            RETRIES = sleep(RETRIES)
