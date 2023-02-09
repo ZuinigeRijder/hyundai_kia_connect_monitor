@@ -40,7 +40,7 @@ from pathlib import Path
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from hyundai_kia_connect_api import VehicleManager, Vehicle, exceptions
-from monitor_utils import arg_has, get_last_date, get_last_line, log, sleep, to_int
+from monitor_utils import arg_has, get_last_line, log, sleep, to_int
 
 
 # keep forceupdate and cacheupdate as keyword, but do nothing with them
@@ -124,8 +124,7 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
             )
         today_time_str = datetime.now().strftime("%H:%M")
         last_line = get_last_line(Path(filename))
-        last_date_str = get_last_date(last_line)
-        last_date = last_date_str.split(" ")[0]  # get rid of possible HH:MM
+        last_date = last_line.split(",")[0].strip().split(" ")[0].strip()
         last_line = re.sub("^[^,]*,", "", last_line).strip()  # get rid of first column
         i = len(daily_stats)
         while i > 0:
@@ -133,33 +132,32 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
             stat = daily_stats[i]
             dailystats_date = stat.date.strftime("%Y%m%d")
             if D:
-                dbg(
+                print(
                     f"{i} dailystats_date:[{dailystats_date}] [{last_date}] {stat}"  # noqa
                 )
             if dailystats_date >= last_date:
                 # only append not already written daily stats
                 line = f"{stat.distance}, {stat.distance_unit}, {stat.total_consumed}, {stat.regenerated_energy},  {stat.engine_consumption}, {stat.climate_consumption}, {stat.onboard_electronics_consumption}, {stat.battery_care_consumption}"  # noqa
-                dailystats_date = f"{dailystats_date} {today_time_str}"
-
                 if dailystats_date > last_date or last_line != line:
+                    dailystats_date = f"{dailystats_date} {today_time_str}"
                     full_line = f"{dailystats_date}, {line}"
                     if D:
-                        dbg(
-                            f"Writing dailystats:\nline=[{full_line}]\nlast=[{last_line}]"  # noqa
+                        print(
+                            f"Writing dailystats {dailystats_date} {last_date}\nflin=[{full_line}]\nline=[{line}]\nlast=[{last_line}]"  # noqa
                         )
                     file.write(full_line)
                     file.write("\n")
                     last_line = line
                 else:
                     if D:
-                        dbg(
+                        print(
                             f"Skipping dailystats: date=[{dailystats_date}]\nlast=[{last_line}]\nline=[{line}]"  # noqa
                         )
             else:
                 if D:
-                    dbg(
-                        f"Skipping dailystats: [{dailystats_date}] [{last_line}]"  # noqa
-                    )
+                    print(
+                        f"Skipping dailystats: [{dailystats_date}] [{last_line}]"
+                    )  # noqa
 
 
 def write_last_run(
@@ -233,7 +231,7 @@ def handle_trip_info(
         monitor_tripinfo_csv_file.touch()
         write_header = True
     last_line = get_last_line(Path(filename))
-    last_date = get_last_date(last_line)
+    last_date = last_line.split(",")[0].strip().split(" ")[0].strip()
     last_line_splitted = last_line.split(",")
     last_hhmmss = "000000"
     if len(last_line_splitted) > 6 and "Date," not in last_line:
@@ -301,7 +299,7 @@ def handle_one_vehicle(
     if number_of_vehicles > 1:
         filename = "monitor." + vehicle.VIN + ".csv"
     last_line = get_last_line(Path(filename))
-    last_date = get_last_date(last_line)
+    last_date = last_line.split(",")[0].strip().split(" ")[0].strip()
     current_date = line.split(",")[0].strip()
     _ = D and dbg(f"Current date:          [{current_date}]")
     if current_date == last_date:
