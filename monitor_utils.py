@@ -113,10 +113,15 @@ def same_day(d_1: datetime, d_2: datetime) -> bool:
     return d_1.year == d_2.year
 
 
+def split_on_comma(text: str) -> list[str]:
+    """split string on comma and strip spaces around strings"""
+    result = [x.strip() for x in text.split(",")]
+    return result
+
+
 def split_output_to_sheet_list(text: str) -> list[list[str]]:
     """split output to sheet list"""
-    result = [x.strip() for x in text.split(",")]
-    return [result]
+    return [split_on_comma(text)]
 
 
 def split_output_to_sheet_float_list(text: str) -> list[list[float]]:
@@ -231,7 +236,7 @@ def read_translations() -> dict:
         column = 1
         for line in inputfile:
             linecount += 1
-            split = line.split(",")
+            split = split_on_comma(line)
             if len(split) < 15:
                 log(f"Error: unexpected translation csvline {linecount}: {line}")
                 continue
@@ -246,7 +251,7 @@ def read_translations() -> dict:
                         column = index
                         break
             else:
-                current = split[column].strip()
+                current = split[column]
                 if current != "":
                     translation = current
 

@@ -17,6 +17,7 @@ from monitor_utils import (
     get_vin_arg,
     safe_divide,
     sleep,
+    split_on_comma,
     split_output_to_sheet_float_list,
     to_int,
     to_float,
@@ -64,7 +65,6 @@ DAILYSTATS_CSV_FILE = Path("monitor.dailystats.csv")
 TRIPINFO_CSV_FILE = Path("monitor.tripinfo.csv")
 CHARGE_CSV_FILE = Path("summary.charge.csv")
 SUMMARY_TRIP_CSV_FILE = Path("summary.trip.csv")
-LASTRUN_FILE = Path("monitor.lastrun")
 LENCHECK = 1
 VIN = get_vin_arg()
 if VIN != "":
@@ -72,7 +72,6 @@ if VIN != "":
     TRIPINFO_CSV_FILE = Path(f"monitor.tripinfo.{VIN}.csv")
     CHARGE_CSV_FILE = Path(f"summary.charge.{VIN}.csv")
     SUMMARY_TRIP_CSV_FILE = Path(f"summary.trip.{VIN}.csv")
-    LASTRUN_FILE = Path(f"monitor.{VIN}.lastrun")
     OUTPUT_SPREADSHEET_NAME = f"monitor.dailystats.{VIN}"
     LENCHECK = 2
 _ = D and dbg(f"DAILYSTATS_CSV_FILE: {DAILYSTATS_CSV_FILE.name}")
@@ -210,24 +209,24 @@ def reverse_read_next_charge_line() -> None:
     )
 
 
-TOTAL_DAYS = 0
-TOTAL_DISTANCE = 0
-TOTAL_CONSUMED = 0
-TOTAL_REGENERATED = 0
-TOTAL_ENGINE = 0
-TOTAL_CLIMATE = 0
-TOTAL_ELECTRONICS = 0
-TOTAL_BATTERY_CARE = 0
+T_DAYS = 0
+T_DISTANCE = 0
+T_CONSUMED = 0
+T_REGENERATED = 0
+T_ENGINE = 0
+T_CLIMATE = 0
+T_ELECTRONICS = 0
+T_BATTERY_CARE = 0
 
 
-def increment_dailystats_totals(line: str) -> None:
+def increment_dailystats_totals(split: list[str]) -> None:
     """increment_dailystats_totals"""
-    _ = D and dbg(f"handle_line: {line}")
-    global TOTAL_DAYS, TOTAL_UNIT, TOTAL_DISTANCE, TOTAL_CONSUMED, TOTAL_REGENERATED, TOTAL_ENGINE, TOTAL_CLIMATE, TOTAL_ELECTRONICS, TOTAL_BATTERY_CARE  # noqa pylint:disable=global-statement
-    split = line.split(",")
-    # date = split[DATE].strip()
+    _ = D and dbg(f"handle_line: {split}")
+    global T_DAYS, TOTAL_UNIT, T_DISTANCE, T_CONSUMED, T_REGENERATED, T_ENGINE, T_CLIMATE, T_ELECTRONICS, T_BATTERY_CARE  # noqa pylint:disable=global-statement
+
+    # date = split[DATE]
     distance = to_int(split[DISTANCE])
-    unit = split[DISTANCE_UNIT].strip()
+    unit = split[DISTANCE_UNIT]
     consumed = to_int(split[CONSUMED])
     regenerated = to_int(split[REGENERATED])
     engine = to_int(split[ENGINE])
@@ -235,15 +234,15 @@ def increment_dailystats_totals(line: str) -> None:
     electronics = to_int(split[ELECTRONICS])
     battery_care = to_int(split[BATTERY_CARE])
 
-    TOTAL_DAYS += 1
+    T_DAYS += 1
     TOTAL_UNIT = unit
-    TOTAL_DISTANCE += distance
-    TOTAL_CONSUMED += consumed
-    TOTAL_REGENERATED += regenerated
-    TOTAL_ENGINE += engine
-    TOTAL_CLIMATE += climate
-    TOTAL_ELECTRONICS += electronics
-    TOTAL_BATTERY_CARE += battery_care
+    T_DISTANCE += distance
+    T_CONSUMED += consumed
+    T_REGENERATED += regenerated
+    T_ENGINE += engine
+    T_CLIMATE += climate
+    T_ELECTRONICS += electronics
+    T_BATTERY_CARE += battery_care
 
 
 TOTAL_TRIPINFO_DRIVE_TIME = 0
@@ -257,7 +256,7 @@ def increment_tripinfo_totals(line: str) -> None:
     """increment_tripinfo_totals"""
     _ = D and dbg(f"handle_line: {line}")
     global TOTAL_TRIPINFO_DRIVE_TIME, TOTAL_TRIPINFO_IDLE_TIME, TOTAL_TRIPINFO_DISTANCE, TOTAL_TRIPINFO_AVERAGE_SPEED, TOTAL_TRIPINFO_MAX_SPEED  # noqa pylint:disable=global-statement
-    split = line.split(",")
+    split = split_on_comma(line)
     drive_time = to_int(split[2])
     idle_time = to_int(split[3])
     distance = to_int(split[4])
@@ -273,7 +272,7 @@ def increment_tripinfo_totals(line: str) -> None:
 
 def print_output(output: str) -> None:
     """print output"""
-    split = output.split(",")
+    split = split_on_comma(output)
     for i in range(len(split)):  # pylint:disable=consider-using-enumerate
         text = split[i].rjust(COLUMN_WIDTHS[i])
         print(text, end="")
@@ -288,12 +287,12 @@ def get_charge_for_date(date: str) -> str:
     charge = ""
     while not CHARGE_EOF:
         line = CHARGE_LAST_READ_LINE
-        splitted_line = line.split(",")
+        splitted_line = split_on_comma(line)
         if len(splitted_line) > 3:
-            charge_date = splitted_line[0].strip()
+            charge_date = splitted_line[0]
             if charge_date == date:
                 _ = D and dbg(f"charge match: {line}")
-                charged = splitted_line[2].strip()
+                charged = splitted_line[2]
                 charge = f"(+{charged}kWh)"
                 reverse_read_next_charge_line()
                 break  # finished
@@ -320,9 +319,9 @@ def get_trip_for_datetime(
         print(f"get_trip_for_datetime: {date} {trip_time_start_str}{trip_time_end_str}")
     while not match and not SUMMARY_TRIP_EOF:
         line = SUMMARY_TRIP_LAST_READ_LINE
-        splitted_line = line.split(",")
+        splitted_line = split_on_comma(line)
         if len(splitted_line) > 3:
-            trip_datetime = splitted_line[0].strip()
+            trip_datetime = splitted_line[0]
             date_elements = trip_datetime.split(" ")
             if len(date_elements) < 2:
                 log(f"Warning: skipping unexpected line: {line}")
@@ -429,9 +428,9 @@ def print_day_trip_info(date_org: str) -> None:
     header = True
     while not TRIPINFO_EOF:
         line = TRIPINFO_LAST_READ_LINE
-        splitted_line = line.split(",")
+        splitted_line = split_on_comma(line)
         if len(splitted_line) > 5:
-            tripinfo_date = splitted_line[0].strip()
+            tripinfo_date = splitted_line[0]
             if tripinfo_date == date:
                 _ = D and (f"tripinfo match: {line}")
                 print_tripinfo(
@@ -515,42 +514,13 @@ def compute_total_charge() -> float:
                 line = line.strip()
                 linecount += 1
                 _ = D and dbg(str(linecount) + ": LINE=[" + line + "]")
-                split = line.split(",")
+                split = split_on_comma(line)
                 if len(split) < 4 or line.startswith("date"):
                     _ = D and dbg(f"Skipping line:\n{line}")
                 else:
                     charge = to_float(split[2])
                     total_charge += charge
     return total_charge
-
-
-def summary_dailystats(today_daily_stats_line: str) -> None:
-    """summary of monitor.dailystats.csv file"""
-    if today_daily_stats_line != "":
-        increment_dailystats_totals(today_daily_stats_line)
-    if DAILYSTATS_CSV_FILE.is_file():
-        with DAILYSTATS_CSV_FILE.open("r", encoding="utf-8") as inputfile:
-            linecount = 0
-            for line in inputfile:
-                line = line.strip()
-                linecount += 1
-                _ = D and dbg(str(linecount) + ": LINE=[" + line + "]")
-                index = line.find(",")
-                if index <= 0 or line.startswith("date"):
-                    _ = D and dbg(f"Skipping line:\n{line}")
-                else:
-                    increment_dailystats_totals(line)
-
-    print_dailystats(
-        "Totals",
-        TOTAL_DISTANCE,
-        TOTAL_CONSUMED,
-        TOTAL_REGENERATED,
-        TOTAL_ENGINE,
-        TOTAL_CLIMATE,
-        TOTAL_ELECTRONICS,
-        TOTAL_BATTERY_CARE,
-    )
 
 
 def summary_tripinfo() -> None:
@@ -584,15 +554,9 @@ def summary_tripinfo() -> None:
     print_output(",,,,,,")  # empty line/row
 
 
-def reverse_print_dailystats_one_line(line: str) -> None:
+def reverse_print_dailystats_one_line(val: list[str]) -> None:
     """reverse print dailystats one line"""
-    line = line.strip()
-    _ = D and dbg(f"line={line}")
-    val = line.split(",")
-    if len(val) != 9 or line.startswith("date"):
-        return  # nothing to do
-
-    date = val[DATE].strip()
+    date = val[DATE].split(" ")[0]
     if len(date) == 8:
         date = date[0:4] + "-" + date[4:6] + "-" + date[6:]
     print_dailystats(
@@ -610,13 +574,23 @@ def reverse_print_dailystats_one_line(line: str) -> None:
     print_output(",,,,,,")  # empty line/row
 
 
-def reverse_print_dailystats(today_daily_stats_line: str) -> None:
+def reverse_print_dailystats(totals: bool) -> None:
     """reverse print dailystats"""
-    if today_daily_stats_line != "":
-        reverse_print_dailystats_one_line(today_daily_stats_line)
     if DAILYSTATS_CSV_FILE.is_file():
+        prev_date_str = ""
         for line in read_reverse_order(DAILYSTATS_CSV_FILE.name):
-            reverse_print_dailystats_one_line(line)
+            splitted = split_on_comma(line)
+            if len(splitted) != 9 or splitted[0].startswith("date"):
+                continue  # nothing to do
+            date_str = splitted[0].split(" ")[0]
+            if date_str != prev_date_str:  # skip identical dates
+                if totals:
+                    increment_dailystats_totals(splitted)
+                else:
+                    reverse_print_dailystats_one_line(splitted)
+                prev_date_str = date_str
+            else:
+                _ = D and dbg(f"skipping: {splitted}")
 
 
 def get_format(range_str: str, special: bool):
@@ -665,7 +639,7 @@ def print_output_queue() -> None:
             if TR.recuperation in queue_output:
                 ct_header = False
                 ct_day_change = True
-                cd_date = queue_output.split(",")[0].strip()
+                cd_date = split_on_comma(queue_output)[0]
                 ct_date = cd_date
                 if not cd_header:
                     cd_row += 1
@@ -751,16 +725,20 @@ if SHEETUPDATE:
             RETRIES = sleep(RETRIES)
 
 
-TODAY_DAILY_STATS_LINE = ""
-if LASTRUN_FILE.is_file():
-    with LASTRUN_FILE.open("r", encoding="utf-8") as lastrun_file:
-        lastrun_lines = lastrun_file.readlines()
-        if len(lastrun_lines) > 5:
-            TODAY_DAILY_STATS_LINE = lastrun_lines[5].strip()
+reverse_print_dailystats(totals=True)  # do the total dailystats summary first
+print_dailystats(
+    "Totals",
+    T_DISTANCE,
+    T_CONSUMED,
+    T_REGENERATED,
+    T_ENGINE,
+    T_CLIMATE,
+    T_ELECTRONICS,
+    T_BATTERY_CARE,
+)
 
-summary_dailystats(TODAY_DAILY_STATS_LINE)  # do the total dailystats summary first
 summary_tripinfo()  # then the total tripinfo
-reverse_print_dailystats(TODAY_DAILY_STATS_LINE)  # and then dailystats
+reverse_print_dailystats(totals=False)  # and then dailystats
 
 if SHEETUPDATE:
     RETRIES = 2

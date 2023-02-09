@@ -18,6 +18,7 @@ from monitor_utils import (
     get_vin_arg,
     safe_divide,
     sleep,
+    split_on_comma,
     to_int,
     to_float,
     is_true,
@@ -270,12 +271,12 @@ COLUMN_WIDTHS = [13, 10, 5, 7, 8, 8, 8, 5, 5, 8, 3, 3, 3, 3, 3, 3, 3, 3, 6, 6, 4
 def print_output_and_update_queue(output: str) -> None:
     """print output and update queue"""
     total_line = ""
-    split = output.split(",")
+    split = split_on_comma(output)
     for i in range(len(split)):  # pylint:disable=consider-using-enumerate
-        string = split[i].strip()
+        string = split[i]
         if i == 0 and string != TR.period:
             string = get_translation(TR_HELPER, string)
-        elif i == 2 and split[0].startswith("DAY "):
+        elif i == 2 and split[0] == "DAY":
             string = get_translation(TR_HELPER, string)
         if len(string) > COLUMN_WIDTHS[i]:
             COLUMN_WIDTHS[i] = len(string)
@@ -293,8 +294,8 @@ def print_output_and_update_queue(output: str) -> None:
 
 def sheet_append_first_rows(row_a: str, row_b: str) -> None:
     """sheet_append_first_rows"""
-    row_a_values = row_a.split(",")
-    row_b_values = row_b.split(",")
+    row_a_values = split_on_comma(row_a)
+    row_b_values = split_on_comma(row_b)
     len_a = len(row_a_values)
     len_b = len(row_b_values)
     if len_a != len_b:
@@ -303,8 +304,8 @@ def sheet_append_first_rows(row_a: str, row_b: str) -> None:
 
     array = []
     for index, value in enumerate(row_a_values):
-        row_a_value = value.strip()
-        row_b_value = row_b_values[index].strip()
+        row_a_value = value
+        row_b_value = row_b_values[index]
         row = index + 1
         if D:
             string_a = row_a_value.ljust(25)
@@ -401,7 +402,7 @@ def get_address(split: list[str]) -> str:
     _ = D and dbg(f"get_address: str{split}")
     location_str = ""
     if len(split) > LOCATION:
-        location_str = split[LOCATION].strip()
+        location_str = split[LOCATION]
         if len(location_str) > 0:
             location_str = ' "' + location_str + '"'
 
@@ -573,16 +574,16 @@ def print_summary(
         ev_range = to_int(split[EV_RANGE])
 
     if DAY and charged_kwh > 3.0 and prefix.startswith("DAY "):
-        splitted = prefix.split(",")
+        splitted = split_on_comma(prefix)
         if len(splitted) > 2:
-            date = splitted[1].strip()
+            date = splitted[1]
             write_charge_csv(f"{date}, {odo:.1f}, {charged_kwh:.1f}, {t_soc_charged}")
 
     if TRIP and prefix.startswith("TRIP "):
-        splitted = prefix.split(",")
+        splitted = split_on_comma(prefix)
         if len(splitted) > 2:
-            date = splitted[1].strip()
-            time_str = splitted[2].strip()
+            date = splitted[1]
+            time_str = splitted[2]
             write_trip_csv(
                 f"{date} {time_str}, {odo:.1f}, {delta_odo:.1f}, {discharged_kwh:.1f}, {charged_kwh:.1f}"  # noqa
             )
@@ -774,7 +775,7 @@ def keep_track_of_totals(
             # so the trip information shows not the correct used kWh
             next_line = MONITOR_CSV_READ_AHEAD_LINE.strip()
             if next_line != "":
-                next_split = next_line.split(",")
+                next_split = split_on_comma(next_line)
                 if len(next_split) > 8:
                     next_date = next_split[0].split(" ")[0]
                     next_soc = to_int(next_split[SOC])
@@ -977,7 +978,7 @@ def summary():
             break  # finish loop
         linecount += 1
         _ = D and dbg(str(linecount) + ": LINE=[" + line + "]")
-        split = line.split(",")
+        split = split_on_comma(line)
         if totals.day and not same_day(
             parser.parse(split[DT]), parser.parse(prev_split[DT])
         ):
@@ -985,7 +986,7 @@ def summary():
             eod_line = line[0:11] + "00:00:00" + prev_line[19:]
             if D:
                 dbg(f"prev_line: {prev_line}\n eod_line: {eod_line}")
-            last_split = eod_line.split(",")
+            last_split = split_on_comma(eod_line)
             totals = handle_line(linecount, last_split, prev_split, totals, False)
         totals = handle_line(linecount, split, prev_split, totals, False)
 
@@ -996,7 +997,7 @@ def summary():
     _ = D and dbg("Handling last values")
     # handle end of day for last value
     eod_line = prev_line[0:11] + "23:59:59" + prev_line[19:]
-    last_split = eod_line.split(",")
+    last_split = split_on_comma(eod_line)
     _ = D and dbg(f"prev_line: {prev_line}\n eod_line: {eod_line}")
     totals = handle_line(linecount, last_split, prev_split, totals, False)
     # and show summaries

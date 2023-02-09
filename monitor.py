@@ -30,6 +30,7 @@ e.g. with Excel:
 - charging pattern over time
 - visited places
 """
+import re
 import sys
 import io
 import configparser
@@ -100,14 +101,13 @@ def writeln(filename: str, string: str) -> None:
         file.write("\n")
 
 
-def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> str:
+def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
     """handle daily stats"""
     daily_stats = vehicle.daily_stats
     if len(daily_stats) == 0:
         _ = D and dbg("No daily stats")
-        return ""
+        return
 
-    today_stats = ""
     filename = "monitor.dailystats.csv"
     if number_of_vehicles > 1:
         filename = "monitor.dailystats." + vehicle.VIN + ".csv"
@@ -122,9 +122,11 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> str:
             file.write(
                 "date, distance, distance_unit, total_consumed, regenerated_energy, engine_consumption, climate_consumption, onboard_electronics_consumption, battery_care_consumption\n"  # noqa
             )
-        today = datetime.now().strftime("%Y%m%d")
-        last_line = get_last_line(filename)
-        last_date = get_last_date(last_line)
+        today_time_str = datetime.now().strftime("%H:%M")
+        last_line = get_last_line(Path(filename))
+        last_date_str = get_last_date(last_line)
+        last_date = last_date_str.split(" ")[0]  # get rid of possible HH:MM
+        last_line = re.sub("^[^,]*,", "", last_line).strip()  # get rid of first column
         i = len(daily_stats)
         while i > 0:
             i = i - 1
@@ -135,19 +137,19 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> str:
                     f"{i} dailystats_date:[{dailystats_date}] [{last_date}] {stat}"  # noqa
                 )
             if dailystats_date >= last_date:
-                # only append not already written daily stats and not today
-                line = f"{dailystats_date}, {stat.distance}, {stat.distance_unit}, {stat.total_consumed}, {stat.regenerated_energy},  {stat.engine_consumption}, {stat.climate_consumption}, {stat.onboard_electronics_consumption}, {stat.battery_care_consumption}"  # noqa
-                if last_line != line:
-                    if today != dailystats_date:
-                        if D:
-                            dbg(
-                                f"Writing dailystats:\nline=[{line}]\nlast=[{last_line}]"  # noqa
-                            )
-                        file.write(line)
-                        file.write("\n")
-                        last_line = line
-                    else:
-                        today_stats = line
+                # only append not already written daily stats
+                line = f"{stat.distance}, {stat.distance_unit}, {stat.total_consumed}, {stat.regenerated_energy},  {stat.engine_consumption}, {stat.climate_consumption}, {stat.onboard_electronics_consumption}, {stat.battery_care_consumption}"  # noqa
+                dailystats_date = f"{dailystats_date} {today_time_str}"
+
+                if dailystats_date > last_date or last_line != line:
+                    full_line = f"{dailystats_date}, {line}"
+                    if D:
+                        dbg(
+                            f"Writing dailystats:\nline=[{full_line}]\nlast=[{last_line}]"  # noqa
+                        )
+                    file.write(full_line)
+                    file.write("\n")
+                    last_line = line
                 else:
                     if D:
                         dbg(
@@ -158,7 +160,6 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> str:
                     dbg(
                         f"Skipping dailystats: [{dailystats_date}] [{last_line}]"  # noqa
                     )
-    return today_stats
 
 
 def write_last_run(
@@ -231,7 +232,7 @@ def handle_trip_info(
     if not monitor_tripinfo_csv_file.is_file():
         monitor_tripinfo_csv_file.touch()
         write_header = True
-    last_line = get_last_line(filename)
+    last_line = get_last_line(Path(filename))
     last_date = get_last_date(last_line)
     last_line_splitted = last_line.split(",")
     last_hhmmss = "000000"
@@ -299,7 +300,7 @@ def handle_one_vehicle(
     filename = "monitor.csv"
     if number_of_vehicles > 1:
         filename = "monitor." + vehicle.VIN + ".csv"
-    last_line = get_last_line(filename)
+    last_line = get_last_line(Path(filename))
     last_date = get_last_date(last_line)
     current_date = line.split(",")[0].strip()
     _ = D and dbg(f"Current date:          [{current_date}]")
@@ -319,12 +320,12 @@ def handle_one_vehicle(
                 f"Writing2:\nline=[{line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]"  # noqa
             )
         writeln(filename, line)
-    today_daily_stats = handle_daily_stats(vehicle, number_of_vehicles)
+    handle_daily_stats(vehicle, number_of_vehicles)
     vehicle_stats = [
         str(last_updated_at),
         str(location_last_updated_at),
         line,
-        today_daily_stats,
+        "",
     ]
     write_last_run(vehicle, number_of_vehicles, vehicle_stats)
     return False
