@@ -609,10 +609,18 @@ def get_format(range_str: str, special: bool):
     return result
 
 
+def append(array: list[dict], formats: list[dict], row: int, values) -> int:
+    """append"""
+    row += 1
+    array.append({"range": f"O{row}:U{row}", "values": values})
+    formats.append(get_format(f"N{row}:U{row}", False))
+    return row
+
+
 def print_output_queue() -> None:
     """print output queue"""
     array: list[dict] = []
-    formats = []
+    formats: list[dict] = []
     row = 0
     # copy daily
     cd_row = 2
@@ -642,35 +650,29 @@ def print_output_queue() -> None:
                 cd_date = split_on_comma(queue_output)[0]
                 ct_date = cd_date
                 if not cd_header:
-                    cd_row += 1
-                    array.append({"range": f"O{cd_row}:U{cd_row}", "values": values})
-                    formats.append(get_format(f"N{cd_row}:U{cd_row}", False))
+                    cd_row = append(array, formats, cd_row, values)
                     cd_header = True
 
             if TR.trip in queue_output:
                 if not ct_header and not ct_header_printed:
                     ct_header_printed = True
-                    values[0][0] = ""  # clear consumption
-                    ct_row += 1
-                    array.append({"range": f"O{ct_row}:U{ct_row}", "values": values})
-                    formats.append(get_format(f"N{ct_row}:U{ct_row}", False))
+                    copy = split_output_to_sheet_list(queue_output)
+                    copy[0][0] = ""  # clear consumption
+                    ct_row = append(array, formats, ct_row, copy)
                 ct_header = True
 
         else:
             formats.append(get_format(f"A{row}:G{row}", False))
             if cd_date != "":
                 # dailystats
-                cd_row += 1
                 tmp = re.sub(r"[^0-9.,]", "", queue_output)
                 floats = split_output_to_sheet_float_list(tmp)
-                array.append({"range": f"O{cd_row}:U{cd_row}", "values": floats})
+                cd_row = append(array, formats, cd_row, floats)
                 array.append({"range": f"N{cd_row}", "values": [[cd_date]]})
-                formats.append(get_format(f"N{cd_row}:U{cd_row}", False))
                 cd_date = ""
             else:
                 if ct_header and queue_output != ",,,,,,":
                     # tripinfo
-                    ct_row += 1
                     trip = [ct_date, 0, "", 0, 0, 0, 0]  # clear consumption
                     tmp = re.sub(r"[^0-9.,:-]", "", queue_output)
                     entry = split_output_to_sheet_list(tmp)[0]
@@ -699,9 +701,7 @@ def print_output_queue() -> None:
 
                     for i in range(3, 7):
                         trip[i] = int(entry[i])
-
-                    array.append({"range": f"O{ct_row}:U{ct_row}", "values": [trip]})
-                    formats.append(get_format(f"N{ct_row}:U{ct_row}", False))
+                    ct_row = append(array, formats, ct_row, [trip])
 
     if len(array) > 0:
         SHEET.batch_update(array)
