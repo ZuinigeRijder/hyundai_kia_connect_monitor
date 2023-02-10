@@ -88,7 +88,7 @@ CLIMATE = 6
 ELECTRONICS = 7
 BATTERY_CARE = 8
 
-TOTAL_UNIT = "km"
+T_UNIT = "km"
 
 TR_HELPER: dict[str, str] = read_translations()
 COLUMN_WIDTHS = [11, 12, 14, 8, 9, 9, 8]
@@ -131,10 +131,8 @@ class Translations:
 def fill_translations() -> Translations:
     """fill translations"""
     per_hour = get_translation_and_update_width("per hour", 5)
-    avg_speed = (
-        get_translation(TR_HELPER, "Average speed") + f" {TOTAL_UNIT}/{per_hour}"
-    )
-    max_speed = get_translation(TR_HELPER, "Max speed") + f" {TOTAL_UNIT}/{per_hour}"
+    avg_speed = get_translation(TR_HELPER, "Average speed") + f" {T_UNIT}/{per_hour}"
+    max_speed = get_translation(TR_HELPER, "Max speed") + f" {T_UNIT}/{per_hour}"
     update_width(avg_speed, 4)
     update_width(max_speed, 5)
 
@@ -222,7 +220,7 @@ T_BATTERY_CARE = 0
 def increment_dailystats_totals(split: list[str]) -> None:
     """increment_dailystats_totals"""
     _ = D and dbg(f"handle_line: {split}")
-    global T_DAYS, TOTAL_UNIT, T_DISTANCE, T_CONSUMED, T_REGENERATED, T_ENGINE, T_CLIMATE, T_ELECTRONICS, T_BATTERY_CARE  # noqa pylint:disable=global-statement
+    global T_DAYS, T_UNIT, T_DISTANCE, T_CONSUMED, T_REGENERATED, T_ENGINE, T_CLIMATE, T_ELECTRONICS, T_BATTERY_CARE  # noqa pylint:disable=global-statement
 
     # date = split[DATE]
     distance = to_int(split[DISTANCE])
@@ -235,7 +233,7 @@ def increment_dailystats_totals(split: list[str]) -> None:
     battery_care = to_int(split[BATTERY_CARE])
 
     T_DAYS += 1
-    TOTAL_UNIT = unit
+    T_UNIT = unit
     T_DISTANCE += distance
     T_CONSUMED += consumed
     T_REGENERATED += regenerated
@@ -409,15 +407,15 @@ def print_tripinfo(
     if distance_summary_trip == 0.0:  # just user other distance
         distance_summary_trip = to_int(distance)
     else:
-        consumption = f"({distance_summary_trip:.1f}{TOTAL_UNIT})"
+        consumption = f"({distance_summary_trip:.1f}{T_UNIT})"
 
     if kwh_consumed > 0.0:
         kwh = f"({kwh_consumed:.1f}kWh)"
         km_mi_per_kwh = safe_divide(distance_summary_trip, kwh_consumed)
-        consumption = f"({km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh)"
+        consumption = f"({km_mi_per_kwh:.1f}{T_UNIT}/kWh)"
 
     print_output(
-        f"{kwh},{trip_time_str},{consumption},{distance}{TOTAL_UNIT},{avg_speed}{TOTAL_UNIT}/{TR.per_hour},{max_speed}{TOTAL_UNIT}/{TR.per_hour},{idle_time}min"  # noqa
+        f"{kwh},{trip_time_str},{consumption},{distance}{T_UNIT},{avg_speed}{T_UNIT}/{TR.per_hour},{max_speed}{T_UNIT}/{TR.per_hour},{idle_time}min"  # noqa
     )
 
 
@@ -497,10 +495,10 @@ def print_dailystats(
         f"{totals},{TR.recuperation},{TR.consumption},{TR.engine},{TR.climate},{TR.electronic_devices},{TR.battery_care}"  # noqa
     )
     print_output(
-        f"{consumed_kwh:.1f}kWh,{regenerated_kwh:.1f}kWh,{km_mi_per_kwh:.1f}{TOTAL_UNIT}/kWh,{engine_kwh:.1f}kWh,{climate_kwh:.1f}kWh,{electronics_kwh:.1f}kWh,{battery_care_kwh:.1f}kWh"  # noqa
+        f"{consumed_kwh:.1f}kWh,{regenerated_kwh:.1f}kWh,{km_mi_per_kwh:.1f}{T_UNIT}/kWh,{engine_kwh:.1f}kWh,{climate_kwh:.1f}kWh,{electronics_kwh:.1f}kWh,{battery_care_kwh:.1f}kWh"  # noqa
     )
     print_output(
-        f"{distance}{TOTAL_UNIT},{regenerated_perc:.1f}%,{kwh_per_km_mi:.1f}kWh/100{TOTAL_UNIT},{engine_perc:.0f}%,{climate_perc:.1f}%,{electronics_perc:.1f}%,{battery_care_perc:.1f}%"  # noqa
+        f"{distance}{T_UNIT},{regenerated_perc:.1f}%,{kwh_per_km_mi:.1f}kWh/100{T_UNIT},{engine_perc:.0f}%,{climate_perc:.1f}%,{electronics_perc:.1f}%,{battery_care_perc:.1f}%"  # noqa
     )
 
 
@@ -632,7 +630,7 @@ def print_output_queue() -> None:
     ct_header_printed = False
     ct_day_change = True
     ct_date = ""
-    array.append({"range": "N1", "values": [[f"{TOTAL_UNIT}/kWh"]]})
+    array.append({"range": "N1", "values": [[f"{T_UNIT}/kWh"]]})
     for queue_output in PRINTED_OUTPUT_QUEUE:
         row += 1
         _ = D and dbg(f"write row: {row} {queue_output}")
