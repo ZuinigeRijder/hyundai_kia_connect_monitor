@@ -701,6 +701,8 @@ def print_output_queue() -> None:
                         trip[i] = int(entry[i])
                     ct_row = append(array, formats, ct_row, [trip])
 
+    array.append({"range": "A2", "values": [[""]]})  # go to beginning of spreadsheet
+
     if len(array) > 0:
         SHEET.batch_update(array)
     if len(formats) > 0:

@@ -385,6 +385,8 @@ def print_output_queue() -> None:
                 },
             }
         )
+
+    array.append({"range": "C6", "values": [[""]]})  # go to beginning of spreadsheet
     if len(array) > 0:
         SHEET.batch_update(array)
     if len(formats) > 0:

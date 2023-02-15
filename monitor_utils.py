@@ -40,8 +40,9 @@ def sleep(retries: int) -> int:
     """sleep when retries > 0"""
     if retries > 0:
         retries -= 1
-        log("Sleeping a minute")
-        time.sleep(60)
+        if retries > 0:
+            log("Sleeping a minute")
+            time.sleep(60)
     return retries
 
 

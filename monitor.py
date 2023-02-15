@@ -196,10 +196,15 @@ def handle_day_trip_info(
     for day in month_trip_info.day_list:
         yyyymmdd = day.yyyymmdd
         if yyyymmdd >= last_date:
+            _ = D and dbg(f"update_day_trip_info: {yyyymmdd}")
             manager.update_day_trip_info(vehicle.id, yyyymmdd)
             day_trip_info = vehicle.day_trip_info
             if day_trip_info is not None:
                 for trip in reversed(day_trip_info.trip_list):
+                    if D:
+                        print(
+                            f"{yyyymmdd},{trip.hhmmss},{trip.drive_time},{trip.idle_time},{trip.distance},{trip.avg_speed},{trip.max_speed}"  # noqa
+                        )
                     hhmmss = trip.hhmmss
                     if yyyymmdd > last_date or hhmmss > last_hhmmss:
                         line = f"{yyyymmdd},{hhmmss},{trip.drive_time},{trip.idle_time},{trip.distance},{trip.avg_speed},{trip.max_speed}"  # noqa
@@ -251,9 +256,10 @@ def handle_trip_info(
                 from_month = now - relativedelta(months=1)
 
         while from_month <= now:
-            yyymm = from_month.strftime("%Y%m")
+            yyyymm = from_month.strftime("%Y%m")
             from_month = from_month + relativedelta(months=1)
-            manager.update_month_trip_info(vehicle.id, yyymm)
+            _ = D and dbg(f"update_month_trip_info: {yyyymm}")
+            manager.update_month_trip_info(vehicle.id, yyyymm)
             month_trip_info = vehicle.month_trip_info
             if month_trip_info is not None:
                 last_date, last_hhmmss = handle_day_trip_info(
@@ -298,26 +304,23 @@ def handle_one_vehicle(
     filename = "monitor.csv"
     if number_of_vehicles > 1:
         filename = "monitor." + vehicle.VIN + ".csv"
-    last_line = get_last_line(Path(filename))
-    last_date = last_line.split(",")[0].strip().split(" ")[0].strip()
-    current_date = line.split(",")[0].strip()
-    _ = D and dbg(f"Current date:          [{current_date}]")
-    if current_date == last_date:
-        if line != last_line:
-            if D:
-                dbg(
-                    f"Writing1:\nline=[{line}]\nlast=[{last_line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]"  # noqa
-                )
+    last_line = get_last_line(Path(filename)).strip()
+    if line != last_line:
+        # check if everything is the same without address
+        list1 = line.split(",")
+        list2 = last_line.split(",")
+        same = False
+        if len(list1) == 11 and len(list2) == 11:
+            list1[9] = ""  # clear address
+            list2[9] = ""
+            same = True
+            for index, value in enumerate(list1):
+                if value != list2[index]:
+                    same = False
+                    break  # finished
+        if not same:
+            _ = D and dbg(f"Writing1:\nline=[{line}]\nlast=[{last_line}]")
             writeln(filename, line)
-        else:
-            if D:
-                dbg(f"Skipping1:\nline=[{line}]\nlast=[{last_line}]")
-    else:
-        if D:
-            dbg(
-                f"Writing2:\nline=[{line}]\ncurrent=[{current_date}]\nlast   =[{last_date}]"  # noqa
-            )
-        writeln(filename, line)
     handle_daily_stats(vehicle, number_of_vehicles)
     vehicle_stats = [
         str(last_updated_at),
