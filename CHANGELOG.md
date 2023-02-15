@@ -1,3 +1,23 @@
+<a name="R3.6.0"></a>
+# [Some small improvements and added CHANGELOG.md (R3.6.0)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.6.0) - 15 Feb 2023
+
+monitor.py:
+- fix that identical lines are not added to monitor.csv, also do not add when only the address is different
+
+sheetupdate.py:
+- go to beginning of spreadsheet
+
+dailystats.py:
+- go to beginning of spreadsheet
+
+monitor_utils.py:
+- Only sleep for 60 seconds when retries > 0
+
+
+
+[Changes][R3.6.0]
+
+
 <a name="R3.5.0"></a>
 # [Add multiple dailystats to monitor.dailystats.csv with timestamp (R3.5.0)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.5.0) - 10 Feb 2023
 
@@ -1186,6 +1206,7 @@ First release with the following tools:
 [Changes][R1.0.0]
 
 
+[R3.6.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.5.0...R3.6.0
 [R3.5.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.4.0...R3.5.0
 [R3.4.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.3.2...R3.4.0
 [R3.3.2]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.3.1...R3.3.2
