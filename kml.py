@@ -148,6 +148,7 @@ def write_kml(
 
     print(f"{count:3}: {name:17} ({lon:8},{lat:9}) {description}")
 
+    write(outputfile, "<Placemark>")
     write(outputfile, "<name>" + name.strip() + "</name>")
     write(outputfile, "<description>" + description.strip() + "</description>")
     write(outputfile, "<Point>" + coordinates + "</Point>")
