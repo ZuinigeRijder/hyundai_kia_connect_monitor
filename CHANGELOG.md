@@ -1,3 +1,11 @@
+<a name="R3.7.0"></a>
+# [fix placemark bug in kml.py (R3.7.0)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.7.0) - 15 Feb 2023
+
+fix placemark bug in kml.py
+
+[Changes][R3.7.0]
+
+
 <a name="R3.6.0"></a>
 # [Some small improvements and added CHANGELOG.md (R3.6.0)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.6.0) - 15 Feb 2023
 
@@ -1206,6 +1214,7 @@ First release with the following tools:
 [Changes][R1.0.0]
 
 
+[R3.7.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.6.0...R3.7.0
 [R3.6.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.5.0...R3.6.0
 [R3.5.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.4.0...R3.5.0
 [R3.4.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.3.2...R3.4.0
