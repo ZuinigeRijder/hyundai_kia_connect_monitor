@@ -63,15 +63,17 @@ OUTPUT_SPREADSHEET_NAME = "monitor.dailystats"
 
 DAILYSTATS_CSV_FILE = Path("monitor.dailystats.csv")
 TRIPINFO_CSV_FILE = Path("monitor.tripinfo.csv")
-CHARGE_CSV_FILE = Path("summary.charge.csv")
+SUMMARY_CHARGE_CSV_FILE = Path("summary.charge.csv")
 SUMMARY_TRIP_CSV_FILE = Path("summary.trip.csv")
+SUMMARY_DAY_CSV_FILE = Path("summary.day.csv")
 LENCHECK = 1
 VIN = get_vin_arg()
 if VIN != "":
     DAILYSTATS_CSV_FILE = Path(f"monitor.dailystats.{VIN}.csv")
     TRIPINFO_CSV_FILE = Path(f"monitor.tripinfo.{VIN}.csv")
-    CHARGE_CSV_FILE = Path(f"summary.charge.{VIN}.csv")
+    SUMMARY_CHARGE_CSV_FILE = Path(f"summary.charge.{VIN}.csv")
     SUMMARY_TRIP_CSV_FILE = Path(f"summary.trip.{VIN}.csv")
+    SUMMARY_DAY_CSV_FILE = Path(f"summary.day.{VIN}.csv")
     OUTPUT_SPREADSHEET_NAME = f"monitor.dailystats.{VIN}"
     LENCHECK = 2
 _ = D and dbg(f"DAILYSTATS_CSV_FILE: {DAILYSTATS_CSV_FILE.name}")
@@ -91,7 +93,7 @@ BATTERY_CARE = 8
 T_UNIT = "km"
 
 TR_HELPER: dict[str, str] = read_translations()
-COLUMN_WIDTHS = [11, 12, 14, 8, 9, 9, 8]
+COLUMN_WIDTHS = [11, 12, 14, 10, 9, 9, 8]
 
 
 def update_width(text: str, index_column_widths: int) -> None:
@@ -165,6 +167,12 @@ def get_weekday_translation(weekday_string: str) -> str:
 
 
 (
+    SUMMARY_DAY_EOF,
+    SUMMARY_DAY_LAST_READ_LINE,
+    SUMMARY_DAY_READ_REVERSE_ORDER,
+) = read_reverse_order_init(SUMMARY_DAY_CSV_FILE)
+
+(
     SUMMARY_TRIP_EOF,
     SUMMARY_TRIP_LAST_READ_LINE,
     SUMMARY_TRIP_READ_REVERSE_ORDER,
@@ -177,10 +185,10 @@ def get_weekday_translation(weekday_string: str) -> str:
 ) = read_reverse_order_init(TRIPINFO_CSV_FILE)
 
 (
-    CHARGE_EOF,
-    CHARGE_LAST_READ_LINE,
-    CHARGE_READ_REVERSE_ORDER,
-) = read_reverse_order_init(CHARGE_CSV_FILE)
+    SUMMARY_CHARGE_EOF,
+    SUMMARY_CHARGE_LAST_READ_LINE,
+    SUMMARY_CHARGE_READ_REVERSE_ORDER,
+) = read_reverse_order_init(SUMMARY_CHARGE_CSV_FILE)
 
 
 def reverse_read_next_summary_trip_line() -> None:
@@ -201,9 +209,21 @@ def reverse_read_next_trip_info_line() -> None:
 
 def reverse_read_next_charge_line() -> None:
     """reverse_read_next_charge_line"""
-    global CHARGE_EOF, CHARGE_LAST_READ_LINE  # noqa pylint:disable=global-statement
-    CHARGE_EOF, CHARGE_LAST_READ_LINE = reverse_read_next_line(
-        CHARGE_READ_REVERSE_ORDER, CHARGE_EOF, CHARGE_LAST_READ_LINE
+    global SUMMARY_CHARGE_EOF, SUMMARY_CHARGE_LAST_READ_LINE  # noqa pylint:disable=global-statement
+    SUMMARY_CHARGE_EOF, SUMMARY_CHARGE_LAST_READ_LINE = reverse_read_next_line(
+        SUMMARY_CHARGE_READ_REVERSE_ORDER,
+        SUMMARY_CHARGE_EOF,
+        SUMMARY_CHARGE_LAST_READ_LINE,
+    )
+
+
+def reverse_read_next_summary_day_line() -> None:
+    """reverse_read_next_summary_day_line"""
+    global SUMMARY_DAY_EOF, SUMMARY_DAY_LAST_READ_LINE  # noqa pylint:disable=global-statement
+    SUMMARY_DAY_EOF, SUMMARY_DAY_LAST_READ_LINE = reverse_read_next_line(
+        SUMMARY_DAY_READ_REVERSE_ORDER,
+        SUMMARY_DAY_EOF,
+        SUMMARY_DAY_LAST_READ_LINE,
     )
 
 
@@ -283,8 +303,8 @@ def print_output(output: str) -> None:
 def get_charge_for_date(date: str) -> str:
     """get_charge_for_date"""
     charge = ""
-    while not CHARGE_EOF:
-        line = CHARGE_LAST_READ_LINE
+    while not SUMMARY_CHARGE_EOF:
+        line = SUMMARY_CHARGE_LAST_READ_LINE
         splitted_line = split_on_comma(line)
         if len(splitted_line) > 3:
             charge_date = splitted_line[0]
@@ -302,6 +322,38 @@ def get_charge_for_date(date: str) -> str:
         reverse_read_next_charge_line()
     _ = D and dbg(f"get_charge_for_date=({date})={charge}")
     return charge
+
+
+def get_day_consumption_per_kwh(date: str) -> str:
+    """get_day_consumption_per_kwh"""
+    day_consumption_per_kwh = ""
+    distance = 0.0
+    discharge = 0.0
+    while not SUMMARY_DAY_EOF:
+        line = SUMMARY_DAY_LAST_READ_LINE
+        split = split_on_comma(line)
+        if len(split) > 4:
+            consumption_date = split[0]
+            if consumption_date == date:
+                _ = D and dbg(f"day_consumption_per_kwh match: {line}")
+                distance = to_float(split[2])
+                discharge = to_float(split[3])
+                consumption = safe_divide(distance, abs(discharge))
+                if consumption > 0.0:
+                    day_consumption_per_kwh = f"({consumption:.1f}{T_UNIT}/kWh)"
+                reverse_read_next_summary_day_line()
+                break  # finished
+            elif consumption_date < date:
+                _ = D and dbg(f"consumption_date {consumption_date} < {date}: {line}")
+                break  # finished
+            else:
+                _ = D and dbg(f"day_consumption_per_kwh skip: {line}")
+        reverse_read_next_summary_day_line()
+    if D:
+        print(
+            f"day_consumption_per_kwh=({date})={day_consumption_per_kwh} distance:{distance:.1f} discharge:{discharge:.1f}"  # noqa
+        )
+    return day_consumption_per_kwh
 
 
 def get_trip_for_datetime(
@@ -371,6 +423,7 @@ def get_trip_for_datetime(
 def print_tripinfo(
     date_org: str,
     header: bool,
+    day_consumption_per_kwh: str,
     charge: str,
     start_time: str,
     drive_time: str,
@@ -382,7 +435,7 @@ def print_tripinfo(
     """print_tripinfo"""
     if header:
         print_output(
-            f"{charge},{TR.trip},,{TR.distance},{TR.average_speed},{TR.max_speed},{TR.idle_time}"  # noqa
+            f"{charge},{TR.trip},{day_consumption_per_kwh},{TR.distance},{TR.average_speed},{TR.max_speed},{TR.idle_time}"  # noqa
         )
     if start_time == "":  # totals line
         trip_time_str = f"{drive_time}min"
@@ -422,6 +475,7 @@ def print_tripinfo(
 def print_day_trip_info(date_org: str) -> None:
     """print stats"""
     charge = get_charge_for_date(date_org)
+    day_consumption_per_kwh = get_day_consumption_per_kwh(date_org)
     date = date_org.replace("-", "")
     header = True
     while not TRIPINFO_EOF:
@@ -434,6 +488,7 @@ def print_day_trip_info(date_org: str) -> None:
                 print_tripinfo(
                     date_org,
                     header,
+                    day_consumption_per_kwh,
                     charge,
                     splitted_line[1],
                     splitted_line[2],
@@ -505,8 +560,8 @@ def print_dailystats(
 def compute_total_charge() -> float:
     """compute_total_charge"""
     total_charge = 0.0
-    if CHARGE_CSV_FILE.is_file():
-        with CHARGE_CSV_FILE.open("r", encoding="utf-8") as inputfile:
+    if SUMMARY_CHARGE_CSV_FILE.is_file():
+        with SUMMARY_CHARGE_CSV_FILE.open("r", encoding="utf-8") as inputfile:
             linecount = 0
             for line in inputfile:
                 line = line.strip()
@@ -519,6 +574,33 @@ def compute_total_charge() -> float:
                     charge = to_float(split[2])
                     total_charge += charge
     return total_charge
+
+
+def compute_total_consumption_per_kwh() -> float:
+    """compute_consumption_charge_per_kwh"""
+    total_distance = 0.0
+    total_kwh_consumed = 0.0
+    if SUMMARY_DAY_CSV_FILE.is_file():
+        with SUMMARY_DAY_CSV_FILE.open("r", encoding="utf-8") as inputfile:
+            linecount = 0
+            for line in inputfile:
+                line = line.strip()
+                linecount += 1
+                _ = D and dbg(str(linecount) + ": LINE=[" + line + "]")
+                split = split_on_comma(line)
+                if len(split) < 5 or line.startswith("date"):
+                    _ = D and dbg(f"Skipping line:\n{line}")
+                else:
+                    distance = to_float(split[2])
+                    discharge = to_float(split[3])
+                    total_distance += distance
+                    total_kwh_consumed += discharge
+    result = safe_divide(total_distance, abs(total_kwh_consumed))
+    if D:
+        print(
+            f"compute_total_consumption_per_kwh: distance:{total_distance:.1f} -kWh: {total_kwh_consumed:.1f} consumption:{result:.1f}"  # noqa
+        )
+    return result
 
 
 def summary_tripinfo() -> None:
@@ -537,10 +619,17 @@ def summary_tripinfo() -> None:
                     increment_tripinfo_totals(line)
 
     total_charge = compute_total_charge()
-    average_speed = round(TOTAL_TRIPINFO_AVERAGE_SPEED / TOTAL_TRIPINFO_DRIVE_TIME)
+    total_consumption_per_kwh = compute_total_consumption_per_kwh()
+    consumption_per_kwh = ""
+    if total_consumption_per_kwh > 0.0:
+        consumption_per_kwh = f"({total_consumption_per_kwh:.1f}{T_UNIT}/kWh)"
+    average_speed = round(
+        safe_divide(TOTAL_TRIPINFO_AVERAGE_SPEED, TOTAL_TRIPINFO_DRIVE_TIME)
+    )
     print_tripinfo(
         date_org="",
         header=True,
+        day_consumption_per_kwh=consumption_per_kwh,
         charge=f"(+{total_charge:.1f}kWh)",
         start_time="",
         drive_time=f"{TOTAL_TRIPINFO_DRIVE_TIME}",

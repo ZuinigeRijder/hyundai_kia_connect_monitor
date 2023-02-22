@@ -9,6 +9,8 @@
 - [kml.py](#kmlpy)
 - [shrink.py](#shrinkpy)
 - [debug.py](#debugpy)
+- [check\_monitor.py](#check_monitorpy)
+- [monitor\_utils.py](#monitor_utilspy)
 - [Raspberry pi configuration](#raspberry-pi-configuration)
 - [Examples](#examples)
   - [monitor.csv](#monitorcsv)
@@ -102,7 +104,7 @@ For this you need to install Python 3.9 or higher. I have installed Python 3.9.1
 [Here is more information about installing Python](https://realpython.com/installing-python/)
 
 Steps:
-- Download the source code of [hyundai_kia_connect_api v2.4.0 here](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases)
+- Download the source code of [hyundai_kia_connect_api v3.1.0 here](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases)
 - Download the [latest hyundai_kia_connect_monitor release here](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases)
 - Extract both and move the hyundai_kia_connect_api subfolder of hyundai_kia_connect_api-[version] under hyundai_kia_connect_monitor.
 - Then configure monitor.cfg
@@ -338,6 +340,7 @@ OUTPUT:
 - standard output: summary per TRIP, DAY, WEEK, MONTH, YEAR in csv format, default all summaries when no parameters given
 - summary.charged.csv or summary.charged.VIN.csv, showing per day "date, odometer, +kWh, end of charge SOC%", can be used by other tools. Is also used by dailystats.py
 - summary.trip.csv or summary.trip.VIN.csv, showing per trip "date, odometer, distance, -kWh, +kWh"
+- summary.day.csv or summary.day.VIN.csv, showing per day "date, odometer, distance, -kWh, +kWh"
 
 Notes:
 - add trip, day, week, month, year or -trip or a combination as parameter, which respectively only shows lines for TRIP, DAY, WEEK, MONTH, YEAR or all without TRIP or a combination
@@ -454,6 +457,7 @@ INPUT:
 - monitor.tripinfo.csv or monitor.tripinfo.VIN.csv
 - summary.charge.csv or summary.charge.VIN.csv
 - summary.trip.csv or summary.trip.VIN.csv
+- summary.day.csv or summary.day.VIN.csv
 
 OUTPUT:
 - standard output: totals, daily and tripinfo statistics in a nice formatted text, including charge information using summary.charge.csv
@@ -513,6 +517,14 @@ python debug.py
 ```
 - INPUTFILE: monitor.cfg (configuration of input to hyundai_kia_connect_api)
 - standard output: debug output and pretty print of the data got from API calls
+
+---
+# check_monitor.py
+Python script for testing: print when the odometer between two monitor.csv entries are the same, but the next SOC is lower. Also compute if delta time is within 20 minutes.
+
+---
+# monitor_utils.py
+Generic utility methods, used by the other python scripts.
 
 ---
 # Raspberry pi configuration
@@ -698,7 +710,34 @@ Screenshot of Excel example using a larger summary.charged.csv:
 
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.charge.jpg)
 
-You can redirect the standard output to a file, e.g. [summary.day.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.csv)
+Example output of [summary.trip.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.trip.csv)
+```
+date, odometer, distance, -kWh, +kWh
+2023-01-13 10:15, 22163.4, 1.2, -1.4, 0.0
+2023-01-14 13:58, 22165.5, 2.1, -0.7, 0.0
+2023-01-14 14:27, 22167.5, 2.0, 0.0, 0.0
+2023-01-15 13:41, 22244.9, 77.4, -15.4, 0.0
+2023-01-15 17:30, 22245.5, 0.6, 0.0, 3.5
+2023-01-15 19:17, 22323.0, 77.5, -11.2, 30.1
+2023-01-16 10:49, 22327.1, 4.1, -1.4, 0.0
+2023-01-16 17:50, 22328.6, 1.5, 0.0, 0.0
+2023-01-17 14:54, 22334.4, 5.8, -1.4, 0.0
+2023-01-18 09:50, 22339.5, 5.1, -1.4, 0.0
+2023-01-18 12:19, 22344.6, 5.1, -0.7, 0.0
+```
+
+Example output of [summary.day.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.csv)
+```
+date, odometer, distance, -kWh, +kWh
+2023-01-13, 22163.4, 1.2, -1.4, 0.0
+2023-01-14, 22167.5, 4.1, -0.7, 0.0
+2023-01-15, 22323.0, 155.5, -26.6, 33.6
+2023-01-16, 22328.6, 5.6, -1.4, 0.0
+2023-01-17, 22334.4, 5.8, -1.4, 0.0
+2023-01-18, 22344.6, 10.2, -2.1, 0.0
+```
+
+You can redirect the standard output to a file, e.g. [summary.day.output.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.output.csv)
 ```
   Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%,AVG,MIN,MAX, 12V%,AVG,MIN,MAX, #charges,   #trips, Address, EV range
 DAY     , 2023-01-13, Fri  ,  22163.4,      1.2,        ,         ,       ,          ,          ,      58, 58, 58, 60,      89, 88, 85, 89,         ,      1  , "9;Kwakstraat; Duckstad; Nederland; 7054; AN",222
@@ -710,7 +749,7 @@ DAY     , 2023-01-18, Wed  ,  22344.6,     10.2,        ,     -1.4,       ,     
   Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%,AVG,MIN,MAX, 12V%,AVG,MIN,MAX, #charges,   #trips, Address, EV range
 ```
 
-[Excel example using python summary.py day > summary.day.csv](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/blob/main/examples/summary.day.xlsx)
+[Excel example using python summary.py day > summary.day.output.csv](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/blob/main/examples/summary.day.xlsx)
 
 Screenshot of excel example with some graphs:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.jpg)
@@ -723,47 +762,48 @@ The dailystats.py [standard output of the monitor.dailystats.csv file](https://r
 output:
 ```
 C:\Users\Rick\git\monitor>python dailystats.py sheetupdate
-  Last run 2023-01-19 08:56 Thu
+   Last run   2023-02-22         12:49       Wed
 
-   Totals        Regen        Consumption    Engine   Climate   Electr.  BatteryCare
-  31.8kWh        4.8kWh        5.6km/kWh    27.8kWh    1.2kWh    2.8kWh     0.0kWh
-   178km         14.9%       17.9kWh/100km    87%       3.7%      8.9%       0.0%
- (+33.6kWh)
+     Totals Recuperation   Consumption    Engine  Climate  Electr. Batt.Care
+    31.8kWh       4.8kWh     5.6km/kWh   27.8kWh   1.2kWh   2.8kWh    0.0kWh
+      178km        14.9% 17.9kWh/100km       87%     3.7%     8.9%      0.0%
+ (+33.6kWh)         Trip   (5.4km/kWh)  Distance Avg km/h Max km/h      Idle
+                  201min                   178km   60km/h  103km/h     28min
 
- 2023-01-18      Regen        Consumption    Engine   Climate   Electr.  BatteryCare
-   1.9kWh        0.4kWh        5.1km/kWh     1.4kWh    0.2kWh    0.4kWh     0.0kWh
-    10km         23.1%       19.4kWh/100km    71%       9.2%     20.1%       0.0%
-                  Trip                      Distance  Avg speed Max speed  Idle time
-  (0.7kWh)    12:07-12:15     (7.3km/kWh)     5km      43km/h    63km/h     1 min
-  (1.4kWh)    09:38-09:47     (3.6km/kWh)     5km      40km/h    63km/h     1 min
+ 2023-01-18 Recuperation   Consumption    Engine  Climate  Electr. Batt.Care
+     1.9kWh       0.4kWh     5.1km/kWh    1.4kWh   0.2kWh   0.4kWh    0.0kWh
+       10km        23.1% 19.4kWh/100km       71%     9.2%    20.1%      0.0%
+                    Trip   (4.9km/kWh)  Distance Avg km/h Max km/h      Idle
+   (0.7kWh)  12:07-12:15   (7.3km/kWh)       5km   43km/h   63km/h      1min
+   (1.4kWh)  09:38-09:47   (3.6km/kWh)       5km   40km/h   63km/h      1min
 
- 2023-01-17      Regen        Consumption    Engine   Climate   Electr.  BatteryCare
-   1.3kWh        0.4kWh        3.8km/kWh     0.7kWh    0.3kWh    0.4kWh     0.0kWh
-    5km          33.6%       26.5kWh/100km    51%      20.6%     27.9%       0.0%
-                  Trip                      Distance  Avg speed Max speed  Idle time
-  (1.4kWh)    14:18-14:50     (4.1km/kWh)     5km      28km/h    60km/h     19 min
+ 2023-01-17 Recuperation   Consumption    Engine  Climate  Electr. Batt.Care
+     1.3kWh       0.4kWh     3.8km/kWh    0.7kWh   0.3kWh   0.4kWh    0.0kWh
+        5km        33.6% 26.5kWh/100km       51%    20.6%    27.9%      0.0%
+                    Trip   (4.1km/kWh)  Distance Avg km/h Max km/h      Idle
+   (1.4kWh)  14:18-14:50   (4.1km/kWh)       5km   28km/h   60km/h     19min
 
- 2023-01-16      Regen        Consumption    Engine   Climate   Electr.  BatteryCare
-   1.2kWh        0.4kWh        4.2km/kWh     0.7kWh    0.1kWh    0.3kWh     0.0kWh
-    5km          35.5%       24.1kWh/100km    59%      12.2%     29.1%       0.0%
-                  Trip                      Distance  Avg speed Max speed  Idle time
-              17:42-17:46       (1.5km)       1km      30km/h    56km/h     1 min
-  (1.4kWh)    10:35-10:45     (2.9km/kWh)     4km      31km/h    51km/h     2 min
+ 2023-01-16 Recuperation   Consumption    Engine  Climate  Electr. Batt.Care
+     1.2kWh       0.4kWh     4.2km/kWh    0.7kWh   0.1kWh   0.3kWh    0.0kWh
+        5km        35.5% 24.1kWh/100km       59%    12.2%    29.1%      0.0%
+                    Trip   (4.0km/kWh)  Distance Avg km/h Max km/h      Idle
+             17:42-17:46       (1.5km)       1km   30km/h   56km/h      1min
+   (1.4kWh)  10:35-10:45   (2.9km/kWh)       4km   31km/h   51km/h      2min
 
- 2023-01-15      Regen        Consumption    Engine   Climate   Electr.  BatteryCare
-  26.5kWh        3.2kWh        5.8km/kWh    24.6kWh    0.5kWh    1.4kWh     0.0kWh
-   154km         11.9%       17.2kWh/100km    93%       2.0%      5.3%       0.0%
- (+33.6kWh)       Trip                      Distance  Avg speed Max speed  Idle time
- (11.2kWh)    18:14-19:13     (6.9km/kWh)     77km     81km/h   103km/h     0 min
-              17:20-17:22       (0.6km)       0km      18km/h    38km/h     0 min
- (15.4kWh)    12:34-13:38     (5.0km/kWh)     77km     77km/h    95km/h     2 min
+ 2023-01-15 Recuperation   Consumption    Engine  Climate  Electr. Batt.Care
+    26.5kWh       3.2kWh     5.8km/kWh   24.6kWh   0.5kWh   1.4kWh    0.0kWh
+      154km        11.9% 17.2kWh/100km       93%     2.0%     5.3%      0.0%
+ (+33.6kWh)         Trip   (5.8km/kWh)  Distance Avg km/h Max km/h      Idle
+  (11.2kWh)  18:14-19:13   (6.9km/kWh)      77km   81km/h  103km/h      0min
+             17:20-17:22       (0.6km)       0km   18km/h   38km/h      0min
+  (15.4kWh)  12:34-13:38   (5.0km/kWh)      77km   77km/h   95km/h      2min
 
- 2023-01-14      Regen        Consumption    Engine   Climate   Electr.  BatteryCare
-   0.8kWh        0.3kWh        4.8km/kWh     0.5kWh    0.1kWh    0.3kWh     0.0kWh
-    4km          33.3%       20.6kWh/100km    57%       6.5%     36.4%       0.0%
-                  Trip                      Distance  Avg speed Max speed  Idle time
-              14:18-14:24       (2.0km)       2km      27km/h    51km/h     1 min
-  (0.7kWh)    13:24-13:31     (3.0km/kWh)     2km      23km/h    48km/h     1 min
+ 2023-01-14 Recuperation   Consumption    Engine  Climate  Electr. Batt.Care
+     0.8kWh       0.3kWh     4.8km/kWh    0.5kWh   0.1kWh   0.3kWh    0.0kWh
+        4km        33.3% 20.6kWh/100km       57%     6.5%    36.4%      0.0%
+                    Trip   (5.9km/kWh)  Distance Avg km/h Max km/h      Idle
+             14:18-14:24       (2.0km)       2km   27km/h   51km/h      1min
+   (0.7kWh)  13:24-13:31   (3.0km/kWh)       2km   23km/h   48km/h      1min
 ```
 
 Video of spreadsheet:

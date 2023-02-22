@@ -49,7 +49,7 @@ def sleep(retries: int) -> int:
 def safe_divide(numerator: float, denumerator: float) -> float:
     """safe_divide"""
     if denumerator == 0.0:
-        return 1.0
+        return 0.0
     return numerator / denumerator
 
 
@@ -66,6 +66,13 @@ def to_float(string: str) -> float:
     if "None" in string:
         return 0.0
     return float(string.strip())
+
+
+def get_safe_float(number: float) -> float:
+    """get safe float"""
+    if number is None:
+        return 0.0
+    return number
 
 
 def float_to_string_no_trailing_zero(input_value: float) -> str:
@@ -144,6 +151,13 @@ def get_last_line(filename: Path) -> str:
                 file.seek(0)
             last_line = file.readline().decode().strip()
     return last_line
+
+
+def get_safe_datetime(date: datetime) -> datetime:
+    """get safe datetime"""
+    if date is None:
+        return datetime(2000, 1, 1)
+    return date
 
 
 def get_last_date(filename: str) -> str:

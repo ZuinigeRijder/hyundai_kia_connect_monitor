@@ -53,3 +53,66 @@
  53: 20230122 17:28 C  (6.401936,52.014258) SOC: 70% 12V: 95% ODO: 22726.0 Address: De Kroon; Waterliniedok; Nieuwegein; Utrecht; Nederland; 3433 KN; Nederland charging plugged:1
  54: 20230122 17:49    (6.401936,52.014258) SOC: 98% 12V: 95% ODO: 22726.0 Address: De Kroon; Waterliniedok; Nieuwegein; Utrecht; Nederland; 3433 KN; Nederland plugged:1
  55: 20230122 18:42    (6.401569,51.934731) SOC: 86% 12V: 95% ODO: 22780.8 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN (+54.8 since 20230122 17:49)
+ 56: 20230123 10:58    (5.145892,51.688867) SOC: 84% 12V: 83% ODO: 22784.6 Address: Dierenkliniek Drunen; Hogeweg; Drunen; Heusden; Noord-Brabant; Nederland; 5151 BH; Nederland (+3.8 since 20230122 18:42)
+ 57: 20230123 11:12    (5.17638 ,51.694006) SOC: 84% 12V: 83% ODO: 22788.0 Address: 30A; Kerkstraat; Bedrijventerrein Nieuwkuijk; Nieuwkuijk; Heusden; Noord-Brabant; Nederland; 5253 AP; Nederland (+3.4 since 20230123 10:58)
+ 58: 20230123 11:44    (5.132364,51.688286) SOC: 82% 12V: 83% ODO: 22792.2 Address: 3; Julianastraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 VT; Nederland (+4.2 since 20230123 11:16)
+ 59: 20230123 11:56    (6.401564,51.934731) SOC: 82% 12V: 83% ODO: 22794.2 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN (+2.0 since 20230123 11:44)
+ 60: 20230125 10:29    (5.085033,51.690917) SOC: 74% 12V: 83% ODO: 22817.5 Address: Professor de Savornin Lohmanpark; Baardwijk; Waalwijk; Noord-Brabant; Nederland; 5142 TM; Nederland (+3.6 since 20230124 16:29)
+ 61: 20230125 10:58    (6.401542,51.934728) SOC: 73% 12V: 86% ODO: 22821.1 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN (+3.6 since 20230125 10:32)
+ 62: 20230125 12:42    (6.401578,51.934733) SOC: 72% 12V: 86% ODO: 22826.4 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN (+5.3 since 20230125 11:02)
+ 63: 20230127 17:13    (6.401597,51.934739) SOC: 69% 12V: 85% ODO: 22832.4 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN (+6.0 since 20230125 12:45)
+ 64: 20230129 11:12    (5.698606,51.244336) SOC: 46% 12V: 86% ODO: 22909.8 Address: 1; Het Dal; Parkhof; Weert; Limburg; Nederland; 6006 KV; Nederland (+77.4 since 20230127 17:16)
+ 65: 20230129 17:07    (6.401758,51.934797) SOC: 24% 12V: 87% ODO: 22987.5 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN (+77.7 since 20230129 11:12)
+ 66: 20230129 21:28 C  (6.401758,51.934797) SOC: 30% 12V: 87% ODO: 22987.5 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN charging plugged:2
+ 67: 20230130 07:01    (6.401758,51.934797) SOC: 60% 12V: 87% ODO: 22987.5 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN plugged:2
+ 68: 20230131 14:44    (6.401561,51.934731) SOC: 60% 12V: 78% ODO: 22992.7 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN (+5.2 since 20230130 07:21)
+ 69: 20230131 15:13    (5.145983,51.688883) SOC: 60% 12V: 78% ODO: 22996.1 Address: Dierenkliniek Drunen; Hogeweg; Drunen; Heusden; Noord-Brabant; Nederland; 5151 BH; Nederland (+3.4 since 20230131 14:44)
+ 70: 20230131 15:26    (5.125614,51.687883) SOC: 59% 12V: 77% ODO: 22997.6 Address: 36; Schoolstraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 HH; Nederland (+1.5 since 20230131 15:13)
+ 71: 20230131 15:38    (6.401542,51.934728) SOC: 59% 12V: 77% ODO: 22999.2 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN (+1.6 since 20230131 15:26)
+ 72: 20230201 10:38    (5.294444,51.644769) SOC: 53% 12V: 87% ODO: 23018.8 Address: 6; De Schakel; Vught; Noord-Brabant; Nederland; 5261 LL; Nederland (+19.6 since 20230131 15:38)
+ 73: 20230201 12:28    (5.293192,51.669144) SOC: 52% 12V: 86% ODO: 23023.8 Address: 24; Bosscheweg; Vught; Noord-Brabant; Nederland; 5261 AA; Nederland (+5.0 since 20230201 10:38)
+ 74: 20230201 14:14    (6.401761,51.934797) SOC: 47% 12V: 87% ODO: 23040.1 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN (+16.3 since 20230201 12:28)
+ 75: 20230204 18:56    (5.045928,51.68813 ) SOC: 47% 12V: 87% ODO: 23047.1 Address: 53; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AB; Nederland (+7.0 since 20230201 14:14)
+ 76: 20230205 00:23    (6.40155 ,51.934728) SOC: 40% 12V: 79% ODO: 23054.4 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN (+7.3 since 20230204 19:19)
+ 77: 20230206 12:59    (5.131228,51.678611) SOC: 40% 12V: 79% ODO: 23055.9 Address: Drunen; Heusden; Noord-Brabant; Nederland; 5151 SM; Nederland (+1.5 since 20230205 00:23)
+ 78: 20230206 16:09    (5.129736,51.682225) SOC: 38% 12V: 81% ODO: 23056.7 Address: 2; Canadalaan; Drunen; Heusden; Noord-Brabant; Nederland; 5152 LB; Nederland (+0.8 since 20230206 13:27)
+ 79: 20230206 16:25    (6.401564,51.934731) SOC: 38% 12V: 81% ODO: 23056.7 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN
+ 80: 20230207 12:29    (6.401767,51.9348  ) SOC: 38% 12V: 81% ODO: 23057.9 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN (+1.2 since 20230206 16:25)
+ 81: 20230207 13:26 C  (6.401767,51.9348  ) SOC: 40% 12V: 76% ODO: 23057.9 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN charging plugged:2
+ 82: 20230207 14:28    (5.135197,51.692608) SOC: 42% 12V: 78% ODO: 23060.5 Address: 18; Leliestraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 TP; Nederland (+2.6 since 20230207 13:26)
+ 83: 20230207 14:44    (6.401758,51.934797) SOC: 42% 12V: 78% ODO: 23063.2 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN (+2.7 since 20230207 14:28)
+ 84: 20230208 12:29    (5.135128,51.692611) SOC: 49% 12V: 86% ODO: 23065.7 Address: 18; Leliestraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 TP; Nederland (+2.5 since 20230207 17:25)
+ 85: 20230208 12:39    (6.401764,51.9348  ) SOC: 49% 12V: 86% ODO: 23068.4 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN (+2.7 since 20230208 12:29)
+ 86: 20230208 13:11 C  (6.401764,51.9348  ) SOC: 50% 12V: 86% ODO: 23068.4 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN charging plugged:2
+ 87: 20230208 16:16    (6.401764,51.9348  ) SOC: 60% 12V: 86% ODO: 23068.4 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN plugged:2
+ 88: 20230209 13:13    (5.069456,51.684997) SOC: 60% 12V: 86% ODO: 23076.2 Address: Noorder Parallelweg; Antoniusparochie; Waalwijk; Noord-Brabant; Nederland; 5141 GA; Nederland (+7.8 since 20230208 16:42) plugged:2
+ 89: 20230209 15:41    (6.401564,51.934731) SOC: 58% 12V: 86% ODO: 23082.7 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN (+6.5 since 20230209 13:17)
+ 90: 20230210 13:41    (5.131369,51.678558) SOC: 57% 12V: 93% ODO: 23084.1 Address: Drunen; Heusden; Noord-Brabant; Nederland; 5151 SM; Nederland (+1.4 since 20230209 19:07)
+ 91: 20230210 14:13    (5.263153,51.71275 ) SOC: 57% 12V: 93% ODO: 23097.1 Address: 21; De Meerheuvel; De Vutter; Engelen; 's-Hertogenbosch; Noord-Brabant; Nederland; 5221 EA; Nederland (+13.0 since 20230210 13:41)
+ 92: 20230210 15:37    (5.13135 ,51.678586) SOC: 51% 12V: 93% ODO: 23110.3 Address: Drunen; Heusden; Noord-Brabant; Nederland; 5151 SM; Nederland (+13.2 since 20230210 14:16)
+ 93: 20230210 16:49    (6.401547,51.934728) SOC: 50% 12V: 92% ODO: 23111.7 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN (+1.4 since 20230210 15:37)
+ 94: 20230211 13:23    (5.266414,51.696472) SOC: 44% 12V: 90% ODO: 23123.8 Address: 375; Helftheuvelpassage; De Schutskamp; West; 's-Hertogenbosch; Noord-Brabant; Nederland; 5224 AA; Nederland (+12.1 since 20230211 07:07)
+ 95: 20230211 14:23    (5.206047,51.689669) SOC: 43% 12V: 89% ODO: 23129.2 Address: 51; Beneluxlaan; Vliedberg; Vlijmen; Heusden; Noord-Brabant; Nederland; 5251 LD; Nederland (+5.4 since 20230211 13:23)
+ 96: 20230211 14:40    (6.401547,51.934728) SOC: 41% 12V: 90% ODO: 23137.2 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN (+8.0 since 20230211 14:23)
+ 97: 20230214 10:59    (6.401758,51.934797) SOC: 41% 12V: 90% ODO: 23137.2 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN
+ 98: 20230214 14:29    (5.135133,51.692611) SOC: 51% 12V: 82% ODO: 23139.8 Address: 18; Leliestraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 TP; Nederland (+2.6 since 20230214 10:59)
+ 99: 20230214 14:53    (5.047236,51.688206) SOC: 50% 12V: 81% ODO: 23148.1 Address: 29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland (+8.3 since 20230214 14:29)
+100: 20230214 15:35    (5.097722,51.678667) SOC: 49% 12V: 81% ODO: 23153.6 Address: Vijverlaan; Waalwijk; Noord-Brabant; Nederland; 5143 NE; Nederland (+5.5 since 20230214 14:53)
+101: 20230214 15:54    (6.401544,51.934728) SOC: 48% 12V: 81% ODO: 23157.4 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN (+3.8 since 20230214 15:35)
+102: 20230215 09:38    (5.152458,51.657058) SOC: 47% 12V: 87% ODO: 23162.4 Address: Giersbergen; Drunen; Heusden; Noord-Brabant; Nederland; 5151 RG; Nederland (+5.0 since 20230214 15:54)
+103: 20230215 12:13    (6.401589,51.934736) SOC: 45% 12V: 86% ODO: 23167.5 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN (+5.1 since 20230215 09:38)
+104: 20230215 12:17 C  (6.401717,51.934775) SOC: 45% 12V: 85% ODO: 23167.5 Address: 7;Kwakstraat; Duckstad; Nederland; 7054; AN charging plugged:2
+105: 20230215 12:43    (6.401717,51.934775) SOC: 46% 12V: 85% ODO: 23167.5 Address: 7;Kwakstraat; Duckstad; Nederland; 7054; AN plugged:2
+106: 20230215 15:12 C  (6.401717,51.934775) SOC: 50% 12V: 85% ODO: 23167.5 Address: 7;Kwakstraat; Duckstad; Nederland; 7054; AN charging plugged:2
+107: 20230216 05:01    (6.401667,51.934867) SOC: 80% 12V: 85% ODO: 23167.5 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN plugged:2
+108: 20230218 11:05    (5.682755,53.036417) SOC: 50% 12V: 84% ODO: 23365.0 Address: 14; Dekamalaan; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8604 ZE; Nederland (+197.5 since 20230218 07:40)
+109: 20230218 12:13    (5.671811,53.02858 ) SOC: 49% 12V: 83% ODO: 23368.4 Address: 3; Oude Oppenhuizerweg; Houkesloot; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8606 JA; Nederland (+3.4 since 20230218 11:05)
+110: 20230218 12:24    (5.672203,53.028608) SOC: 49% 12V: 82% ODO: 23368.4 Address: 11; Oude Oppenhuizerweg; Houkesloot; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8606 JA; Nederland
+111: 20230218 13:34    (5.682575,53.036311) SOC: 74% 12V: 84% ODO: 23371.2 Address: 14; Dekamalaan; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8604 ZE; Nederland (+2.8 since 20230218 13:16)
+112: 20230218 13:56    (5.681164,53.016689) SOC: 74% 12V: 83% ODO: 23374.5 Address: Van der Valk Hotel Sneek; 1; Burgemeester Rasterhofflaan; Houkesloot; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8606 KZ; Nederland (+3.3 since 20230218 13:34)
+113: 20230218 14:47    (5.683153,53.036231) SOC: 73% 12V: 83% ODO: 23377.8 Address: 17-120; Dekamalaan; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8604 ZG; Nederland (+3.3 since 20230218 13:56)
+114: 20230218 17:29    (6.401767,51.9348  ) SOC: 22% 12V: 85% ODO: 23575.6 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN (+197.8 since 20230218 14:47)
+115: 20230219 05:51 C  (6.401767,51.9348  ) SOC: 50% 12V: 85% ODO: 23575.6 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN charging plugged:2
+116: 20230219 09:05    (6.401767,51.9348  ) SOC: 60% 12V: 85% ODO: 23575.6 Address: 6;Kwakstraat; Duckstad; Nederland; 7054; AN plugged:2
+117: 20230219 13:58    (5.048203,51.688308) SOC: 58% 12V: 86% ODO: 23582.8 Address: 19; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland (+7.2 since 20230219 09:13)
+118: 20230219 17:48    (6.401544,51.934728) SOC: 57% 12V: 84% ODO: 23589.5 Address: 9;Kwakstraat; Duckstad; Nederland; 7054; AN (+6.7 since 20230219 13:58)

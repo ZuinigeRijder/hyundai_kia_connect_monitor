@@ -1,8 +1,7 @@
-  Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%,AVG,MIN,MAX, 12V%,AVG,MIN,MAX, #charges,   #trips, Address, EV range
-DAY     , 2023-01-13, Fri  ,  22163.4,      1.2,        ,         ,       ,          ,          ,      58, 58, 58, 60,      89, 88, 85, 89,         ,      1  , "9;Kwakstraat; Duckstad; Nederland; 7054; AN",222
-DAY     , 2023-01-14, Sat  ,  22167.5,      4.1,        ,     -0.7,       ,          ,          ,      57, 57, 57, 58,      89, 89, 89, 90,         ,      2  , "9;Kwakstraat; Duckstad; Nederland; 7054; AN",205
-DAY     , 2023-01-15, Sun  ,  22323.0,    155.5,    33.6,    -26.6,    5.8,      17.1,      6.54,      67, 49, 35, 83,      95, 92, 89, 95,      1  ,      3  , "9;Kwakstraat; Duckstad; Nederland; 7054; AN",255
-DAY     , 2023-01-16, Mon  ,  22328.6,      5.6,        ,     -1.4,       ,          ,          ,      65, 66, 65, 67,      76, 87, 76, 95,         ,      2  , "7;Kwakstraat; Duckstad; Nederland; 7054; AN",241
-DAY     , 2023-01-17, Tue  ,  22334.4,      5.8,        ,     -1.4,       ,          ,          ,      63, 64, 63, 65,      86, 83, 76, 86,         ,      1  , "9;Kwakstraat; Duckstad; Nederland; 7054; AN",228
-DAY     , 2023-01-18, Wed  ,  22344.6,     10.2,        ,     -1.4,       ,          ,          ,      58, 60, 58, 63,      88, 88, 86, 89,         ,      2  , "9;Kwakstraat; Duckstad; Nederland; 7054; AN",202
-  Period, date      , info , odometer, delta km,    +kWh,     -kWh, km/kWh, kWh/100km, cost Euro, SOC%,AVG,MIN,MAX, 12V%,AVG,MIN,MAX, #charges,   #trips, Address, EV range
+date, odometer, distance, -kWh, +kWh
+2023-01-13, 22163.4, 1.2, -1.4, 0.0
+2023-01-14, 22167.5, 4.1, -0.7, 0.0
+2023-01-15, 22323.0, 155.5, -26.6, 33.6
+2023-01-16, 22328.6, 5.6, -1.4, 0.0
+2023-01-17, 22334.4, 5.8, -1.4, 0.0
+2023-01-18, 22344.6, 10.2, -2.1, 0.0

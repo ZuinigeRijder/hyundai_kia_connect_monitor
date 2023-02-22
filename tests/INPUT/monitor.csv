@@ -89,3 +89,410 @@ datetime, longitude, latitude, engineOn, 12V%, odometer, SOC%, charging, plugged
 2023-01-22 17:37:28+01:00, 6.401936, 52.014258, False, 95, 22726, 90, True, 1, De Kroon; Waterliniedok; Nieuwegein; Utrecht; Nederland; 3433 KN; Nederland, 349
 2023-01-22 17:49:56+01:00, 6.401936, 52.014258, False, 95, 22726, 98, False, 1, De Kroon; Waterliniedok; Nieuwegein; Utrecht; Nederland; 3433 KN; Nederland, 383
 2023-01-22 18:42:25+01:00, 6.401569, 51.934731, False, 95, 22780.8, 86, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 320
+2023-01-23 10:58:55+01:00, 5.145892, 51.688867, False, 83, 22784.6, 84, False, 0, Dierenkliniek Drunen; Hogeweg; Drunen; Heusden; Noord-Brabant; Nederland; 5151 BH; Nederland, 302
+2023-01-23 11:12:52+01:00, 5.17638, 51.694006, False, 83, 22788, 84, False, 0, 30A; Kerkstraat; Bedrijventerrein Nieuwkuijk; Nieuwkuijk; Heusden; Noord-Brabant; Nederland; 5253 AP; Nederland, 302
+2023-01-23 11:16:04+01:00, 5.17638, 51.694006, False, 83, 22788, 83, False, 0, 30A; Kerkstraat; Bedrijventerrein Nieuwkuijk; Nieuwkuijk; Heusden; Noord-Brabant; Nederland; 5253 AP; Nederland, 298
+2023-01-23 11:44:21+01:00, 5.132364, 51.688286, False, 83, 22792.2, 82, False, 0, 3; Julianastraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 VT; Nederland, 293
+2023-01-23 11:56:53+01:00, 6.401564, 51.934731, False, 83, 22794.2, 82, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 293
+2023-01-24 16:29:12+01:00, 6.401564, 51.934731, False, 83, 22813.9, 74, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 258
+2023-01-25 10:29:45+01:00, 5.085033, 51.690917, False, 83, 22817.5, 74, False, 0, Professor de Savornin Lohmanpark; Baardwijk; Waalwijk; Noord-Brabant; Nederland; 5142 TM; Nederland, 258
+2023-01-25 10:32:56+01:00, 5.085033, 51.690917, False, 86, 22817.5, 73, False, 0, Professor de Savornin Lohmanpark; Baardwijk; Waalwijk; Noord-Brabant; Nederland; 5142 TM; Nederland, 247
+2023-01-25 10:58:35+01:00, 6.401542, 51.934728, False, 86, 22821.1, 73, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 247
+2023-01-25 11:02:42+01:00, 6.401542, 51.934728, False, 86, 22821.1, 72, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 242
+2023-01-25 12:42:31+01:00, 6.401578, 51.934733, False, 86, 22826.4, 72, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 242
+2023-01-25 12:45:44+01:00, 6.401578, 51.934733, False, 86, 22826.4, 71, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 234
+2023-01-27 17:13:24+01:00, 6.401597, 51.934739, False, 85, 22832.4, 69, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 239
+2023-01-27 17:16:38+01:00, 6.401597, 51.934739, False, 84, 22832.4, 68, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 237
+2023-01-29 11:12:16+01:00, 5.698606, 51.244336, False, 86, 22909.8, 46, False, 0, 1; Het Dal; Parkhof; Weert; Limburg; Nederland; 6006 KV; Nederland, 156
+2023-01-29 17:07:49+01:00, 6.401758, 51.934797, False, 87, 22987.5, 24, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 83
+2023-01-29 17:17:26+01:00, 6.401758, 51.934797, False, 87, 22987.5, 24, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 83
+2023-01-29 21:28:39+01:00, 6.401758, 51.934797, False, 87, 22987.5, 30, True, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 105
+2023-01-30 03:52:47+01:00, 6.401758, 51.934797, False, 87, 22987.5, 50, True, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 177
+2023-01-30 06:42:43+01:00, 6.401758, 51.934797, False, 87, 22987.5, 59, True, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 210
+2023-01-30 07:01:27+01:00, 6.401758, 51.934797, False, 87, 22987.5, 60, False, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 213
+2023-01-30 07:21:12+01:00, 6.401758, 51.934797, False, 87, 22987.5, 60, False, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 214
+2023-01-31 14:44:06+01:00, 6.401561, 51.934731, False, 78, 22992.7, 60, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 209
+2023-01-31 15:13:17+01:00, 5.145983, 51.688883, False, 78, 22996.1, 60, False, 0, Dierenkliniek Drunen; Hogeweg; Drunen; Heusden; Noord-Brabant; Nederland; 5151 BH; Nederland, 209
+2023-01-31 15:26:24+01:00, 5.125614, 51.687883, False, 77, 22997.6, 59, False, 0, 36; Schoolstraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 HH; Nederland, 205
+2023-01-31 15:38:25+01:00, 6.401542, 51.934728, False, 77, 22999.2, 59, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 204
+2023-02-01 10:38:05+01:00, 5.294444, 51.644769, False, 87, 23018.8, 53, False, 0, 6; De Schakel; Vught; Noord-Brabant; Nederland; 5261 LL; Nederland, 182
+2023-02-01 12:28:18+01:00, 5.293192, 51.669144, False, 86, 23023.8, 52, False, 0, 24; Bosscheweg; Vught; Noord-Brabant; Nederland; 5261 AA; Nederland, 177
+2023-02-01 14:14:59+01:00, 6.401761, 51.934797, False, 87, 23040.1, 47, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 162
+2023-02-04 18:56:17+01:00, 5.045928, 51.68813, False, 87, 23047.1, 47, False, 0, 53; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AB; Nederland, 162
+2023-02-04 19:19:30+01:00, 5.045928, 51.68813, False, 77, 23047.1, 42, False, 0, 53; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AB; Nederland, 151
+2023-02-05 00:23:30+01:00, 6.40155, 51.934728, False, 79, 23054.4, 40, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 145
+2023-02-06 12:59:18+01:00, 5.131228, 51.678611, False, 79, 23055.9, 40, False, 0, Drunen; Heusden; Noord-Brabant; Nederland; 5151 SM; Nederland, 145
+2023-02-06 13:27:10+01:00, 5.131228, 51.678611, False, 81, 23055.9, 38, False, 0, Drunen; Heusden; Noord-Brabant; Nederland; 5151 SM; Nederland, 136
+2023-02-06 16:09:22+01:00, 5.129736, 51.682225, False, 81, 23056.7, 38, False, 0, 2; Canadalaan; Drunen; Heusden; Noord-Brabant; Nederland; 5152 LB; Nederland, 136
+2023-02-06 16:25:33+01:00, 6.401564, 51.934731, False, 81, 23056.7, 38, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 129
+2023-02-07 12:29:20+01:00, 6.401767, 51.9348, False, 81, 23057.9, 38, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 129
+2023-02-07 13:26:58+01:00, 6.401767, 51.9348, False, 76, 23057.9, 40, True, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-07 14:28:06+01:00, 5.135197, 51.692608, False, 78, 23060.5, 42, False, 0, 18; Leliestraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 TP; Nederland, 141
+2023-02-07 14:44:25+01:00, 6.401758, 51.934797, False, 78, 23063.2, 42, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-07 17:07:33+01:00, 6.401758, 51.934797, False, 78, 23063.2, 49, False, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-07 17:25:49+01:00, 6.401758, 51.934797, False, 78, 23063.2, 49, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-08 12:29:32+01:00, 5.135128, 51.692611, False, 86, 23065.7, 49, False, 0, 18; Leliestraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 TP; Nederland, 158
+2023-02-08 12:39:31+01:00, 6.401764, 51.9348, False, 86, 23068.4, 49, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 158
+2023-02-08 13:11:26+01:00, 6.401764, 51.9348, False, 86, 23068.4, 50, True, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 176
+2023-02-08 15:58:30+01:00, 6.401764, 51.9348, False, 86, 23068.4, 59, True, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 210
+2023-02-08 16:16:58+01:00, 6.401764, 51.9348, False, 86, 23068.4, 60, False, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 213
+2023-02-08 16:42:41+01:00, 6.401764, 51.9348, False, 86, 23068.4, 60, False, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 213
+2023-02-09 13:13:59+01:00, 5.069456, 51.684997, False, 86, 23076.2, 60, False, 2, Noorder Parallelweg; Antoniusparochie; Waalwijk; Noord-Brabant; Nederland; 5141 GA; Nederland, 213
+2023-02-09 13:17:25+01:00, 5.069456, 51.684997, False, 87, 23076.2, 60, False, 0, Noorder Parallelweg; Antoniusparochie; Waalwijk; Noord-Brabant; Nederland; 5141 GA; Nederland, 200
+2023-02-09 15:41:08+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 15:41:08+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 15:41:08+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 15:41:08+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 15:41:08+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 15:41:08+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 15:41:08+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 15:41:08+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 15:41:08+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 15:41:08+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 15:41:08+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-09 19:07:01+01:00, 6.401564, 51.934731, False, 86, 23082.7, 58, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 196
+2023-02-10 13:41:09+01:00, 5.131369, 51.678558, False, 93, 23084.1, 57, False, 0, Drunen; Heusden; Noord-Brabant; Nederland; 5151 SM; Nederland, 193
+2023-02-10 13:41:09+01:00, 5.131369, 51.678558, False, 93, 23084.1, 57, False, 0, Drunen; Heusden; Noord-Brabant; Nederland; 5151 SM; Nederland, 193
+2023-02-10 14:13:43+01:00, 5.263153, 51.71275, False, 93, 23097.1, 57, False, 0, 21; De Meerheuvel; De Vutter; Engelen; 's-Hertogenbosch; Noord-Brabant; Nederland; 5221 EA; Nederland, 193
+2023-02-10 14:16:56+01:00, 5.263153, 51.71275, False, 93, 23097.1, 54, False, 0, 21; De Meerheuvel; De Vutter; Engelen; 's-Hertogenbosch; Noord-Brabant; Nederland; 5221 EA; Nederland, 182
+2023-02-10 14:16:56+01:00, 5.263153, 51.71275, False, 93, 23097.1, 54, False, 0, 21; De Meerheuvel; De Vutter; Engelen; 's-Hertogenbosch; Noord-Brabant; Nederland; 5221 EA; Nederland, 182
+2023-02-10 14:16:56+01:00, 5.263153, 51.71275, False, 93, 23097.1, 54, False, 0, 21; De Meerheuvel; De Vutter; Engelen; 's-Hertogenbosch; Noord-Brabant; Nederland; 5221 EA; Nederland, 182
+2023-02-10 14:16:56+01:00, 5.263153, 51.71275, False, 93, 23097.1, 54, False, 0, 21; De Meerheuvel; De Vutter; Engelen; 's-Hertogenbosch; Noord-Brabant; Nederland; 5221 EA; Nederland, 182
+2023-02-10 14:16:56+01:00, 5.263153, 51.71275, False, 93, 23097.1, 54, False, 0, 21; De Meerheuvel; De Vutter; Engelen; 's-Hertogenbosch; Noord-Brabant; Nederland; 5221 EA; Nederland, 182
+2023-02-10 15:37:44+01:00, 5.13135, 51.678586, False, 93, 23110.3, 51, False, 0, Drunen; Heusden; Noord-Brabant; Nederland; 5151 SM; Nederland, 171
+2023-02-10 15:37:44+01:00, 5.13135, 51.678586, False, 93, 23110.3, 51, False, 0, Drunen; Heusden; Noord-Brabant; Nederland; 5151 SM; Nederland, 171
+2023-02-10 15:37:44+01:00, 5.13135, 51.678586, False, 93, 23110.3, 51, False, 0, Drunen; Heusden; Noord-Brabant; Nederland; 5151 SM; Nederland, 171
+2023-02-10 15:37:44+01:00, 5.13135, 51.678586, False, 93, 23110.3, 51, False, 0, Drunen; Heusden; Noord-Brabant; Nederland; 5151 SM; Nederland, 171
+2023-02-10 15:37:44+01:00, 5.13135, 51.678586, False, 93, 23110.3, 51, False, 0, Drunen; Heusden; Noord-Brabant; Nederland; 5151 SM; Nederland, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-10 16:49:26+01:00, 6.401547, 51.934728, False, 92, 23111.7, 50, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 171
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 07:07:09+01:00, 6.401547, 51.934728, False, 92, 23111.7, 47, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 169
+2023-02-11 13:23:50+01:00, 5.266414, 51.696472, False, 90, 23123.8, 44, False, 0, 375; Helftheuvelpassage; De Schutskamp; West; 's-Hertogenbosch; Noord-Brabant; Nederland; 5224 AA; Nederland, 151
+2023-02-11 13:23:50+01:00, 5.266414, 51.696472, False, 90, 23123.8, 44, False, 0, 375; Helftheuvelpassage; De Schutskamp; West; 's-Hertogenbosch; Noord-Brabant; Nederland; 5224 AA; Nederland, 151
+2023-02-11 13:23:50+01:00, 5.266414, 51.696472, False, 90, 23123.8, 44, False, 0, 375; Helftheuvelpassage; De Schutskamp; West; 's-Hertogenbosch; Noord-Brabant; Nederland; 5224 AA; Nederland, 151
+2023-02-11 13:23:50+01:00, 5.266414, 51.696472, False, 90, 23123.8, 44, False, 0, 375; Helftheuvelpassage; De Schutskamp; West; 's-Hertogenbosch; Noord-Brabant; Nederland; 5224 AA; Nederland, 151
+2023-02-11 14:23:25+01:00, 5.206047, 51.689669, False, 89, 23129.2, 43, False, 0, 51; Beneluxlaan; Vliedberg; Vlijmen; Heusden; Noord-Brabant; Nederland; 5251 LD; Nederland, 146
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-11 14:40:24+01:00, 6.401547, 51.934728, False, 90, 23137.2, 41, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 10:59:12+01:00, 6.401758, 51.934797, False, 90, 23137.2, 41, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 10:59:12+01:00, 6.401758, 51.934797, False, 90, 23137.2, 41, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 10:59:12+01:00, 6.401758, 51.934797, False, 90, 23137.2, 41, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 10:59:12+01:00, 6.401758, 51.934797, False, 90, 23137.2, 41, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 10:59:12+01:00, 6.401758, 51.934797, False, 90, 23137.2, 41, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 10:59:12+01:00, 6.401758, 51.934797, False, 90, 23137.2, 41, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 10:59:12+01:00, 6.401758, 51.934797, False, 90, 23137.2, 41, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 10:59:12+01:00, 6.401758, 51.934797, False, 90, 23137.2, 41, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 10:59:12+01:00, 6.401758, 51.934797, False, 90, 23137.2, 41, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 10:59:12+01:00, 6.401758, 51.934797, False, 90, 23137.2, 41, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 10:59:12+01:00, 6.401758, 51.934797, False, 90, 23137.2, 41, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 10:59:12+01:00, 6.401758, 51.934797, False, 90, 23137.2, 41, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 10:59:12+01:00, 6.401758, 51.934797, False, 90, 23137.2, 41, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 10:59:12+01:00, 6.401758, 51.934797, False, 90, 23137.2, 41, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 141
+2023-02-14 14:29:29+01:00, 5.135133, 51.692611, False, 82, 23139.8, 51, False, 0, 18; Leliestraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 TP; Nederland, 185
+2023-02-14 14:29:29+01:00, 5.135133, 51.692611, False, 82, 23139.8, 51, False, 0, 18; Leliestraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 TP; Nederland, 185
+2023-02-14 14:53:09+01:00, 5.047236, 51.688206, False, 81, 23148.1, 50, False, 0, 29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland, 179
+2023-02-14 14:53:09+01:00, 5.047236, 51.688206, False, 81, 23148.1, 50, False, 0, 29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland, 179
+2023-02-14 14:53:09+01:00, 5.047236, 51.688206, False, 81, 23148.1, 50, False, 0, 29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland, 179
+2023-02-14 15:35:44+01:00, 5.097722, 51.678667, False, 81, 23153.6, 49, False, 0, Vijverlaan; Waalwijk; Noord-Brabant; Nederland; 5143 NE; Nederland, 176
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-14 15:54:59+01:00, 6.401544, 51.934728, False, 81, 23157.4, 48, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 174
+2023-02-15 09:38:56+01:00, 5.152458, 51.657058, False, 87, 23162.4, 47, False, 0, Giersbergen; Drunen; Heusden; Noord-Brabant; Nederland; 5151 RG; Nederland, 157
+2023-02-15 12:13:53+01:00, 6.401589, 51.934736, False, 86, 23167.5, 45, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 161
+2023-02-15 12:17:02+01:00, 6.401717, 51.934775, False, 85, 23167.5, 45, True, 2, 7;Kwakstraat; Duckstad; Nederland; 7054; AN, 161
+2023-02-15 12:43:13+01:00, 6.401717, 51.934775, False, 85, 23167.5, 46, False, 2, 7;Kwakstraat; Duckstad; Nederland; 7054; AN, 165
+2023-02-15 15:12:22+01:00, 6.401717, 51.934775, False, 85, 23167.5, 50, True, 2, 7;Kwakstraat; Duckstad; Nederland; 7054; AN, 178
+2023-02-16 05:01:21+01:00, 6.401667, 51.934867, False, 85, 23167.5, 80, False, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 296
+2023-02-16 08:04:41+01:00, 6.401667, 51.934867, False, 85, 23167.5, 80, False, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 296
+2023-02-17 21:03:41+01:00, 6.401667, 51.934867, False, 85, 23167.5, 82, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 307
+2023-02-18 03:06:57+01:00, 6.401667, 51.934867, False, 85, 23167.5, 100, False, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 379
+2023-02-18 07:40:34+01:00, 6.401667, 51.934867, False, 85, 23167.5, 100, False, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 379
+2023-02-18 11:05:32+01:00, 5.682755, 53.036417, False, 84, 23365, 50, False, 0, 14; Dekamalaan; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8604 ZE; Nederland, 177
+2023-02-18 12:13:05+01:00, 5.671811, 53.02858, False, 83, 23368.4, 49, False, 0, 3; Oude Oppenhuizerweg; Houkesloot; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8606 JA; Nederland, 173
+2023-02-18 12:24:36+01:00, 5.672203, 53.028608, False, 82, 23368.4, 49, False, 0, 11; Oude Oppenhuizerweg; Houkesloot; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8606 JA; Nederland, 172
+2023-02-18 13:16:45+01:00, 5.672203, 53.028608, False, 83, 23368.4, 75, False, 0, 11; Oude Oppenhuizerweg; Houkesloot; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8606 JA; Nederland, 281
+2023-02-18 13:34:25+01:00, 5.682575, 53.036311, False, 84, 23371.2, 74, False, 0, 14; Dekamalaan; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8604 ZE; Nederland, 279
+2023-02-18 13:56:05+01:00, 5.681164, 53.016689, False, 83, 23374.5, 74, False, 0, Van der Valk Hotel Sneek; 1; Burgemeester Rasterhofflaan; Houkesloot; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8606 KZ; Nederland, 270
+2023-02-18 14:47:54+01:00, 5.683153, 53.036231, False, 83, 23377.8, 73, False, 0, 17-120; Dekamalaan; Sneek; Súdwest-Fryslân; Fryslân; Nederland; 8604 ZG; Nederland, 265
+2023-02-18 17:29:47+01:00, 6.401767, 51.9348, False, 85, 23575.6, 22, False, 0, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 78
+2023-02-19 05:51:49+01:00, 6.401767, 51.9348, False, 85, 23575.6, 50, True, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 183
+2023-02-19 08:46:34+01:00, 6.401767, 51.9348, False, 85, 23575.6, 59, True, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 216
+2023-02-19 09:05:25+01:00, 6.401767, 51.9348, False, 85, 23575.6, 60, False, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 220
+2023-02-19 09:13:26+01:00, 6.401767, 51.9348, False, 85, 23575.6, 60, False, 2, 6;Kwakstraat; Duckstad; Nederland; 7054; AN, 220
+2023-02-19 13:58:30+01:00, 5.048203, 51.688308, False, 86, 23582.8, 58, False, 0, 19; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland, 209
+2023-02-19 17:48:06+01:00, 6.401544, 51.934728, False, 84, 23589.5, 57, False, 0, 9;Kwakstraat; Duckstad; Nederland; 7054; AN, 204

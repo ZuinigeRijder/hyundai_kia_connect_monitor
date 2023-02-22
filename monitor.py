@@ -40,7 +40,15 @@ from pathlib import Path
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from hyundai_kia_connect_api import VehicleManager, Vehicle, exceptions
-from monitor_utils import arg_has, get_last_line, log, sleep, to_int
+from monitor_utils import (
+    arg_has,
+    get_last_line,
+    get_safe_datetime,
+    get_safe_float,
+    log,
+    sleep,
+    to_int,
+)
 
 
 # keep forceupdate and cacheupdate as keyword, but do nothing with them
@@ -290,13 +298,15 @@ def handle_one_vehicle(
             if geocode_name != "":
                 geocode = geocode_name.replace(",", ";")
 
-    last_updated_at = vehicle.last_updated_at
-    location_last_updated_at = vehicle.location_last_updated_at
+    location_longitude = get_safe_float(vehicle.location_longitude)
+    location_latitude = get_safe_float(vehicle.location_latitude)
+    last_updated_at = get_safe_datetime(vehicle.last_updated_at)
+    location_last_updated_at = get_safe_datetime(vehicle.location_last_updated_at)
     dates = [last_updated_at, location_last_updated_at]
     newest_updated_at = max(dates)
     _ = D and dbg(f"newest: {newest_updated_at} from {dates}")
     ev_driving_range = to_int(f"{vehicle.ev_driving_range}")
-    line = f"{newest_updated_at}, {vehicle.location_longitude}, {vehicle.location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {vehicle.odometer}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa
+    line = f"{newest_updated_at}, {location_longitude}, {location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {vehicle.odometer}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa
     if "None, None" in line:  # something gone wrong, retry
         log(f"Skipping Unexpected line: {line}")
         return True  # exit subroutine with error

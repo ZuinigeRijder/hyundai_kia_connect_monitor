@@ -77,6 +77,7 @@ LASTRUN_FILENAME = Path("monitor.lastrun")
 OUTPUT_SPREADSHEET_NAME = "hyundai-kia-connect-monitor"
 CHARGE_CSV_FILENAME = Path("summary.charge.csv")
 TRIP_CSV_FILENAME = Path("summary.trip.csv")
+DAY_CSV_FILENAME = Path("summary.day.csv")
 CHARGE_CSV_FILE: TextIOWrapper
 
 LENCHECK = 1
@@ -87,6 +88,7 @@ if VIN != "":
     OUTPUT_SPREADSHEET_NAME = f"monitor.{VIN}"
     CHARGE_CSV_FILENAME = Path(f"summary.charge.{VIN}.csv")
     TRIP_CSV_FILENAME = Path("summary.trip.{VIN}.csv")
+    DAY_CSV_FILENAME = Path("summary.day.{VIN}.csv")
     LENCHECK = 2
 _ = D and dbg(f"INPUT_CSV_FILE: {MONITOR_CSV_FILENAME.name}")
 
@@ -429,6 +431,9 @@ MONITOR_CSV_FILE: TextIOWrapper = MONITOR_CSV_FILENAME.open("r", encoding="utf-8
 MONITOR_CSV_FILE_EOL: bool = False
 MONITOR_CSV_READ_AHEAD_LINE: str = ""
 MONITOR_CSV_READ_DONE_ONCE: bool = False
+MONITOR_CSV_CURR_SPLIT: list[str] = []
+MONITOR_CSV_NEXT_SPLIT: list[str] = []
+MONITOR_CSV_LINECOUNT: int = 0
 
 
 def get_next_monitor_csv_line() -> str:
@@ -444,20 +449,24 @@ def get_next_monitor_csv_line() -> str:
     Skips identical lines, where only the datetime is different
     Does fill INPUT_CSV_READ_AHEAD_LINE (for external use)
     """
-    global MONITOR_CSV_FILE_EOL, MONITOR_CSV_READ_AHEAD_LINE, MONITOR_CSV_READ_DONE_ONCE  # noqa pylint:disable=global-statement
+    global MONITOR_CSV_FILE_EOL, MONITOR_CSV_READ_AHEAD_LINE, MONITOR_CSV_READ_DONE_ONCE, MONITOR_CSV_CURR_SPLIT, MONITOR_CSV_NEXT_SPLIT, MONITOR_CSV_LINECOUNT  # noqa pylint:disable=global-statement
 
     while not MONITOR_CSV_FILE_EOL:
         if MONITOR_CSV_READ_DONE_ONCE:  # read 1 line
             line = MONITOR_CSV_READ_AHEAD_LINE
-            MONITOR_CSV_READ_AHEAD_LINE = MONITOR_CSV_FILE.readline()
+            MONITOR_CSV_CURR_SPLIT = MONITOR_CSV_NEXT_SPLIT
         else:  # read 2 lines
             MONITOR_CSV_READ_DONE_ONCE = True
             line = MONITOR_CSV_FILE.readline()
-            MONITOR_CSV_READ_AHEAD_LINE = MONITOR_CSV_FILE.readline()
+            MONITOR_CSV_CURR_SPLIT = split_on_comma(line)
 
+        MONITOR_CSV_LINECOUNT += 1
+        MONITOR_CSV_READ_AHEAD_LINE = MONITOR_CSV_FILE.readline()
+        MONITOR_CSV_NEXT_SPLIT = split_on_comma(MONITOR_CSV_READ_AHEAD_LINE)
         if not line:
             MONITOR_CSV_FILE_EOL = True
             MONITOR_CSV_READ_AHEAD_LINE = line
+            MONITOR_CSV_NEXT_SPLIT = []
             break  # finished
 
         if line != MONITOR_CSV_READ_AHEAD_LINE:  # skip identical lines
@@ -467,7 +476,7 @@ def get_next_monitor_csv_line() -> str:
                 index = line.find(",")
                 next_line = MONITOR_CSV_READ_AHEAD_LINE.strip()
                 read_ahead_index = next_line.find(",")
-                # skip identical lines, when only first column is the same
+                # skip identical lines, when only first column (datetime) is the same
                 if index >= 0 and (
                     read_ahead_index < 0 or next_line[read_ahead_index:] != line[index:]
                 ):
@@ -480,11 +489,50 @@ def get_next_monitor_csv_line() -> str:
     return ""
 
 
+def get_corrected_next_monitor_csv_line() -> str:
+    """get_corrected_next_monitor_csv_line"""
+    while True:
+        line = get_next_monitor_csv_line()
+        if line == "":  # EOF
+            return ""  # finished
+
+        split = MONITOR_CSV_CURR_SPLIT
+        if len(split) != 11:
+            _ = D and dbg(f"#### Skipping line {MONITOR_CSV_LINECOUNT}: [{line}]")
+            continue
+
+        _ = D and dbg(str(MONITOR_CSV_LINECOUNT) + ": LINE=[" + line + "]")
+        next_line = MONITOR_CSV_READ_AHEAD_LINE.strip()
+        next_split = MONITOR_CSV_NEXT_SPLIT
+        if len(next_split) != 11:
+            _ = D and dbg(f"Next split skip: {MONITOR_CSV_LINECOUNT}: [{next_line}]")
+            return line
+
+        if split[ODO] == next_split[ODO] and split[SOC] > next_split[SOC]:
+            _ = D and dbg(f"#### Same odo and SOC smaller:\n{line}\n{next_line}\n")
+            date_curr = datetime.strptime(split[DT][:19], "%Y-%m-%d %H:%M:%S")
+            date_next = datetime.strptime(next_split[DT][:19], "%Y-%m-%d %H:%M:%S")
+            delta_min = round((date_next - date_curr).total_seconds() / 60)
+            _ = D and dbg(f"delta minutes: {delta_min}")
+            if delta_min < 20:
+                # just use the next line
+                continue
+
+        return line
+
+
 def write_charge_csv(line: str) -> None:
     """write charge csv"""
     _ = D and dbg(f"{CHARGE_CSV_FILENAME}:[{line}]")
     CHARGE_CSV_FILE.write(line)
     CHARGE_CSV_FILE.write("\n")
+
+
+def write_day_csv(line: str) -> None:
+    """write day csv"""
+    _ = D and dbg(f"{DAY_CSV_FILENAME}:[{line}]")
+    DAY_CSV_FILE.write(line)
+    DAY_CSV_FILE.write("\n")
 
 
 def write_trip_csv(line: str) -> None:
@@ -575,11 +623,17 @@ def print_summary(
     if len(split) > EV_RANGE:
         ev_range = to_int(split[EV_RANGE])
 
-    if DAY and charged_kwh > 3.0 and prefix.startswith("DAY "):
+    if DAY and prefix.startswith("DAY "):
         splitted = split_on_comma(prefix)
         if len(splitted) > 2:
             date = splitted[1]
-            write_charge_csv(f"{date}, {odo:.1f}, {charged_kwh:.1f}, {t_soc_charged}")
+            write_day_csv(
+                f"{date}, {odo:.1f}, {delta_odo:.1f}, {discharged_kwh:.1f}, {charged_kwh:.1f}"  # noqa
+            )
+            if charged_kwh > 3.0:
+                write_charge_csv(
+                    f"{date}, {odo:.1f}, {charged_kwh:.1f}, {t_soc_charged}"
+                )
 
     if TRIP and prefix.startswith("TRIP "):
         splitted = split_on_comma(prefix)
@@ -725,7 +779,7 @@ def print_summaries(
 
 
 def keep_track_of_totals(
-    values: Totals, split: list[str], prev_split: list[str], trip=False
+    values: Totals, split: list[str], prev_split: list[str]
 ) -> Totals:
     """keep_track_of_totals"""
     if D:
@@ -772,30 +826,6 @@ def keep_track_of_totals(
     if delta_odo > 0.0:
         t_trips += 1
         _ = D and dbg(f"DELTA_ODO: {delta_odo:.1f} {t_trips}")
-        if trip:
-            # workaround that sometimes SOC is decreased in next line
-            # so the trip information shows not the correct used kWh
-            next_line = MONITOR_CSV_READ_AHEAD_LINE.strip()
-            if next_line != "":
-                next_split = split_on_comma(next_line)
-                if len(next_split) > 8:
-                    next_date = next_split[0].split(" ")[0]
-                    next_soc = to_int(next_split[SOC])
-                    split_date = split[0].split(" ")[0]
-                    if D:
-                        print(
-                            f"split_date: {split_date}\nnext_date : {next_date}\nsplit: {split}\nnext : {next_split}\n"  # noqa
-                        )
-                    if (
-                        next_date == split_date
-                        and next_split[ODO] == split[ODO]
-                        and next_soc < soc
-                    ):
-                        # date and ODO the same, but SOC is lower, fix it
-                        _ = D and dbg(f"before soc: {soc}, delta_soc: {delta_soc}")
-                        delta_soc = next_soc - prev_soc
-                        soc = next_soc
-                        _ = D and dbg(f"after  soc: {soc}, delta_soc: {delta_soc}\n")
 
     # keep track of elapsed minutes
     current_day = parser.parse(split[DT])
@@ -939,7 +969,7 @@ def handle_line(
         if YEAR:
             t_year = keep_track_of_totals(t_year, split, prev_split)
         if TRIP:
-            t_trip = keep_track_of_totals(t_trip, split, prev_split, trip=True)
+            t_trip = keep_track_of_totals(t_trip, split, prev_split)
             if t_trip.trips > 0:
                 day_trip_str = current_day.strftime("%Y-%m-%d")
                 day_info = current_day.strftime("%H:%M")
@@ -967,7 +997,6 @@ def summary():
         log(f"ERROR: file does not exist: {MONITOR_CSV_FILENAME}")
         return
 
-    linecount = 0
     prev_line = ""
     prev_split = ()
     totals: GrandTotals = GrandTotals(None, None, None, None, None)
@@ -975,12 +1004,11 @@ def summary():
     print_header_and_update_queue()
 
     while True:
-        line = get_next_monitor_csv_line()
+        line = get_corrected_next_monitor_csv_line()
         if line == "":  # EOF
             break  # finish loop
-        linecount += 1
-        _ = D and dbg(str(linecount) + ": LINE=[" + line + "]")
-        split = split_on_comma(line)
+        _ = D and dbg(str(MONITOR_CSV_LINECOUNT) + ": LINE=[" + line + "]")
+        split = MONITOR_CSV_CURR_SPLIT
         if totals.day and not same_day(
             parser.parse(split[DT]), parser.parse(prev_split[DT])
         ):
@@ -989,8 +1017,10 @@ def summary():
             if D:
                 dbg(f"prev_line: {prev_line}\n eod_line: {eod_line}")
             last_split = split_on_comma(eod_line)
-            totals = handle_line(linecount, last_split, prev_split, totals, False)
-        totals = handle_line(linecount, split, prev_split, totals, False)
+            totals = handle_line(
+                MONITOR_CSV_LINECOUNT, last_split, prev_split, totals, False
+            )
+        totals = handle_line(MONITOR_CSV_LINECOUNT, split, prev_split, totals, False)
 
         prev_line = line
         prev_split = split
@@ -1001,9 +1031,9 @@ def summary():
     eod_line = prev_line[0:11] + "23:59:59" + prev_line[19:]
     last_split = split_on_comma(eod_line)
     _ = D and dbg(f"prev_line: {prev_line}\n eod_line: {eod_line}")
-    totals = handle_line(linecount, last_split, prev_split, totals, False)
+    totals = handle_line(MONITOR_CSV_LINECOUNT, last_split, prev_split, totals, False)
     # and show summaries
-    handle_line(linecount, last_split, last_split, totals, True)
+    handle_line(MONITOR_CSV_LINECOUNT, last_split, last_split, totals, True)
     print_header_and_update_queue()
 
 
@@ -1027,13 +1057,17 @@ CHARGE_CSV_FILE = CHARGE_CSV_FILENAME.open("w", encoding="utf-8")
 write_charge_csv("date, odometer, +kWh, end charged SOC%")
 
 
-# always rewrite trip file, because input might be changed
+# always rewrite day and tripfile, because input might be changed
+DAY_CSV_FILE = DAY_CSV_FILENAME.open("w", encoding="utf-8")
+write_day_csv("date, odometer, distance, -kWh, +kWh")
+
 TRIP_CSV_FILE = TRIP_CSV_FILENAME.open("w", encoding="utf-8")
 write_trip_csv("date, odometer, distance, -kWh, +kWh")
 
 summary()  # do the work
 MONITOR_CSV_FILE.close()
 CHARGE_CSV_FILE.close()
+DAY_CSV_FILE.close()
 TRIP_CSV_FILE.close()
 
 if SHEETUPDATE:

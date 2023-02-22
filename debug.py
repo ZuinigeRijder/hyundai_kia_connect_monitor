@@ -85,20 +85,21 @@ def print_info(vehicles: dict) -> None:
             target_soc_range = get_child_value(
                 item, "dte.rangeByFuel.totalAvailableRange.value"
             )
-            print("Target SOC level      : " + str(target_soc_level))
-            print("Target SOC range      : " + str(target_soc_range))
+            print("Target SOC level        : " + str(target_soc_level))
+            print("Target SOC range        : " + str(target_soc_range))
 
-        print("Last updated at       : " + str(vehicle.last_updated_at))
-        print("Location              : " + str(vehicle.location))
-        print("Air temperature       : " + str(vehicle.air_temperature))
-        print("Driving range         : " + str(vehicle.ev_driving_range))
-        print("Charge limits AC      : " + str(vehicle.ev_charge_limits_ac))
-        print("Charge limits DC      : " + str(vehicle.ev_charge_limits_dc))
-        print("Odometer              : " + str(vehicle.odometer))
-        print("Total driving range   : " + str(vehicle.total_driving_range))
-        print("Battery SOC           : " + str(vehicle.ev_battery_percentage))
-        print("12V percentage        : " + str(vehicle.car_battery_percentage))
-        print("Locked                : " + str(vehicle.is_locked))
+        print("Last updated at         : " + str(vehicle.last_updated_at))
+        print("Location Last updated at: " + str(vehicle.location_last_updated_at))
+        print("Location                : " + str(vehicle.location))
+        print("Air temperature         : " + str(vehicle.air_temperature))
+        print("Driving range           : " + str(vehicle.ev_driving_range))
+        print("Charge limits AC        : " + str(vehicle.ev_charge_limits_ac))
+        print("Charge limits DC        : " + str(vehicle.ev_charge_limits_dc))
+        print("Odometer                : " + str(vehicle.odometer))
+        print("Total driving range     : " + str(vehicle.total_driving_range))
+        print("Battery SOC             : " + str(vehicle.ev_battery_percentage))
+        print("12V percentage          : " + str(vehicle.car_battery_percentage))
+        print("Locked                  : " + str(vehicle.is_locked))
 
 
 vm = VehicleManager(
