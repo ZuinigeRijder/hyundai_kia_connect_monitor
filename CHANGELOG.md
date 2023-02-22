@@ -1,3 +1,91 @@
+<a name="R3.8.0"></a>
+# [Added summary day consumption to dailystats and other improvements (R3.8.0)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.8.0) - 22 Feb 2023
+
+summary.py:
+- write summary.day.csv, like summary.trip.csv, so this can be used by dailystats.py
+- improved the SOC readings, when the odometer between two monitor.csv entries are the same, but the next SOC is lower within 20 minutes, skip the first entry, because the SOC is sometimes updated later
+- because of this general skipping, the workaround for TRIP could be removed
+- this improves the consumption figures a bit for DAY, WEEK, MONTH, YEAR 
+- some small code improvements
+
+monitor_utils.py:
+- safe_divide returns now 0.0 when divide by zero
+- added methods get_safe_float and get_safe_datettime
+
+monitor.py:
+- avoid runtime errors by getting safe float and datetime, also when this is None for vehicle.location_longitude, vehicle.location_latitude, vehicle.last_updated_at and vehicle.location_last_updated_at
+
+dailystats.py:
+- added total consumption from summary.day.csv to totals between round brackets
+- added consumption per day to overview between round brackets
+- made column D 2 spaces wider
+- avoid divide by zero
+- some small code improvements
+
+BEFORE without day consumption between round brackets:
+````
+     Totals Recuperation   Consumption    Engine  Climate  Electr. Batt.Care
+    31.8kWh       4.8kWh     5.6km/kWh   27.8kWh   1.2kWh   2.8kWh    0.0kWh
+      178km        14.9% 17.9kWh/100km       87%     3.7%     8.9%      0.0%
+ (+33.6kWh)         Trip                Distance Avg km/h Max km/h      Idle
+                  201min                   178km   60km/h  103km/h     28min
+                                                                            
+ 2023-01-18 Recuperation   Consumption    Engine  Climate  Electr. Batt.Care
+     1.9kWh       0.4kWh     5.1km/kWh    1.4kWh   0.2kWh   0.4kWh    0.0kWh
+       10km        23.1% 19.4kWh/100km       71%     9.2%    20.1%      0.0%
+                    Trip                Distance Avg km/h Max km/h      Idle
+   (0.7kWh)  12:07-12:15   (7.3km/kWh)       5km   43km/h   63km/h      1min
+   (1.4kWh)  09:38-09:47   (3.6km/kWh)       5km   40km/h   63km/h      1min
+
+````
+
+AFTER with day consumption between round brackets:
+````
+     Totals Recuperation   Consumption    Engine  Climate  Electr. Batt.Care
+    31.8kWh       4.8kWh     5.6km/kWh   27.8kWh   1.2kWh   2.8kWh    0.0kWh
+      178km        14.9% 17.9kWh/100km       87%     3.7%     8.9%      0.0%
+ (+33.6kWh)         Trip   (5.4km/kWh)  Distance Avg km/h Max km/h      Idle
+                  201min                   178km   60km/h  103km/h     28min
+                                                                            
+ 2023-01-18 Recuperation   Consumption    Engine  Climate  Electr. Batt.Care
+     1.9kWh       0.4kWh     5.1km/kWh    1.4kWh   0.2kWh   0.4kWh    0.0kWh
+       10km        23.1% 19.4kWh/100km       71%     9.2%    20.1%      0.0%
+                    Trip   (4.9km/kWh)  Distance Avg km/h Max km/h      Idle
+   (0.7kWh)  12:07-12:15   (7.3km/kWh)       5km   43km/h   63km/h      1min
+   (1.4kWh)  09:38-09:47   (3.6km/kWh)       5km   40km/h   63km/h      1min
+````
+
+debug.py:
+- print also vehicle.location_last_updated_at (for USA this datetime was not filled, so this is now more clear)
+
+check_monitor.py (new): 
+- program for testing: when the odometer between two monitor.csv entries are the same, but the next SOC is lower within 20 minutes, skip the first entry, because the SOC is sometimes updated later
+
+requirements.txt:
+- added minimum versions instead of exact versions
+- update to higher version of hyundai_kia_connect_api>=3.1.0
+
+README.md:
+- tested and updated with hyundai_kia_connect_api v3.1.0
+- summary.py: added output summary.day.csv 
+- dailystats.py: added use of summary.day.csv
+- added check_monitor.py
+- added examples
+
+tests\run_tests.bat:
+- added checking for summary.day.csv
+- added option to run limited test (no parameters) or full test (with parameter)
+
+tests\INPUT\*:
+- added summary.cfg used for running the tests
+- much larger real world example input files
+
+tests\OUTPUT\*:
+- new reference files
+
+[Changes][R3.8.0]
+
+
 <a name="R3.7.0"></a>
 # [fix placemark bug in kml.py (R3.7.0)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.7.0) - 15 Feb 2023
 
@@ -12,7 +100,7 @@ fix placemark bug in kml.py
 monitor.py:
 - fix that identical lines are not added to monitor.csv, also do not add when only the address is different
 
-sheetupdate.py:
+summary.py:
 - go to beginning of spreadsheet
 
 dailystats.py:
@@ -1214,6 +1302,7 @@ First release with the following tools:
 [Changes][R1.0.0]
 
 
+[R3.8.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.7.0...R3.8.0
 [R3.7.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.6.0...R3.7.0
 [R3.6.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.5.0...R3.6.0
 [R3.5.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.4.0...R3.5.0
