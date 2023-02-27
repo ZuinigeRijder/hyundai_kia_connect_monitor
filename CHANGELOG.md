@@ -1,3 +1,28 @@
+<a name="R3.8.1"></a>
+# [fix timezone mismatch (R3.8.1)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.8.1) - 27 Feb 2023
+
+In monitor.py and monitor_utils.py the timezone is not filled when datetime is None.
+
+monitor_utils.py (added timezone parameter):
+````
+def get_safe_datetime(date: datetime, tzinfo: timezone) -> datetime:
+    """get safe datetime"""
+    if date is None:
+        return datetime(2000, 1, 1, tzinfo=tzinfo)
+    return date
+````
+
+monitor.py (extra parameter vehicle.timezone):
+````
+    last_updated_at = get_safe_datetime(vehicle.last_updated_at, vehicle.timezone)
+    location_last_updated_at = get_safe_datetime(
+        vehicle.location_last_updated_at, vehicle.timezone
+    )
+````
+
+[Changes][R3.8.1]
+
+
 <a name="R3.8.0"></a>
 # [Added summary day consumption to dailystats and other improvements (R3.8.0)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.8.0) - 22 Feb 2023
 
@@ -1302,6 +1327,7 @@ First release with the following tools:
 [Changes][R1.0.0]
 
 
+[R3.8.1]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.8.0...R3.8.1
 [R3.8.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.7.0...R3.8.0
 [R3.7.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.6.0...R3.7.0
 [R3.6.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.5.0...R3.6.0
