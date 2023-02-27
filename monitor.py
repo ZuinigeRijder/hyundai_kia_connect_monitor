@@ -300,8 +300,10 @@ def handle_one_vehicle(
 
     location_longitude = get_safe_float(vehicle.location_longitude)
     location_latitude = get_safe_float(vehicle.location_latitude)
-    last_updated_at = get_safe_datetime(vehicle.last_updated_at)
-    location_last_updated_at = get_safe_datetime(vehicle.location_last_updated_at)
+    last_updated_at = get_safe_datetime(vehicle.last_updated_at, vehicle.timezone)
+    location_last_updated_at = get_safe_datetime(
+        vehicle.location_last_updated_at, vehicle.timezone
+    )
     dates = [last_updated_at, location_last_updated_at]
     newest_updated_at = max(dates)
     _ = D and dbg(f"newest: {newest_updated_at} from {dates}")

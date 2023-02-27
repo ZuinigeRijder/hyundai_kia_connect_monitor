@@ -5,7 +5,7 @@ monitor utils
 import configparser
 import sys
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 import time
 from typing import Generator
@@ -153,10 +153,10 @@ def get_last_line(filename: Path) -> str:
     return last_line
 
 
-def get_safe_datetime(date: datetime) -> datetime:
+def get_safe_datetime(date: datetime, tzinfo: timezone) -> datetime:
     """get safe datetime"""
     if date is None:
-        return datetime(2000, 1, 1)
+        return datetime(2000, 1, 1, tzinfo=tzinfo)
     return date
 
 
