@@ -109,8 +109,23 @@ vm = VehicleManager(
     password=PASSWORD,
     pin=PIN,
 )
+for KEY in vm.vehicles:
+    VEHICLE = vm.vehicles[KEY]
+    print(f"timezone: {VEHICLE.timezone}")
+    print(f"vehicle: {VEHICLE}")
+
 vm.check_and_refresh_token()
+# vm.force_refresh_all_vehicles_states()
 vm.update_all_vehicles_with_cached_state()  # needed >= 2.0.0
+
+for KEY in vm.vehicles:
+    VEHICLE = vm.vehicles[KEY]
+    print(f"timezone: {VEHICLE.timezone}")
+    print(f"Last updated at: {VEHICLE.last_updated_at}")
+    print(f"Location Last updated at: {VEHICLE.location_last_updated_at}")
+    print(f"Location: {VEHICLE.location}")
+    print(f"vehicle: {VEHICLE}")
+
 print(type(vm.vehicles))
 print(vm.vehicles)
 print("Pretty print vm.vehicles:")

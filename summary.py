@@ -682,7 +682,8 @@ def print_summaries(
     day_str = t_day.current_day.strftime("%Y-%m-%d")
 
     if not same_day(current_day, t_day.current_day) or last:
-        DAY_COUNTER += 1
+        elapsed = current_day - t_day.current_day
+        DAY_COUNTER += elapsed.days
         if DAY:
             day_info = t_day.current_day.strftime("%a")
             print_summary(
