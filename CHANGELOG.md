@@ -1,3 +1,18 @@
+<a name="R3.9.0"></a>
+# [Fixed bug with elapsed days (R3.9.0)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.9.0) - 26 Jun 2023
+
+The elapsed days was computed wrong, so the averages were wrong for:
+- YEARLY
+- MONTH AVG
+- WEEK AVG
+- DAY AVG
+- TRIP AVG
+
+The result was, that the expected km/miles driven for a year was too high.
+
+[Changes][R3.9.0]
+
+
 <a name="R3.8.1"></a>
 # [fix timezone mismatch (R3.8.1)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.8.1) - 27 Feb 2023
 
@@ -1327,6 +1342,7 @@ First release with the following tools:
 [Changes][R1.0.0]
 
 
+[R3.9.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.8.1...R3.9.0
 [R3.8.1]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.8.0...R3.8.1
 [R3.8.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.7.0...R3.8.0
 [R3.7.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.6.0...R3.7.0
