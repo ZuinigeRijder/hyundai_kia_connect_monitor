@@ -203,6 +203,7 @@ pin =
 use_geocode = True
 use_geocode_email = True
 language = en
+odometer_metric = km
 ```
 
 Explanation of the configuration items:
@@ -214,6 +215,7 @@ Explanation of the configuration items:
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
 - use_geocode_email: (default: True) use email to avoid abuse of address lookup
 - language: (default: en) the Bluelink App is reset to English for users who have set another language in the Bluelink App in Europe when using hyundai_kia_connect_api, you can configure another language as workaround
+- odometer_metric, e.g. km or mi
 
 *Note: language is only implemented for Europe currently.*
 
@@ -350,7 +352,6 @@ Notes:
 Example configuration of summary.cfg:
 ```
 [summary]
-odometer_metric = km
 net_battery_size_kwh = 70.0
 average_cost_per_kwh = 0.246
 cost_currency = Euro
@@ -361,7 +362,6 @@ show_zero_values = False
 ```
 
 Explanation of configuration items:
-- odometer_metric, e.g. km or mi
 - net_battery_size_kwh, I have an IONIQ 5 Project 45 with 72.6 kWh battery and 3.5% buffer, so net 70 kWh
 - average_cost_per_kwh, currently the kWh prices are higher in the Netherlands, but I have also solar panels for home charging
 - cost_currency, e.g. Euro or Dollar

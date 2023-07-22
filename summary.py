@@ -15,6 +15,7 @@ from dateutil import parser
 from monitor_utils import (
     log,
     arg_has,
+    get,
     get_vin_arg,
     safe_divide,
     sleep,
@@ -109,19 +110,22 @@ HIGHEST_ODO = 0.0
 
 # == read monitor in monitor.cfg ===========================
 config_parser = configparser.ConfigParser()
-config_parser.read("summary.cfg")
-monitor_settings = dict(config_parser.items("summary"))
+config_parser.read("monitor.cfg")
+monitor_settings = dict(config_parser.items("monitor"))
+ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
 
-ODO_METRIC = monitor_settings["odometer_metric"].lower()
-NET_BATTERY_SIZE_KWH = to_float(monitor_settings["net_battery_size_kwh"])
-AVERAGE_COST_PER_KWH = to_float(monitor_settings["average_cost_per_kwh"])
-COST_CURRENCY = monitor_settings["cost_currency"]
+config_parser.read("summary.cfg")
+summary_settings = dict(config_parser.items("summary"))
+
+NET_BATTERY_SIZE_KWH = to_float(summary_settings["net_battery_size_kwh"])
+AVERAGE_COST_PER_KWH = to_float(summary_settings["average_cost_per_kwh"])
+COST_CURRENCY = summary_settings["cost_currency"]
 MIN_CONSUMPTION_DISCHARGE_KWH = to_float(
-    monitor_settings["min_consumption_discharge_kwh"]
+    summary_settings["min_consumption_discharge_kwh"]
 )
-SMALL_POSITIVE_DELTA = int(monitor_settings["ignore_small_positive_delta_soc"])
-SMALL_NEGATIVE_DELTA = int(monitor_settings["ignore_small_negative_delta_soc"])
-SHOW_ZERO_VALUES = is_true(monitor_settings["show_zero_values"])
+SMALL_POSITIVE_DELTA = int(summary_settings["ignore_small_positive_delta_soc"])
+SMALL_NEGATIVE_DELTA = int(summary_settings["ignore_small_negative_delta_soc"])
+SHOW_ZERO_VALUES = is_true(summary_settings["show_zero_values"])
 
 # indexes to splitted monitor.csv items
 DT = 0  # datetime

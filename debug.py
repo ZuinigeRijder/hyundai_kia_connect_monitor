@@ -31,7 +31,7 @@ def get_child_value(data: dict, key: str) -> dict:
                 value = value[int(k)]
                 # pylint: disable=broad-except
             except Exception:
-                value = None
+                value = {}
     return value
 
 

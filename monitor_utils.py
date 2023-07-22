@@ -46,6 +46,19 @@ def sleep(retries: int) -> int:
     return retries
 
 
+def km_to_mile(kilometer: float) -> float:
+    """Convert km to mile"""
+    mile = kilometer * 0.6213711922
+    return mile
+
+
+def get(dictionary: dict, key: str, default: str = "") -> str:
+    """get key from dictionary"""
+    if key in dictionary:
+        return dictionary[key].strip()
+    return default
+
+
 def safe_divide(numerator: float, denumerator: float) -> float:
     """safe_divide"""
     if denumerator == 0.0:
@@ -57,8 +70,7 @@ def to_int(string: str) -> int:
     """convert to int"""
     if "None" in string:
         return -1
-    split = string.split(".")  # get rid of decimal part
-    return int(split[0].strip())
+    return round(to_float(string))
 
 
 def to_float(string: str) -> float:
