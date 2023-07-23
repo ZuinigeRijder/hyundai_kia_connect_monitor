@@ -14,7 +14,6 @@ from dateutil.relativedelta import relativedelta
 import gspread
 from monitor_utils import (
     get,
-    km_to_mile,
     log,
     arg_has,
     get_vin_arg,
@@ -96,8 +95,6 @@ ENGINE = 5
 CLIMATE = 6
 ELECTRONICS = 7
 BATTERY_CARE = 8
-
-T_UNIT = "km"
 
 TR_HELPER: dict[str, str] = read_translations()
 COLUMN_WIDTHS = [11, 12, 14, 10, 9, 9, 8]
@@ -237,7 +234,7 @@ def reverse_read_next_summary_day_line() -> None:
 
 
 T_DAYS = 0
-T_DISTANCE = 0
+T_DISTANCE = 0.0
 T_CONSUMED = 0
 T_REGENERATED = 0
 T_ENGINE = 0
@@ -249,11 +246,10 @@ T_BATTERY_CARE = 0
 def increment_dailystats_totals(split: list[str]) -> None:
     """increment_dailystats_totals"""
     _ = D and dbg(f"handle_line: {split}")
-    global T_DAYS, T_UNIT, T_DISTANCE, T_CONSUMED, T_REGENERATED, T_ENGINE, T_CLIMATE, T_ELECTRONICS, T_BATTERY_CARE  # noqa pylint:disable=global-statement
+    global T_DAYS, T_DISTANCE, T_CONSUMED, T_REGENERATED, T_ENGINE, T_CLIMATE, T_ELECTRONICS, T_BATTERY_CARE  # noqa pylint:disable=global-statement
 
     # date = split[DATE]
-    distance = to_int(split[DISTANCE])
-    unit = split[DISTANCE_UNIT]
+    distance = to_float(split[DISTANCE])
     consumed = to_int(split[CONSUMED])
     regenerated = to_int(split[REGENERATED])
     engine = to_int(split[ENGINE])
@@ -262,7 +258,6 @@ def increment_dailystats_totals(split: list[str]) -> None:
     battery_care = to_int(split[BATTERY_CARE])
 
     T_DAYS += 1
-    T_UNIT = unit
     T_DISTANCE += distance
     T_CONSUMED += consumed
     T_REGENERATED += regenerated
@@ -274,7 +269,7 @@ def increment_dailystats_totals(split: list[str]) -> None:
 
 TOTAL_TRIPINFO_DRIVE_TIME = 0
 TOTAL_TRIPINFO_IDLE_TIME = 0
-TOTAL_TRIPINFO_DISTANCE = 0
+TOTAL_TRIPINFO_DISTANCE = 0.0
 TOTAL_TRIPINFO_AVERAGE_SPEED = 0
 TOTAL_TRIPINFO_MAX_SPEED = 0
 
@@ -286,7 +281,7 @@ def increment_tripinfo_totals(line: str) -> None:
     split = split_on_comma(line)
     drive_time = to_int(split[2])
     idle_time = to_int(split[3])
-    distance = to_int(split[4])
+    distance = to_float(split[4])
     avg_speed = to_int(split[5])
     max_speed = to_int(split[6])
 
@@ -466,10 +461,6 @@ def print_tripinfo(
         kwh_consumed = -kwh_consumed
     kwh = ""
     consumption = ""
-    if T_UNIT == "km" and ODO_METRIC == "mi":
-        distance = f"{km_to_mile(to_float(distance)):.1f}"
-        avg_speed = f"{km_to_mile(to_float(avg_speed)):.0f}"
-        max_speed = f"{km_to_mile(to_float(max_speed)):.0f}"
     if distance_summary_trip == 0.0:  # just user other distance
         distance_summary_trip = to_float(distance)
     else:
@@ -480,9 +471,15 @@ def print_tripinfo(
         km_mi_per_kwh = safe_divide(distance_summary_trip, kwh_consumed)
         consumption = f"({km_mi_per_kwh:.1f}{ODO_METRIC}/kWh)"
 
-    print_output(
-        f"{kwh},{trip_time_str},{consumption},{distance}{ODO_METRIC},{avg_speed}{ODO_METRIC}/{TR.per_hour},{max_speed}{ODO_METRIC}/{TR.per_hour},{idle_time}min"  # noqa
-    )
+    distance_float = to_float(distance)
+    if ODO_METRIC == "mi":
+        print_output(
+            f"{kwh},{trip_time_str},{consumption},{distance_float:.1f}{ODO_METRIC},{avg_speed}{ODO_METRIC}/{TR.per_hour},{max_speed}{ODO_METRIC}/{TR.per_hour},{idle_time}min"  # noqa
+        )
+    else:
+        print_output(
+            f"{kwh},{trip_time_str},{consumption},{distance_float:.0f}{ODO_METRIC},{avg_speed}{ODO_METRIC}/{TR.per_hour},{max_speed}{ODO_METRIC}/{TR.per_hour},{idle_time}min"  # noqa
+        )
 
 
 def print_day_trip_info(date_org: str) -> None:
@@ -524,7 +521,6 @@ def print_day_trip_info(date_org: str) -> None:
 def print_dailystats(
     date: str,
     distance: float,
-    distance_unit: str,
     consumed: int,
     regenerated: int,
     engine: int,
@@ -533,8 +529,6 @@ def print_dailystats(
     batterycare: int,
 ) -> None:
     """print stats"""
-    if distance_unit == "km" and ODO_METRIC == "mi":
-        distance = km_to_mile(distance)
     regenerated_perc = safe_divide(regenerated * 100, consumed)
     engine_perc = safe_divide(engine * 100, consumed)
     climate_perc = safe_divide(climate * 100, consumed)
@@ -568,7 +562,7 @@ def print_dailystats(
     print_output(
         f"{consumed_kwh:.1f}kWh,{regenerated_kwh:.1f}kWh,{km_mi_per_kwh:.1f}{ODO_METRIC}/kWh,{engine_kwh:.1f}kWh,{climate_kwh:.1f}kWh,{electronics_kwh:.1f}kWh,{battery_care_kwh:.1f}kWh"  # noqa
     )
-    if distance_unit == "km" and ODO_METRIC == "mi":
+    if ODO_METRIC == "mi":
         print_output(
             f"{distance:.1f}{ODO_METRIC},{regenerated_perc:.1f}%,{kwh_per_km_mi:.1f}kWh/100{ODO_METRIC},{engine_perc:.0f}%,{climate_perc:.1f}%,{electronics_perc:.1f}%,{battery_care_perc:.1f}%"  # noqa
         )
@@ -670,7 +664,6 @@ def reverse_print_dailystats_one_line(val: list[str]) -> None:
     print_dailystats(
         date,
         to_int(val[DISTANCE]),
-        val[DISTANCE_UNIT],
         to_int(val[CONSUMED]),
         to_int(val[REGENERATED]),
         to_int(val[ENGINE]),
@@ -840,7 +833,6 @@ reverse_print_dailystats(totals=True)  # do the total dailystats summary first
 print_dailystats(
     "Totals",
     T_DISTANCE,
-    T_UNIT,
     T_CONSUMED,
     T_REGENERATED,
     T_ENGINE,

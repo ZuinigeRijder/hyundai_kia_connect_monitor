@@ -42,9 +42,11 @@ from dateutil.relativedelta import relativedelta
 from hyundai_kia_connect_api import VehicleManager, Vehicle, exceptions
 from monitor_utils import (
     arg_has,
+    get,
     get_last_line,
     get_safe_datetime,
     get_safe_float,
+    km_to_mile,
     log,
     sleep,
     to_int,
@@ -81,6 +83,7 @@ PIN = monitor_settings["pin"]
 USE_GEOCODE = monitor_settings["use_geocode"].lower() == "true"
 USE_GEOCODE_EMAIL = monitor_settings["use_geocode_email"].lower() == "true"
 LANGUAGE = monitor_settings["language"]
+ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
 
 
 # == subroutines =============================================================
@@ -145,7 +148,14 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
                 )
             if dailystats_date >= last_date:
                 # only append not already written daily stats
-                line = f"{stat.distance}, {stat.distance_unit}, {stat.total_consumed}, {stat.regenerated_energy},  {stat.engine_consumption}, {stat.climate_consumption}, {stat.onboard_electronics_consumption}, {stat.battery_care_consumption}"  # noqa
+                distance = float(stat.distance)
+                distance_unit = stat.distance_unit
+                if ODO_METRIC == "mi":
+                    distance = km_to_mile(distance)
+                    distance_unit = ODO_METRIC
+                    line = f"{distance:.1f}, {distance_unit}, {stat.total_consumed}, {stat.regenerated_energy},  {stat.engine_consumption}, {stat.climate_consumption}, {stat.onboard_electronics_consumption}, {stat.battery_care_consumption}"  # noqa
+                else:
+                    line = f"{distance:.0f}, {distance_unit}, {stat.total_consumed}, {stat.regenerated_energy},  {stat.engine_consumption}, {stat.climate_consumption}, {stat.onboard_electronics_consumption}, {stat.battery_care_consumption}"  # noqa
                 if dailystats_date > last_date or last_line != line:
                     dailystats_date = f"{dailystats_date} {today_time_str}"
                     full_line = f"{dailystats_date}, {line}"
@@ -215,7 +225,16 @@ def handle_day_trip_info(
                         )
                     hhmmss = trip.hhmmss
                     if yyyymmdd > last_date or hhmmss > last_hhmmss:
-                        line = f"{yyyymmdd},{hhmmss},{trip.drive_time},{trip.idle_time},{trip.distance},{trip.avg_speed},{trip.max_speed}"  # noqa
+                        distance = float(trip.distance)
+                        avg_speed = float(trip.avg_speed)
+                        max_speed = float(trip.max_speed)
+                        if ODO_METRIC == "mi":
+                            distance = km_to_mile(distance)
+                            avg_speed = km_to_mile(avg_speed)
+                            max_speed = km_to_mile(max_speed)
+                            line = f"{yyyymmdd},{hhmmss},{trip.drive_time},{trip.idle_time},{distance:.1f},{avg_speed:.0f},{max_speed:.0f}"  # noqa
+                        else:
+                            line = f"{yyyymmdd},{hhmmss},{trip.drive_time},{trip.idle_time},{distance:.0f},{avg_speed:.0f},{max_speed:.0f}"  # noqa
                         _ = D and dbg(f"Writing tripinfo line:[{line}]")
                         file.write(line)
                         file.write("\n")
@@ -308,7 +327,12 @@ def handle_one_vehicle(
     newest_updated_at = max(dates)
     _ = D and dbg(f"newest: {newest_updated_at} from {dates}")
     ev_driving_range = to_int(f"{vehicle.ev_driving_range}")
-    line = f"{newest_updated_at}, {location_longitude}, {location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {vehicle.odometer}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa
+    odometer = vehicle.odometer
+    if ODO_METRIC == "mi":
+        odometer = km_to_mile(odometer)
+        line = f"{newest_updated_at}, {location_longitude}, {location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {odometer:.1f}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa
+    else:
+        line = f"{newest_updated_at}, {location_longitude}, {location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {odometer:.0f}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa
     if "None, None" in line:  # something gone wrong, retry
         log(f"Skipping Unexpected line: {line}")
         return True  # exit subroutine with error
