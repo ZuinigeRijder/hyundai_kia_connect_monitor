@@ -1,3 +1,76 @@
+<a name="R3.13.0"></a>
+# [Fix in convert to miles (R3.13.0)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.13.0) - 23 Jul 2023
+
+Fix in convert to miles.
+
+Convert to miles when configured odometer_metric = mi:
+- Forgotten to add/commit monitor.py
+- Also convert in monitor.tripinfo.csv and monitor.dailystats.csv to miles when configured.
+
+Note 1: configuration item "odometer_metric = km" is moved from summary.cfg to monitor.cfg and the default is "km"
+Note 2: when you configure "odometer_metric = mi" in monitor.cfg, make sure to remove all *.csv files, because they might contain not converted values
+Note 3: When converting to miles, sometimes one decimal digit is used to have a more accurate conversion from km to miles
+
+
+
+[Changes][R3.13.0]
+
+
+<a name="R3.12.0"></a>
+# [Convert to miles when configured odometer_metric = mi and returned API unit is km (R3.12.0)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.12.0) - 22 Jul 2023
+
+ Convert to miles when configured odometer_metric = mi and returned API unit is km.
+
+Note 1: configuration item "odometer_metric = km" is moved from summary.cfg to monitor.cfg and the default is "km".
+Note 2: when you configure "odometer_metric = mi" in monitor.cfg, make sure to remove all *.csv files, because they might contain not converted values
+Note 3: When converting to miles, sometimes one decimal digit is used to have a more accurate conversion
+
+[Changes][R3.12.0]
+
+
+<a name="R3.11.0"></a>
+# [EU: Fix for Kia no longer working since 29 june 2023 (R3.11.0)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.11.0) - 03 Jul 2023
+
+The hyundai_kia_connect_api stopped working for EU. Both for Kia and Hyundai, since 29 June 2023.
+See this issue: https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/issues/348
+
+A fix is found for EU Hyundai and EU Kia.
+
+The Hyundai Bluelink server appeared to have a stricter check on pushRegId.
+Also for EU Kia the problem is fixed, besides stricter pushRegId, there is a new AppId and stamp generation made for EU Kia.
+
+hyundai_kia_connect_monitor is not updated (only README.md and requirements.txt).
+
+How to fix it for EU Hyundai and EU Kia:
+- Download the source code of [hyundai_kia_connect_api v3.3.11 here](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases)
+- Extract this source code
+- Replace the hyundai_kia_connect_monitor/hyundai_kia_connect_api folder with the hyundai_kia_connect_api-3.3.11/hyundai_kia_connect_api folder
+
+[Changes][R3.11.0]
+
+
+<a name="R3.10.0"></a>
+# [EU: Fix for Hyundai only no longer working since 29 june 2023 (R3.10.0)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.10.0) - 03 Jul 2023
+
+The hyundai_kia_connect_api stopped working for EU. Both for Kia and Hyundai, since 29 June 2023.
+See this issue: https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/issues/348
+
+A fix is found for EU Hyundai, the Hyundai Bluelink server appeared to have a stricter check on pushRegId.
+
+For EU Kia the problem is NOT fixed yet in hyundai_kia_connect_api and there is worked on by [@cdnninja](https://github.com/cdnninja) and others. There needs to be at least a new AppId and stamp generation to be made for EU Kia.
+
+hyundai_kia_connect_monitor is not updated (only README.md and requirements.txt).
+
+How to fix it for EU Hyundai:
+- Download the source code of [hyundai_kia_connect_api v3.3.8 here](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases)
+- Extract this source code
+- Replace the hyundai_kia_connect_monitor/hyundai_kia_connect_api folder with the hyundai_kia_connect_api-3.3.8/hyundai_kia_connect_api folder
+
+
+
+[Changes][R3.10.0]
+
+
 <a name="R3.9.0"></a>
 # [Fixed bug with elapsed days (R3.9.0)](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.9.0) - 26 Jun 2023
 
@@ -1342,6 +1415,10 @@ First release with the following tools:
 [Changes][R1.0.0]
 
 
+[R3.13.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.12.0...R3.13.0
+[R3.12.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.11.0...R3.12.0
+[R3.11.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.10.0...R3.11.0
+[R3.10.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.9.0...R3.10.0
 [R3.9.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.8.1...R3.9.0
 [R3.8.1]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.8.0...R3.8.1
 [R3.8.0]: https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/compare/R3.7.0...R3.8.0
