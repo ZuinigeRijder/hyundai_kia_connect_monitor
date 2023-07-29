@@ -104,9 +104,9 @@ For this you need to install Python 3.9 or higher. I have installed Python 3.9.1
 [Here is more information about installing Python](https://realpython.com/installing-python/)
 
 Steps:
-- Download the source code of [hyundai_kia_connect_api v3.3.11 here](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases)
+- Download the latest release source code of [hyundai_kia_connect_api here](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/releases)
 - Download the [latest hyundai_kia_connect_monitor release here](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases)
-- Extract both and move the hyundai_kia_connect_api subfolder of hyundai_kia_connect_api-[version] under hyundai_kia_connect_monitor.
+- Extract both and move the hyundai_kia_connect_api subfolder of hyundai_kia_connect_api-[version] underneath hyundai_kia_connect_monitor.
 - Then configure monitor.cfg
 - Then run: python monitor.py
 
