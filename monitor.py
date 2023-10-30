@@ -112,6 +112,11 @@ def writeln(filename: str, string: str) -> None:
         file.write("\n")
 
 
+def to_miles_needed(vehicle: Vehicle) -> bool:
+    """to_miles_needed"""
+    return ODO_METRIC == "mi" and vehicle.odometer_unit == "km"
+
+
 def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
     """handle daily stats"""
     daily_stats = vehicle.daily_stats
@@ -150,7 +155,7 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
                 # only append not already written daily stats
                 distance = float(stat.distance)
                 distance_unit = stat.distance_unit
-                if ODO_METRIC == "mi":
+                if to_miles_needed(vehicle):
                     distance = km_to_mile(distance)
                     distance_unit = ODO_METRIC
                     line = f"{distance:.1f}, {distance_unit}, {stat.total_consumed}, {stat.regenerated_energy},  {stat.engine_consumption}, {stat.climate_consumption}, {stat.onboard_electronics_consumption}, {stat.battery_care_consumption}"  # noqa
@@ -228,7 +233,7 @@ def handle_day_trip_info(
                         distance = float(trip.distance)
                         avg_speed = float(trip.avg_speed)
                         max_speed = float(trip.max_speed)
-                        if ODO_METRIC == "mi":
+                        if to_miles_needed(vehicle):
                             distance = km_to_mile(distance)
                             avg_speed = km_to_mile(avg_speed)
                             max_speed = km_to_mile(max_speed)
@@ -328,7 +333,7 @@ def handle_one_vehicle(
     _ = D and dbg(f"newest: {newest_updated_at} from {dates}")
     ev_driving_range = to_int(f"{vehicle.ev_driving_range}")
     odometer = vehicle.odometer
-    if ODO_METRIC == "mi":
+    if to_miles_needed(vehicle):
         odometer = km_to_mile(odometer)
         line = f"{newest_updated_at}, {location_longitude}, {location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {odometer:.1f}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa
     else:

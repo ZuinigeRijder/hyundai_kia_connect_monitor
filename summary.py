@@ -2,6 +2,7 @@
 """
 Simple Python3 script to make a summary of monitor.csv
 """
+from copy import deepcopy
 from io import TextIOWrapper
 import sys
 import configparser
@@ -697,8 +698,8 @@ def print_summaries(
                 split,
                 1.0,
             )
-        t_day = current_day_values
-        t_trip = current_day_values
+        t_day = deepcopy(current_day_values)
+        t_trip = deepcopy(current_day_values)
 
     if WEEK and (not same_week(current_day, t_week.current_day) or last):
         weeknr = t_week.current_day.strftime("%W")
@@ -709,7 +710,7 @@ def print_summaries(
             split,
             1.0,
         )
-        t_week = current_day_values
+        t_week = deepcopy(current_day_values)
 
     if MONTH and (not same_month(current_day, t_month.current_day) or last):
         month_info = t_month.current_day.strftime("%b")
@@ -720,7 +721,7 @@ def print_summaries(
             split,
             1.0,
         )
-        t_month = current_day_values
+        t_month = deepcopy(current_day_values)
     if YEAR and (not same_year(current_day, t_year.current_day) or last):
         year = t_year.current_day.strftime("%Y")
         print_summary(
@@ -777,7 +778,7 @@ def print_summaries(
             )
 
         DAY_COUNTER = 0
-        t_year = current_day_values
+        t_year = deepcopy(current_day_values)
 
     totals = GrandTotals(t_day, t_week, t_month, t_year, t_trip)
     return totals
@@ -943,11 +944,11 @@ def handle_line(
     if not t_day:
         _ = D and dbg(f"not TDAY: {t_day} first time, fill in with initial values")
         totals = GrandTotals(
-            current_day_values,
-            current_day_values,
-            current_day_values,
-            current_day_values,
-            current_day_values,
+            deepcopy(current_day_values),
+            deepcopy(current_day_values),
+            deepcopy(current_day_values),
+            deepcopy(current_day_values),
+            deepcopy(current_day_values),
         )
         return totals
 
@@ -985,7 +986,7 @@ def handle_line(
                     split,
                     1.0,
                 )
-                t_trip = current_day_values
+                t_trip = deepcopy(current_day_values)
 
     totals = GrandTotals(t_day, t_week, t_month, t_year, t_trip)
 
