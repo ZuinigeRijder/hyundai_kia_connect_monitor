@@ -214,7 +214,9 @@ def read_reverse_order(file_name: str) -> Generator[str, None, None]:
             yield buffer.decode()[::-1]
 
 
-def read_reverse_order_init(path: Path) -> tuple[bool, str, Generator[str, None, None]]:
+def read_reverse_order_init(
+    path: Path,
+) -> tuple[bool, str, Generator[str, None, None]]:
     """ "read_reverse_order_init"""
     eof = False
     last_read_line = ""

@@ -148,6 +148,9 @@ DAY_COUNTER = 0
 LAST_OUTPUT_QUEUE_MAX_LEN = 122
 LAST_OUTPUT_QUEUE: deque[str] = deque(maxlen=LAST_OUTPUT_QUEUE_MAX_LEN)
 
+SHEET_ROW_A = ""
+SHEET_ROW_B = ""
+
 
 @dataclass
 class Totals:
@@ -567,6 +570,7 @@ def print_summary(
     prefix: str, current: Totals, values: Totals, split: list[str], factor: float
 ) -> None:
     """print_summary"""
+    global SHEET_ROW_A, SHEET_ROW_B  # pylint:disable=global-statement
     if D:
         dbg("print_summary")
         dbg("PREV  : " + str(values))
@@ -664,9 +668,8 @@ def print_summary(
         location_last_updated_at = get_splitted_list_item(lastrun_lines, 3)
         last_upd_dt = last_updated_at[1]
         location_last_upd_dt = location_last_updated_at[1]
-        row_a = f"{TR.last_run},{TR.vehicle_upd},{TR.gps_update},{TR.last_entry},{TR.last_address},{TR.odometer} {ODO_METRIC},{TR.driven} {ODO_METRIC},+kWh,-kWh,{ODO_METRIC}/kWh,kWh/100{ODO_METRIC},{TR.cost} {COST_CURRENCY},{TR.soc_perc},{TR.avg} {TR.soc_perc},{TR.min} {TR.soc_perc},{TR.max} {TR.soc_perc},{TR.volt12_perc},{TR.avg} {TR.volt12_perc},{TR.min} {TR.volt12_perc},{TR.max} {TR.volt12_perc},{TR.charges},{TR.trips},{TR.ev_range}"  # noqa
-        row_b = f"{last_run_dt},{last_upd_dt},{location_last_upd_dt},{last_line},{location_str},{odo:.1f},{delta_odo:.1f},{charged_kwh:.1f},{discharged_kwh:.1f},{km_mi_per_kwh_str},{kwh_per_km_mi_str},{cost_str},{t_soc_cur},{t_soc_avg},{t_soc_min},{t_soc_max},{t_volt12_cur},{t_volt12_avg},{t_volt12_min},{t_volt12_max},{t_charges},{t_trips},{ev_range}"  # noqa
-        sheet_append_first_rows(row_a, row_b)
+        SHEET_ROW_A = f"{TR.last_run},{TR.vehicle_upd},{TR.gps_update},{TR.last_entry},{TR.last_address},{TR.odometer} {ODO_METRIC},{TR.driven} {ODO_METRIC},+kWh,-kWh,{ODO_METRIC}/kWh,kWh/100{ODO_METRIC},{TR.cost} {COST_CURRENCY},{TR.soc_perc},{TR.avg} {TR.soc_perc},{TR.min} {TR.soc_perc},{TR.max} {TR.soc_perc},{TR.volt12_perc},{TR.avg} {TR.volt12_perc},{TR.min} {TR.volt12_perc},{TR.max} {TR.volt12_perc},{TR.charges},{TR.trips},{TR.ev_range}"  # noqa
+        SHEET_ROW_B = f"{last_run_dt},{last_upd_dt},{location_last_upd_dt},{last_line},{location_str},{odo:.1f},{delta_odo:.1f},{charged_kwh:.1f},{discharged_kwh:.1f},{km_mi_per_kwh_str},{kwh_per_km_mi_str},{cost_str},{t_soc_cur},{t_soc_avg},{t_soc_min},{t_soc_max},{t_volt12_cur},{t_volt12_avg},{t_volt12_min},{t_volt12_max},{t_charges},{t_trips},{ev_range}"  # noqa
     else:
         output = f"{prefix},{odo_str},{delta_odo_str},{charged_kwh_str},{discharged_kwh_str},{km_mi_per_kwh_str},{kwh_per_km_mi_str},{cost_str},{t_soc_cur},{t_soc_avg},{t_soc_min},{t_soc_max},{t_volt12_cur},{t_volt12_avg},{t_volt12_min},{t_volt12_max},{t_charges_str},{t_trips_str},{ev_range},{location_str}"  # noqa
         print_output_and_update_queue(output)
@@ -1043,21 +1046,6 @@ def summary():
     print_header_and_update_queue()
 
 
-if SHEETUPDATE:
-    RETRIES = 2
-    while RETRIES > 0:
-        try:
-            gc = gspread.service_account()
-            spreadsheet = gc.open(OUTPUT_SPREADSHEET_NAME)
-            SHEET = spreadsheet.sheet1
-            SHEET.clear()
-            RETRIES = 0
-        except Exception as ex:  # pylint: disable=broad-except
-            log("Exception: " + str(ex))
-            traceback.print_exc()
-            RETRIES = sleep(RETRIES)
-
-
 # always rewrite charge file, because input might be changed
 CHARGE_CSV_FILE = CHARGE_CSV_FILENAME.open("w", encoding="utf-8")
 write_charge_csv("date, odometer, +kWh, end charged SOC%")
@@ -1080,6 +1068,11 @@ if SHEETUPDATE:
     RETRIES = 2
     while RETRIES > 0:
         try:
+            gc = gspread.service_account()
+            spreadsheet = gc.open(OUTPUT_SPREADSHEET_NAME)
+            SHEET = spreadsheet.sheet1
+            SHEET.clear()
+            sheet_append_first_rows(SHEET_ROW_A, SHEET_ROW_B)
             print_output_queue()
             RETRIES = 0
         except Exception as ex:  # pylint: disable=broad-except
