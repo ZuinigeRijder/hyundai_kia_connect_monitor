@@ -1,6 +1,7 @@
 # == debug.py Author: Zuinige Rijder =========================================
 """ Simple Python3 script to debug hyundai_kia_connect_api values """
 import configparser
+from datetime import datetime
 import logging
 from hyundai_kia_connect_api import VehicleManager, Vehicle
 
@@ -125,6 +126,22 @@ for KEY in vm.vehicles:
     print(f"Location Last updated at: {VEHICLE.location_last_updated_at}")
     print(f"Location: {VEHICLE.location}")
     print(f"vehicle: {VEHICLE}")
+
+    now = datetime.now()
+    yyyymm = now.strftime("%Y%m")
+    yyyymmdd = now.strftime("%Y%m%d")
+    vm.update_month_trip_info(VEHICLE.id, yyyymm)
+    if VEHICLE.month_trip_info is not None:
+        for day in VEHICLE.month_trip_info.day_list:  # ordered on day
+            if yyyymmdd == day.yyyymmdd:  # in example only interested in current day
+                vm.update_day_trip_info(VEHICLE.id, day.yyyymmdd)
+                if VEHICLE.day_trip_info is not None:
+                    for trip in reversed(
+                        VEHICLE.day_trip_info.trip_list
+                    ):  # show oldest first
+                        print(
+                            f"{day.yyyymmdd},{trip.hhmmss},{trip.drive_time},{trip.idle_time},{trip.distance},{trip.avg_speed},{trip.max_speed}"  # noqa
+                        )
 
 print(type(vm.vehicles))
 print(vm.vehicles)
