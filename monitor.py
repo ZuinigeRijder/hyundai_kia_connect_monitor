@@ -319,7 +319,7 @@ def handle_one_vehicle(
         if len(vehicle.geocode) > 0:
             # replace comma by semicolon for easier splitting
             geocode_name = vehicle.geocode[0]
-            if geocode_name != "":
+            if geocode_name is not None and geocode_name != "":
                 geocode = geocode_name.replace(",", ";")
 
     location_longitude = get_safe_float(vehicle.location_longitude)
