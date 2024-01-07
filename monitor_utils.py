@@ -256,10 +256,11 @@ def read_translations() -> dict:
     """read translations"""
     translations: dict = {}
     parser = configparser.ConfigParser()
-    parser.read("monitor.cfg")
+    script_dirname = os.path.abspath(os.path.dirname(__file__))
+    parser.read(f"{script_dirname}/monitor.cfg")
     monitor_settings = dict(parser.items("monitor"))
     language = monitor_settings["language"].lower().strip()
-    translations_csv_file = Path("monitor.translations.csv")
+    translations_csv_file = Path(f"{script_dirname}/monitor.translations.csv")
     with translations_csv_file.open("r", encoding="utf-8") as inputfile:
         linecount = 0
         column = 1

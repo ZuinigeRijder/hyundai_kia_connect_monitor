@@ -4,6 +4,7 @@ Simple Python3 script to make a dailystats overview
 """
 import configparser
 from dataclasses import dataclass
+from os import path
 import re
 import sys
 import traceback
@@ -81,7 +82,8 @@ if VIN != "":
 _ = D and dbg(f"DAILYSTATS_CSV_FILE: {DAILYSTATS_CSV_FILE.name}")
 
 parser = configparser.ConfigParser()
-parser.read("monitor.cfg")
+SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
+parser.read(f"{SCRIPT_DIRNAME}/monitor.cfg")
 monitor_settings = dict(parser.items("monitor"))
 ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
 

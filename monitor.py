@@ -30,6 +30,7 @@ e.g. with Excel:
 - charging pattern over time
 - visited places
 """
+from os import path
 import re
 import sys
 import io
@@ -72,7 +73,8 @@ if D:
 
 # == read monitor in monitor.cfg ===========================
 parser = configparser.ConfigParser()
-parser.read("monitor.cfg")
+SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
+parser.read(f"{SCRIPT_DIRNAME}/monitor.cfg")
 monitor_settings = dict(parser.items("monitor"))
 
 REGION = monitor_settings["region"]
@@ -333,6 +335,8 @@ def handle_one_vehicle(
     _ = D and dbg(f"newest: {newest_updated_at} from {dates}")
     ev_driving_range = to_int(f"{vehicle.ev_driving_range}")
     odometer = vehicle.odometer
+    if odometer is None:
+        odometer = 0.0
     if to_miles_needed(vehicle):
         odometer = km_to_mile(odometer)
         line = f"{newest_updated_at}, {location_longitude}, {location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {odometer:.1f}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa

@@ -4,6 +4,7 @@ Simple Python3 script to make a summary of monitor.csv
 """
 from copy import deepcopy
 from io import TextIOWrapper
+from os import path
 import sys
 import configparser
 import traceback
@@ -111,11 +112,12 @@ HIGHEST_ODO = 0.0
 
 # == read monitor in monitor.cfg ===========================
 config_parser = configparser.ConfigParser()
-config_parser.read("monitor.cfg")
+SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
+config_parser.read(f"{SCRIPT_DIRNAME}/monitor.cfg")
 monitor_settings = dict(config_parser.items("monitor"))
 ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
 
-config_parser.read("summary.cfg")
+config_parser.read(f"{SCRIPT_DIRNAME}/summary.cfg")
 summary_settings = dict(config_parser.items("summary"))
 
 NET_BATTERY_SIZE_KWH = to_float(summary_settings["net_battery_size_kwh"])
@@ -453,8 +455,6 @@ def get_next_monitor_csv_line() -> str:
     Skips empty lines
     Skips header lines
     Skips lines without ,
-    Skips identical lines
-    Skips identical lines, where only the datetime is different
     Does fill INPUT_CSV_READ_AHEAD_LINE (for external use)
     """
     global MONITOR_CSV_FILE_EOL, MONITOR_CSV_READ_AHEAD_LINE, MONITOR_CSV_READ_DONE_ONCE, MONITOR_CSV_CURR_SPLIT, MONITOR_CSV_NEXT_SPLIT, MONITOR_CSV_LINECOUNT  # noqa pylint:disable=global-statement
@@ -477,19 +477,13 @@ def get_next_monitor_csv_line() -> str:
             MONITOR_CSV_NEXT_SPLIT = []
             break  # finished
 
-        if line != MONITOR_CSV_READ_AHEAD_LINE:  # skip identical lines
-            line = line.strip()
-            # only lines with content and not header line
-            if line != "" and not line.startswith("datetime"):
-                index = line.find(",")
-                next_line = MONITOR_CSV_READ_AHEAD_LINE.strip()
-                read_ahead_index = next_line.find(",")
-                # skip identical lines, when only first column (datetime) is the same
-                if index >= 0 and (
-                    read_ahead_index < 0 or next_line[read_ahead_index:] != line[index:]
-                ):
-                    _ = D and dbg(f"next=[{line}]")
-                    return line
+        line = line.strip()
+        # only lines with content and not header line
+        if line != "" and not line.startswith("datetime"):
+            index = line.find(",")
+            if index >= 0:
+                _ = D and dbg(f"next=[{line}]")
+                return line
 
         _ = D and dbg(f"skip=[{line}]")
 

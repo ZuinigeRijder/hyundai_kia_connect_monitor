@@ -3,13 +3,15 @@
 import configparser
 from datetime import datetime
 import logging
+from os import path
 from hyundai_kia_connect_api import VehicleManager, Vehicle
 
 logging.basicConfig(level=logging.DEBUG)
 
 # == read monitor settings in monitor.cfg ==================
 parser = configparser.ConfigParser()
-parser.read("monitor.cfg")
+SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
+parser.read(f"{SCRIPT_DIRNAME}/monitor.cfg")
 monitor_settings = dict(parser.items("monitor"))
 
 REGION = monitor_settings["region"]
