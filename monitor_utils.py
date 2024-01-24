@@ -3,6 +3,7 @@
 monitor utils
 """
 import configparser
+import errno
 import sys
 import os
 from datetime import datetime, timezone
@@ -44,6 +45,19 @@ def sleep(retries: int) -> int:
             log("Sleeping a minute")
             time.sleep(60)
     return retries
+
+
+def get_filepath(filename: str) -> str:
+    """get_filepath"""
+    if os.path.isfile(filename):  # current directory
+        filepath = filename
+    else:  # script directory
+        script_dirname = os.path.abspath(os.path.dirname(__file__))
+        filepath = f"{script_dirname}/{filename}"
+
+    if not os.path.isfile(filepath):
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filepath)
+    return filepath
 
 
 def km_to_mile(kilometer: float) -> float:
@@ -256,11 +270,10 @@ def read_translations() -> dict:
     """read translations"""
     translations: dict = {}
     parser = configparser.ConfigParser()
-    script_dirname = os.path.abspath(os.path.dirname(__file__))
-    parser.read(f"{script_dirname}/monitor.cfg")
+    parser.read(get_filepath("monitor.cfg"))
     monitor_settings = dict(parser.items("monitor"))
     language = monitor_settings["language"].lower().strip()
-    translations_csv_file = Path(f"{script_dirname}/monitor.translations.csv")
+    translations_csv_file = Path(get_filepath("monitor.translations.csv"))
     with translations_csv_file.open("r", encoding="utf-8") as inputfile:
         linecount = 0
         column = 1

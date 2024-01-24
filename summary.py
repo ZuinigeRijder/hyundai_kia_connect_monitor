@@ -4,7 +4,6 @@ Simple Python3 script to make a summary of monitor.csv
 """
 from copy import deepcopy
 from io import TextIOWrapper
-from os import path
 import sys
 import configparser
 import traceback
@@ -15,6 +14,7 @@ from collections import deque
 import gspread
 from dateutil import parser
 from monitor_utils import (
+    get_filepath,
     log,
     arg_has,
     get,
@@ -112,12 +112,11 @@ HIGHEST_ODO = 0.0
 
 # == read monitor in monitor.cfg ===========================
 config_parser = configparser.ConfigParser()
-SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
-config_parser.read(f"{SCRIPT_DIRNAME}/monitor.cfg")
+config_parser.read(get_filepath("monitor.cfg"))
 monitor_settings = dict(config_parser.items("monitor"))
 ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
 
-config_parser.read(f"{SCRIPT_DIRNAME}/summary.cfg")
+config_parser.read(get_filepath("summary.cfg"))
 summary_settings = dict(config_parser.items("summary"))
 
 NET_BATTERY_SIZE_KWH = to_float(summary_settings["net_battery_size_kwh"])

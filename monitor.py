@@ -30,7 +30,6 @@ e.g. with Excel:
 - charging pattern over time
 - visited places
 """
-from os import path
 import re
 import sys
 import io
@@ -44,6 +43,7 @@ from hyundai_kia_connect_api import VehicleManager, Vehicle, exceptions
 from monitor_utils import (
     arg_has,
     get,
+    get_filepath,
     get_last_line,
     get_safe_datetime,
     get_safe_float,
@@ -73,8 +73,7 @@ if D:
 
 # == read monitor in monitor.cfg ===========================
 parser = configparser.ConfigParser()
-SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
-parser.read(f"{SCRIPT_DIRNAME}/monitor.cfg")
+parser.read(get_filepath("monitor.cfg"))
 monitor_settings = dict(parser.items("monitor"))
 
 REGION = monitor_settings["region"]

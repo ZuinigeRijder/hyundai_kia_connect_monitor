@@ -4,7 +4,6 @@ Simple Python3 script to make a dailystats overview
 """
 import configparser
 from dataclasses import dataclass
-from os import path
 import re
 import sys
 import traceback
@@ -15,6 +14,7 @@ from dateutil.relativedelta import relativedelta
 import gspread
 from monitor_utils import (
     get,
+    get_filepath,
     log,
     arg_has,
     get_vin_arg,
@@ -82,8 +82,7 @@ if VIN != "":
 _ = D and dbg(f"DAILYSTATS_CSV_FILE: {DAILYSTATS_CSV_FILE.name}")
 
 parser = configparser.ConfigParser()
-SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
-parser.read(f"{SCRIPT_DIRNAME}/monitor.cfg")
+parser.read(get_filepath("monitor.cfg"))
 monitor_settings = dict(parser.items("monitor"))
 ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
 
