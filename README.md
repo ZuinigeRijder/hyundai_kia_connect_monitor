@@ -954,8 +954,9 @@ _ = D and dbg(f"some formatting")
 
 How often should I run the tools:
 - this depends on your usage pattern
-- if you are only interested in daily statistics and trip info from the car, you only need to run monitor.py and dailystats.py once a day, because it will retrieve the daily stats and trip stats from the server
-- if you want to capture charging sessions, then you need to run monitor.py before the charging session and after the charging session, if you only charge in the night, then twice is sufficient (in the evening once before charging and in the morning once before leaving with the car)
+- if you are only interested in daily statistics and trip info from the car, you only need to run monitor.py once a day, because it will retrieve the daily stats and trip stats from the server
+- if you want to capture charging sessions, then you need to run monitor.py before the charging session and after the charging session. If you only charge in the night, then twice is sufficient (in the evening once before charging and in the morning once before leaving with the car)
+- If you want the latest information of the car (e.g. battery percentage) to be send to the bluelink server, do a refresh status in the bluelink App and thereafter run monitor.py
 - if you also want to catch trip consumption figures and charging sessions during the day with summary.py, you need to run monitor.py as often as is allowed with the API call limit, e.g. I run monitor.py once per 15 minutes between 6:00 and 22:00
 
 Why are regularly exceptions thrown when running monitor.py?
