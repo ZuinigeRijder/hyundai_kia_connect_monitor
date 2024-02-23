@@ -13,6 +13,7 @@ from collections import deque
 from dateutil.relativedelta import relativedelta
 import gspread
 from monitor_utils import (
+    float_to_string_no_trailing_zero,
     get,
     get_filepath,
     log,
@@ -345,7 +346,7 @@ def get_day_consumption_per_kwh(date: str) -> str:
                 discharge = to_float(split[3])
                 consumption = safe_divide(distance, abs(discharge))
                 if consumption > 0.0:
-                    day_consumption_per_kwh = f"({consumption:.1f}{ODO_METRIC}/kWh)"
+                    day_consumption_per_kwh = f"({float_to_string_no_trailing_zero(consumption)}{ODO_METRIC}/kWh)"  # noqa
                 reverse_read_next_summary_day_line()
                 break  # finished
             elif consumption_date < date:
@@ -356,7 +357,7 @@ def get_day_consumption_per_kwh(date: str) -> str:
         reverse_read_next_summary_day_line()
     if D:
         print(
-            f"day_consumption_per_kwh=({date})={day_consumption_per_kwh} distance:{distance:.1f} discharge:{discharge:.1f}"  # noqa
+            f"day_consumption_per_kwh=({date})={day_consumption_per_kwh} distance:{float_to_string_no_trailing_zero(distance)} discharge:{float_to_string_no_trailing_zero(discharge)}"  # noqa
         )
     return day_consumption_per_kwh
 
@@ -465,22 +466,21 @@ def print_tripinfo(
     if distance_summary_trip == 0.0:  # just user other distance
         distance_summary_trip = to_float(distance)
     else:
-        consumption = f"({distance_summary_trip:.1f}{ODO_METRIC})"
+        consumption = (
+            f"({float_to_string_no_trailing_zero(distance_summary_trip)}{ODO_METRIC})"
+        )
 
     if kwh_consumed > 0.0:
-        kwh = f"({kwh_consumed:.1f}kWh)"
+        kwh = f"({float_to_string_no_trailing_zero(kwh_consumed)}kWh)"
         km_mi_per_kwh = safe_divide(distance_summary_trip, kwh_consumed)
-        consumption = f"({km_mi_per_kwh:.1f}{ODO_METRIC}/kWh)"
+        consumption = (
+            f"({float_to_string_no_trailing_zero(km_mi_per_kwh)}{ODO_METRIC}/kWh)"
+        )
 
     distance_float = to_float(distance)
-    if ODO_METRIC == "mi":
-        print_output(
-            f"{kwh},{trip_time_str},{consumption},{distance_float:.1f}{ODO_METRIC},{avg_speed}{ODO_METRIC}/{TR.per_hour},{max_speed}{ODO_METRIC}/{TR.per_hour},{idle_time}min"  # noqa
-        )
-    else:
-        print_output(
-            f"{kwh},{trip_time_str},{consumption},{distance_float:.0f}{ODO_METRIC},{avg_speed}{ODO_METRIC}/{TR.per_hour},{max_speed}{ODO_METRIC}/{TR.per_hour},{idle_time}min"  # noqa
-        )
+    print_output(
+        f"{kwh},{trip_time_str},{consumption},{float_to_string_no_trailing_zero(distance_float)}{ODO_METRIC},{avg_speed}{ODO_METRIC}/{TR.per_hour},{max_speed}{ODO_METRIC}/{TR.per_hour},{idle_time}min"  # noqa
+    )
 
 
 def print_day_trip_info(date_org: str) -> None:
@@ -561,16 +561,11 @@ def print_dailystats(
         f"{totals},{TR.recuperation},{TR.consumption},{TR.engine},{TR.climate},{TR.electronic_devices},{TR.battery_care}"  # noqa
     )
     print_output(
-        f"{consumed_kwh:.1f}kWh,{regenerated_kwh:.1f}kWh,{km_mi_per_kwh:.1f}{ODO_METRIC}/kWh,{engine_kwh:.1f}kWh,{climate_kwh:.1f}kWh,{electronics_kwh:.1f}kWh,{battery_care_kwh:.1f}kWh"  # noqa
+        f"{float_to_string_no_trailing_zero(consumed_kwh)}kWh,{float_to_string_no_trailing_zero(regenerated_kwh)}kWh,{float_to_string_no_trailing_zero(km_mi_per_kwh)}{ODO_METRIC}/kWh,{float_to_string_no_trailing_zero(engine_kwh)}kWh,{float_to_string_no_trailing_zero(climate_kwh)}kWh,{float_to_string_no_trailing_zero(electronics_kwh)}kWh,{float_to_string_no_trailing_zero(battery_care_kwh)}kWh"  # noqa
     )
-    if ODO_METRIC == "mi":
-        print_output(
-            f"{distance:.1f}{ODO_METRIC},{regenerated_perc:.1f}%,{kwh_per_km_mi:.1f}kWh/100{ODO_METRIC},{engine_perc:.0f}%,{climate_perc:.1f}%,{electronics_perc:.1f}%,{battery_care_perc:.1f}%"  # noqa
-        )
-    else:
-        print_output(
-            f"{distance:.0f}{ODO_METRIC},{regenerated_perc:.1f}%,{kwh_per_km_mi:.1f}kWh/100{ODO_METRIC},{engine_perc:.0f}%,{climate_perc:.1f}%,{electronics_perc:.1f}%,{battery_care_perc:.1f}%"  # noqa
-        )
+    print_output(
+        f"{float_to_string_no_trailing_zero(distance)}{ODO_METRIC},{float_to_string_no_trailing_zero(regenerated_perc)}%,{float_to_string_no_trailing_zero(kwh_per_km_mi)}kWh/100{ODO_METRIC},{engine_perc:.0f}%,{float_to_string_no_trailing_zero(climate_perc)}%,{float_to_string_no_trailing_zero(electronics_perc)}%,{float_to_string_no_trailing_zero(battery_care_perc)}%"  # noqa
+    )
 
 
 def compute_total_charge() -> float:
@@ -614,7 +609,7 @@ def compute_total_consumption_per_kwh() -> float:
     result = safe_divide(total_distance, abs(total_kwh_consumed))
     if D:
         print(
-            f"compute_total_consumption_per_kwh: distance:{total_distance:.1f} -kWh: {total_kwh_consumed:.1f} consumption:{result:.1f}"  # noqa
+            f"compute_total_consumption_per_kwh: distance:{float_to_string_no_trailing_zero(total_distance)} -kWh: {float_to_string_no_trailing_zero(total_kwh_consumed)} consumption:{float_to_string_no_trailing_zero(result)}"  # noqa
         )
     return result
 
@@ -638,7 +633,7 @@ def summary_tripinfo() -> None:
     total_consumption_per_kwh = compute_total_consumption_per_kwh()
     consumption_per_kwh = ""
     if total_consumption_per_kwh > 0.0:
-        consumption_per_kwh = f"({total_consumption_per_kwh:.1f}{ODO_METRIC}/kWh)"
+        consumption_per_kwh = f"({float_to_string_no_trailing_zero(total_consumption_per_kwh)}{ODO_METRIC}/kWh)"  # noqa
     average_speed = round(
         safe_divide(TOTAL_TRIPINFO_AVERAGE_SPEED, TOTAL_TRIPINFO_DRIVE_TIME)
     )
@@ -646,7 +641,7 @@ def summary_tripinfo() -> None:
         date_org="",
         header=True,
         day_consumption_per_kwh=consumption_per_kwh,
-        charge=f"(+{total_charge:.1f}kWh)",
+        charge=f"(+{float_to_string_no_trailing_zero(total_charge)}kWh)",
         start_time="",
         drive_time=f"{TOTAL_TRIPINFO_DRIVE_TIME}",
         idle_time=f"{TOTAL_TRIPINFO_IDLE_TIME}",
@@ -664,7 +659,7 @@ def reverse_print_dailystats_one_line(val: list[str]) -> None:
         date = date[0:4] + "-" + date[4:6] + "-" + date[6:]
     print_dailystats(
         date,
-        to_int(val[DISTANCE]),
+        to_float(val[DISTANCE]),
         to_int(val[CONSUMED]),
         to_int(val[REGENERATED]),
         to_int(val[ENGINE]),

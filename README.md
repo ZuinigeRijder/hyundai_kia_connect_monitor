@@ -27,6 +27,10 @@ Automatic trip administration tools for Hyundai Bluelink or Kia UVO Connect user
 Determining afterwards your private and/or business trips and information about those trips and usage of the car.
 Best of all is the fact that it does NOT drain your 12 volt battery of the car, because it only uses the cached server information!
 
+Examples of supported cars (including cars with newer [ccNC Infotainment](https://ifdesign.com/en/winner-ranking/project/hyundai-ccnc-infotainment-system-seon/568244)):
+- Hyundai (Bluelink): Ioniq, IONIQ 5, IONIQ 6, Kona
+- Kia (Connect): EV6, EV9, Niro, Soul
+
 [Here a video](http://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U) with some nice diagrams in Google Spreadsheet, showing:
 
 Daily Statistics:
