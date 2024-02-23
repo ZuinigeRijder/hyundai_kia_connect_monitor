@@ -144,7 +144,7 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
         last_line = get_last_line(Path(filename))
         last_date = last_line.split(",")[0].strip().split(" ")[0].strip()
         last_line = re.sub("^[^,]*,", "", last_line).strip()  # get rid of first column
-        print(f"daily_stats: {daily_stats}")
+        _ = D and dbg(f"daily_stats: {daily_stats}")
         i = len(daily_stats)
         while i > 0:
             i = i - 1
