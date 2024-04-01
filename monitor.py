@@ -75,7 +75,7 @@ if D:
 # == read monitor in monitor.cfg ===========================
 parser = configparser.ConfigParser()
 parser.read(get_filepath("monitor.cfg"))
-monitor_settings = dict(parser.items("monitor"))
+monitor_settings = dict(parser.items("monitor",raw=True))
 
 REGION = monitor_settings["region"]
 BRAND = monitor_settings["brand"]
