@@ -159,20 +159,20 @@ class Totals:
 
     current_day: datetime
     odo: float
-    charged_perc: int
-    discharged_perc: int
+    charged_perc: float
+    discharged_perc: float
     charges: int
     trips: int
     elapsed_minutes: int
-    soc_cur: int
+    soc_cur: float
     soc_avg: float
-    soc_min: int
-    soc_max: int
+    soc_min: float
+    soc_max: float
     volt12_cur: int
     volt12_avg: float
     volt12_min: int
     volt12_max: int
-    soc_charged: int
+    soc_charged: float
 
 
 @dataclass
@@ -276,7 +276,30 @@ def init(current_day: datetime, odo: float, soc: int, volt12: int) -> Totals:
     return totals
 
 
-COLUMN_WIDTHS = [13, 10, 5, 7, 8, 8, 8, 5, 5, 8, 3, 3, 3, 3, 3, 3, 3, 3, 6, 6, 4, 99]
+COLUMN_WIDTHS = [
+    13,  # Period
+    10,  # Date
+    5,  # Info
+    7,  # Odometer
+    8,  # Delta km
+    8,  # +kWh
+    8,  # -kWh
+    5,  # km/kWh
+    5,  # kWh/100km
+    8,  # Cost
+    4,  # SOC%
+    4,  # SOC% Avg
+    4,  # Soc% Min
+    4,  # SOC% Max
+    3,  # 12V%
+    3,  # 12V% Avg
+    3,  # 12V% Min
+    3,  # 12V% Max
+    6,  # #Charging
+    6,  # #Trips
+    4,  # Range
+    99,  # Address
+]
 
 
 def print_output_and_update_queue(output: str) -> None:
@@ -634,7 +657,7 @@ def print_summary(
             )
             if charged_kwh > 3.0:
                 write_charge_csv(
-                    f"{date}, {odo:.1f}, {float_to_string_no_trailing_zero(charged_kwh)}, {t_soc_charged}"  # noqa
+                    f"{date}, {odo:.1f}, {float_to_string_no_trailing_zero(charged_kwh)}, {float_to_string_no_trailing_zero(t_soc_charged)}"  # noqa
                 )
 
     if TRIP and prefix.startswith("TRIP "):
@@ -662,9 +685,9 @@ def print_summary(
         last_upd_dt = last_updated_at[1]
         location_last_upd_dt = location_last_updated_at[1]
         SHEET_ROW_A = f"{TR.last_run},{TR.vehicle_upd},{TR.gps_update},{TR.last_entry},{TR.last_address},{TR.odometer} {ODO_METRIC},{TR.driven} {ODO_METRIC},+kWh,-kWh,{ODO_METRIC}/kWh,kWh/100{ODO_METRIC},{TR.cost} {COST_CURRENCY},{TR.soc_perc},{TR.avg} {TR.soc_perc},{TR.min} {TR.soc_perc},{TR.max} {TR.soc_perc},{TR.volt12_perc},{TR.avg} {TR.volt12_perc},{TR.min} {TR.volt12_perc},{TR.max} {TR.volt12_perc},{TR.charges},{TR.trips},{TR.ev_range}"  # noqa
-        SHEET_ROW_B = f"{last_run_dt},{last_upd_dt},{location_last_upd_dt},{last_line},{location_str},{odo:.1f},{float_to_string_no_trailing_zero(delta_odo)},{float_to_string_no_trailing_zero(charged_kwh)},{float_to_string_no_trailing_zero(discharged_kwh)},{km_mi_per_kwh_str},{kwh_per_km_mi_str},{cost_str},{t_soc_cur},{t_soc_avg},{t_soc_min},{t_soc_max},{t_volt12_cur},{t_volt12_avg},{t_volt12_min},{t_volt12_max},{t_charges},{t_trips},{ev_range}"  # noqa
+        SHEET_ROW_B = f"{last_run_dt},{last_upd_dt},{location_last_upd_dt},{last_line},{location_str},{odo:.1f},{float_to_string_no_trailing_zero(delta_odo)},{float_to_string_no_trailing_zero(charged_kwh)},{float_to_string_no_trailing_zero(discharged_kwh)},{km_mi_per_kwh_str},{kwh_per_km_mi_str},{cost_str},{float_to_string_no_trailing_zero(t_soc_cur)},{float_to_string_no_trailing_zero(t_soc_avg)},{float_to_string_no_trailing_zero(t_soc_min)},{float_to_string_no_trailing_zero(t_soc_max)},{t_volt12_cur},{t_volt12_avg},{t_volt12_min},{t_volt12_max},{t_charges},{t_trips},{ev_range}"  # noqa
     else:
-        output = f"{prefix},{odo_str},{delta_odo_str},{charged_kwh_str},{discharged_kwh_str},{km_mi_per_kwh_str},{kwh_per_km_mi_str},{cost_str},{t_soc_cur},{t_soc_avg},{t_soc_min},{t_soc_max},{t_volt12_cur},{t_volt12_avg},{t_volt12_min},{t_volt12_max},{t_charges_str},{t_trips_str},{ev_range},{location_str}"  # noqa
+        output = f"{prefix},{odo_str},{delta_odo_str},{charged_kwh_str},{discharged_kwh_str},{km_mi_per_kwh_str},{kwh_per_km_mi_str},{cost_str},{float_to_string_no_trailing_zero(t_soc_cur)},{float_to_string_no_trailing_zero(t_soc_avg)},{float_to_string_no_trailing_zero(t_soc_min)},{float_to_string_no_trailing_zero(t_soc_max)},{t_volt12_cur},{t_volt12_avg},{t_volt12_min},{t_volt12_max},{t_charges_str},{t_trips_str},{ev_range},{location_str}"  # noqa
         print_output_and_update_queue(output)
 
 
@@ -816,14 +839,14 @@ def keep_track_of_totals(
     ) != to_float(prev_split[LON])
     moved = coord_changed or delta_odo != 0.0
 
-    soc = to_int(split[SOC])
-    prev_soc = to_int(prev_split[SOC])
+    soc = to_float(split[SOC])
+    prev_soc = to_float(prev_split[SOC])
     delta_soc = soc - prev_soc
-    if (soc == 0 or prev_soc == 0) and abs(delta_soc) > 5:
+    if (soc == 0.0 or prev_soc == 0.0) and abs(delta_soc) > 5:
         # possibly wrong readout, take largest
         soc = max(soc, prev_soc)
         prev_soc = soc
-        delta_soc = 0
+        delta_soc = 0.0
 
     if delta_odo > 0.0:
         t_trips += 1
@@ -855,7 +878,7 @@ def keep_track_of_totals(
     prev_charging = is_true(prev_split[CHARGING])
     no_charging = not charging and not prev_charging
 
-    if delta_soc != 0:
+    if delta_soc != 0.0:
         if D:
             dbg(
                 f"Delta SOC: {delta_soc}, no_charging: {no_charging}, moved: {moved}, elapsed_minutes: {elapsed_minutes}"  # noqa
@@ -888,7 +911,7 @@ def keep_track_of_totals(
     if charging and not prev_charging:
         t_charges += 1
         _ = D and dbg("CHARGES: " + str(t_charges))
-    elif delta_soc > 1 and no_charging:
+    elif delta_soc > 1.0 and no_charging:
         t_charges += 1
         _ = D and dbg("charges: DELTA_SOC > 1: " + str(t_charges))
 
