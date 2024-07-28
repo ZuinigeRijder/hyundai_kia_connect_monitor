@@ -530,6 +530,7 @@ def print_dailystats(
     batterycare: int,
 ) -> None:
     """print stats"""
+    consumed = consumed + regenerated  # car efficiency is including regenerated
     regenerated_perc = safe_divide(regenerated * 100, consumed)
     engine_perc = safe_divide(engine * 100, consumed)
     climate_perc = safe_divide(climate * 100, consumed)
