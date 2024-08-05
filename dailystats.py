@@ -86,6 +86,10 @@ parser = configparser.ConfigParser()
 parser.read(get_filepath("monitor.cfg"))
 monitor_settings = dict(parser.items("monitor"))
 ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
+INCLUDE_REGENERATE_IN_CONSUMPTION = (
+    get(monitor_settings, "include_regenerate_in_consumption", "False").lower()
+    == "true"
+)
 
 # indexes to splitted monitor.dailystats.csv items
 DATE = 0
@@ -530,7 +534,8 @@ def print_dailystats(
     batterycare: int,
 ) -> None:
     """print stats"""
-    consumed = consumed + regenerated  # car efficiency is including regenerated
+    if INCLUDE_REGENERATE_IN_CONSUMPTION:
+        consumed = consumed + regenerated  # car efficiency is including regenerated
     regenerated_perc = safe_divide(regenerated * 100, consumed)
     engine_perc = safe_divide(engine * 100, consumed)
     climate_perc = safe_divide(climate * 100, consumed)

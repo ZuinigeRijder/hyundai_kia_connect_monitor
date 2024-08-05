@@ -208,6 +208,7 @@ use_geocode = True
 use_geocode_email = True
 language = en
 odometer_metric = km
+include_regenerate_in_consumption = False
 ```
 
 Explanation of the configuration items:
@@ -220,6 +221,7 @@ Explanation of the configuration items:
 - use_geocode_email: (default: True) use email to avoid abuse of address lookup
 - language: (default: en) the Bluelink App is reset to English for users who have set another language in the Bluelink App in Europe when using hyundai_kia_connect_api, you can configure another language as workaround
 - odometer_metric, e.g. km or mi
+- include_regenerate_in_consumption, in [R3.23.0](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.23.0) the regeneration is taken into account for the consumption in daily stats, to better match the boardcomputer values. However, some users have better results in the old situation. Included a setting, default is the old situation before R3.23.0.
 
 *Note: language is only implemented for Europe currently.*
 
