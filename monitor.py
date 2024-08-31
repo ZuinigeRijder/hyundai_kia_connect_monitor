@@ -140,16 +140,25 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
             file.write(
                 "date, distance, distance_unit, total_consumed, regenerated_energy, engine_consumption, climate_consumption, onboard_electronics_consumption, battery_care_consumption\n"  # noqa
             )
+        usa = int(REGION) == 3
         today_time_str = datetime.now().strftime("%H:%M")
         last_line = get_last_line(Path(filename))
-        last_date = last_line.split(",")[0].strip().split(" ")[0].strip()
+        last_date = last_line.split(",")[0].strip()  # get yyymmdd hh:mm
+        if not usa:
+            # get rid of timestamp, always write new cumulative data from today
+            last_date = last_date.split(" ")[0].strip()
         last_line = re.sub("^[^,]*,", "", last_line).strip()  # get rid of first column
         _ = D and dbg(f"daily_stats: {daily_stats}")
         i = len(daily_stats)
         while i > 0:
             i = i - 1
             stat = daily_stats[i]
-            dailystats_date = stat.date.strftime("%Y%m%d")
+            if usa:
+                # write new (non-cumulative) data from today
+                dailystats_date = stat.date.strftime("%Y%m%d %H:%M")
+            else:
+                # always write new cumulative data from today
+                dailystats_date = stat.date.strftime("%Y%m%d")
             if D:
                 print(
                     f"{i} dailystats_date:[{dailystats_date}] [{last_date}] {stat}"  # noqa
@@ -157,13 +166,16 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
             if dailystats_date >= last_date:
                 # only append not already written daily stats
                 distance = float(stat.distance)
-                distance_unit = stat.distance_unit
+                distance_unit = vehicle.odometer_unit
                 if to_miles_needed(vehicle):
                     distance = km_to_mile(distance)
                     distance_unit = ODO_METRIC
                 line = f"{float_to_string_no_trailing_zero(distance)}, {distance_unit}, {stat.total_consumed}, {stat.regenerated_energy},  {stat.engine_consumption}, {stat.climate_consumption}, {stat.onboard_electronics_consumption}, {stat.battery_care_consumption}"  # noqa
                 if dailystats_date > last_date or last_line != line:
-                    dailystats_date = f"{dailystats_date} {today_time_str}"
+                    if not usa:
+                        # use request time to keep track of updates
+                        dailystats_date = f"{dailystats_date} {today_time_str}"
+
                     full_line = f"{dailystats_date}, {line}"
                     if D:
                         print(

@@ -86,6 +86,7 @@ parser = configparser.ConfigParser()
 parser.read(get_filepath("monitor.cfg"))
 monitor_settings = dict(parser.items("monitor"))
 ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
+REGION = monitor_settings["region"]
 INCLUDE_REGENERATE_IN_CONSUMPTION = (
     get(monitor_settings, "include_regenerate_in_consumption", "False").lower()
     == "true"
@@ -678,23 +679,53 @@ def reverse_print_dailystats_one_line(val: list[str]) -> None:
     print_output(",,,,,,")  # empty line/row
 
 
+def compute_cumulative_dailystats(val: list[str], total: list[str]) -> list[str]:
+    """compute_cumulative_dailystats"""
+    total[DATE] = val[DATE]
+    total[DISTANCE] = str(to_float(val[DISTANCE]) + to_float(total[DISTANCE]))
+    total[CONSUMED] = str(to_int(val[CONSUMED]) + to_int(total[CONSUMED]))
+    total[REGENERATED] = str(to_int(val[REGENERATED]) + to_int(total[REGENERATED]))
+    total[ENGINE] = str(to_int(val[ENGINE]) + to_int(total[ENGINE]))
+    total[CLIMATE] = str(to_int(val[CLIMATE]) + to_int(total[CLIMATE]))
+    total[ELECTRONICS] = str(to_int(val[ELECTRONICS]) + to_int(total[ELECTRONICS]))
+    total[BATTERY_CARE] = str(to_int(val[BATTERY_CARE]) + to_int(total[BATTERY_CARE]))
+    return total
+
+
 def reverse_print_dailystats(totals: bool) -> None:
     """reverse print dailystats"""
     if DAILYSTATS_CSV_FILE.is_file():
+        usa = int(REGION) == 3
+        cumulative_splitted: list[str] = []
         prev_date_str = ""
         for line in read_reverse_order(DAILYSTATS_CSV_FILE.name):
             splitted = split_on_comma(line)
             if len(splitted) != 9 or splitted[0].startswith("date"):
                 continue  # nothing to do
-            date_str = splitted[0].split(" ")[0]
-            if date_str != prev_date_str:  # skip identical dates
+            date_str = splitted[0].split(" ")[0]  # yyyymmdd
+            if usa or date_str != prev_date_str:  # skip identical dates for non-usa
                 if totals:
                     increment_dailystats_totals(splitted)
                 else:
-                    reverse_print_dailystats_one_line(splitted)
+                    if usa:
+                        if prev_date_str != "":
+                            if date_str == prev_date_str:
+                                cumulative_splitted = compute_cumulative_dailystats(
+                                    splitted, cumulative_splitted
+                                )
+                            else:
+                                reverse_print_dailystats_one_line(cumulative_splitted)
+                                cumulative_splitted = splitted
+                        else:
+                            cumulative_splitted = splitted
+                    else:
+                        reverse_print_dailystats_one_line(splitted)
                 prev_date_str = date_str
             else:
                 _ = D and dbg(f"skipping: {splitted}")
+
+        if usa and not totals and len(cumulative_splitted) > 0:
+            reverse_print_dailystats_one_line(cumulative_splitted)
 
 
 def get_format(range_str: str, special: bool):
