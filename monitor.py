@@ -350,26 +350,49 @@ def handle_one_vehicle(
         odometer = 0.0
     if to_miles_needed(vehicle):
         odometer = km_to_mile(odometer)
+
+    # server cache last_updated_at sometimes shows 2 (timezone) hours difference
+    # https://github.com/Hyundai-Kia-Connect/kia_uvo/issues/931#issuecomment-2381025284
+    filename = "monitor.csv"
+    if number_of_vehicles > 1:
+        filename = "monitor." + vehicle.VIN + ".csv"
+    last_line = get_last_line(Path(filename)).strip()
+    list2 = last_line.split(",")
+    if len(list2) == 11:
+        # convert timezone string to datetime and see if it is in utcoffset range
+        previous_updated_at_string = list2[0]  # get datetime
+        if (
+            len(previous_updated_at_string) == 25
+        ):  # datetime string must be 25 in length
+            previous_updated_at = datetime.strptime(
+                previous_updated_at_string, "%Y-%m-%d %H:%M:%S%z"
+            )
+            if newest_updated_at < previous_updated_at:
+                utcoffset = newest_updated_at.utcoffset()
+                newest_updated_at_corrected = newest_updated_at + utcoffset
+                if (
+                    newest_updated_at_corrected
+                    >= previous_updated_at  # newest not too old?
+                ):
+                    log(
+                        f"fixed newest_updated_at: old: {newest_updated_at} new: {newest_updated_at_corrected} previous: {previous_updated_at}"  # noqa
+                    )
+                    newest_updated_at = newest_updated_at_corrected
+
     line = f"{newest_updated_at}, {location_longitude}, {location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {float_to_string_no_trailing_zero(odometer)}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa
     if "None, None" in line:  # something gone wrong, retry
         log(f"Skipping Unexpected line: {line}")
         return True  # exit subroutine with error
 
-    filename = "monitor.csv"
-    if number_of_vehicles > 1:
-        filename = "monitor." + vehicle.VIN + ".csv"
-    last_line = get_last_line(Path(filename)).strip()
     if line != last_line:
-        # check if everything is the same without address
+        # check if everything is the same without timestamp and address
+        # seems that the server sometimes returns wrong timestamp
         list1 = line.split(",")
-        list2 = last_line.split(",")
         same = False
         if len(list1) == 11 and len(list2) == 11:
-            list1[9] = ""  # clear address
-            list2[9] = ""
             same = True
             for index, value in enumerate(list1):
-                if value != list2[index]:
+                if index != 9 and value != list2[index]:
                     same = False
                     break  # finished
         if not same:
@@ -377,7 +400,7 @@ def handle_one_vehicle(
             writeln(filename, line)
     handle_daily_stats(vehicle, number_of_vehicles)
     vehicle_stats = [
-        str(last_updated_at),
+        str(newest_updated_at),
         str(location_last_updated_at),
         line,
         "",
