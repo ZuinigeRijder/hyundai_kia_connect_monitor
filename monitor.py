@@ -370,14 +370,12 @@ def handle_one_vehicle(
             if newest_updated_at < previous_updated_at:
                 utcoffset = newest_updated_at.utcoffset()
                 newest_updated_at_corrected = newest_updated_at + utcoffset
-                if (
-                    newest_updated_at_corrected
-                    >= previous_updated_at  # newest not too old?
-                ):
+                if newest_updated_at_corrected >= previous_updated_at:
                     log(
                         f"fixed newest_updated_at: old: {newest_updated_at} new: {newest_updated_at_corrected} previous: {previous_updated_at}"  # noqa
                     )
                     newest_updated_at = newest_updated_at_corrected
+                newest_updated_at = max(newest_updated_at, previous_updated_at)
 
     line = f"{newest_updated_at}, {location_longitude}, {location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {float_to_string_no_trailing_zero(odometer)}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa
     if "None, None" in line:  # something gone wrong, retry
