@@ -209,6 +209,8 @@ use_geocode_email = True
 language = en
 odometer_metric = km
 include_regenerate_in_consumption = False
+consumption_efficiency_factor_dailystats = 1.0
+consumption_efficiency_factor_summary = 1.0
 ```
 
 Explanation of the configuration items:
@@ -219,11 +221,15 @@ Explanation of the configuration items:
 - pin: pincode of your bluelink account, required for CANADA, and potentially USA, otherwise pass a blank string
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
 - use_geocode_email: (default: True) use email to avoid abuse of address lookup
-- language: (default: en) the Bluelink App is reset to English for users who have set another language in the Bluelink App in Europe when using hyundai_kia_connect_api, you can configure another language as workaround
+- language: (default: en) the Bluelink App is reset to English for users who have set another language in the Bluelink App in Europe when using hyundai_kia_connect_api, you can configure another language as workaround. See Note 2
 - odometer_metric, e.g. km or mi
-- include_regenerate_in_consumption, in [R3.23.0](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/releases/tag/R3.23.0) the regeneration is taken into account for the consumption in daily stats, to better match the boardcomputer values. However, some users have better results in the old situation. Included a setting, default is the old situation before R3.23.0.
+- include_regenerate_in_consumption, when set to True the regeneration is taken into account for the consumption calculation in daily stats. However, I think that the next 2 configuration items will better match the boardcomputer values.
+- consumption_efficiency_factor_dailystats, see Note 1
+- consumption_efficiency_factor_summary, see Note 1
 
-*Note: language is only implemented for Europe currently.*
+*Note 1: I think that the consumption values ​​of the on-board computer are corrected with an efficiency number, e.g. 1 kWh of energy results in 0.9 kWh of real energy (losses when converting battery kWh by the car). So therefor I introduced an efficiency configuration factor in monitor.cfg, consumption_efficiency_factor_dailystats and consumption_efficiency_factor_summary. For example, when setting this to 0.9, 10% of the energy is lost during the conversion and is used in the consumption calculation. Default the values are 1.0, so no correction.*
+
+*Note2: language is only implemented for Europe currently.*
 
 [For a list of language codes, see here.](https://www.science.co.il/language/Codes.php). Currently in Europe the Bluelink App shows the following languages:
 - "en" English

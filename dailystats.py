@@ -91,6 +91,10 @@ INCLUDE_REGENERATE_IN_CONSUMPTION = (
     get(monitor_settings, "include_regenerate_in_consumption", "False").lower()
     == "true"
 )
+CONSUMPTION_EFFICIENCY_FACTOR_DAILYSTATS = to_float(
+    get(monitor_settings, "consumption_efficiency_factor_dailystats", "1.0")
+)
+
 
 # indexes to splitted monitor.dailystats.csv items
 DATE = 0
@@ -478,6 +482,8 @@ def print_tripinfo(
     if kwh_consumed > 0.0:
         kwh = f"({float_to_string_no_trailing_zero(kwh_consumed)}kWh)"
         km_mi_per_kwh = safe_divide(distance_summary_trip, kwh_consumed)
+        if CONSUMPTION_EFFICIENCY_FACTOR_DAILYSTATS > 0.0:
+            km_mi_per_kwh *= CONSUMPTION_EFFICIENCY_FACTOR_DAILYSTATS
         consumption = (
             f"({float_to_string_no_trailing_zero(km_mi_per_kwh)}{ODO_METRIC}/kWh)"
         )
@@ -544,6 +550,9 @@ def print_dailystats(
     battery_care_perc = safe_divide(batterycare * 100, consumed)
     km_mi_per_kwh = safe_divide(distance, consumed / 1000)
     kwh_per_km_mi = safe_divide(100, km_mi_per_kwh)
+    if CONSUMPTION_EFFICIENCY_FACTOR_DAILYSTATS > 0.0:
+        km_mi_per_kwh *= CONSUMPTION_EFFICIENCY_FACTOR_DAILYSTATS
+        kwh_per_km_mi /= CONSUMPTION_EFFICIENCY_FACTOR_DAILYSTATS
 
     consumed_kwh = consumed / 1000
     regenerated_kwh = regenerated / 1000

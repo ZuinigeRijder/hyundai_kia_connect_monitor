@@ -115,6 +115,9 @@ config_parser = configparser.ConfigParser()
 config_parser.read(get_filepath("monitor.cfg"))
 monitor_settings = dict(config_parser.items("monitor"))
 ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
+CONSUMPTION_EFFICIENCY_FACTOR_SUMMARY = to_float(
+    get(monitor_settings, "consumption_efficiency_factor_summary", "1.0")
+)
 
 config_parser.read(get_filepath("summary.cfg"))
 summary_settings = dict(config_parser.items("summary"))
@@ -629,9 +632,12 @@ def print_summary(
             cost = discharged_kwh * -AVERAGE_COST_PER_KWH
             cost_str = f"{cost:.2f}"
             km_mi_per_kwh = safe_divide(delta_odo, -discharged_kwh)
-            km_mi_per_kwh_str = f"{km_mi_per_kwh:.1f}"
             if km_mi_per_kwh > 0.0:
                 kwh_per_km_mi = safe_divide(100, km_mi_per_kwh)
+                if CONSUMPTION_EFFICIENCY_FACTOR_SUMMARY > 0.0:
+                    km_mi_per_kwh *= CONSUMPTION_EFFICIENCY_FACTOR_SUMMARY
+                    kwh_per_km_mi /= CONSUMPTION_EFFICIENCY_FACTOR_SUMMARY
+                km_mi_per_kwh_str = f"{km_mi_per_kwh:.1f}"
                 kwh_per_km_mi_str = f"{kwh_per_km_mi:.1f}"
     else:
         # do not show positive discharges
