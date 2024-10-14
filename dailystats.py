@@ -2,25 +2,29 @@
 """
 Simple Python3 script to make a dailystats overview
 """
+# pylint:disable=logging-fstring-interpolation,logging-not-lazy
 import configparser
 from dataclasses import dataclass
+import logging
+import logging.config
+from os import path
 import re
 import sys
 import traceback
 from datetime import datetime
 from pathlib import Path
 from collections import deque
+import typing
 from dateutil.relativedelta import relativedelta
 import gspread
 from monitor_utils import (
     float_to_string_no_trailing_zero,
     get,
     get_filepath,
-    log,
     arg_has,
     get_vin_arg,
     safe_divide,
-    sleep,
+    sleep_a_minute,
     split_on_comma,
     split_output_to_sheet_float_list,
     to_int,
@@ -33,17 +37,21 @@ from monitor_utils import (
     split_output_to_sheet_list,
 )
 
+SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
+logging.config.fileConfig(f"{SCRIPT_DIRNAME}/logging_config.ini")
+D = arg_has("debug")
+if D:
+    logging.getLogger().setLevel(logging.DEBUG)
+
 # Initializing a queue for about 30 days
 MAX_QUEUE_LEN = 122
 PRINTED_OUTPUT_QUEUE: deque[str] = deque(maxlen=MAX_QUEUE_LEN)
-
-D = arg_has("debug")
 
 
 def dbg(line: str) -> bool:
     """print line if debugging"""
     if D:
-        print(line)
+        logging.debug(line)
     return D  # just to make a lazy evaluation expression possible
 
 
@@ -59,11 +67,12 @@ for kindex in range(1, len(sys.argv)):
             KEYWORD_ERROR = True
 
 if KEYWORD_ERROR or arg_has("help"):
-    print("Usage: python dailystats.py [sheetupdate] [vin=VIN]")
+    logging.info("Usage: python dailystats.py [sheetupdate] [vin=VIN]")
     exit()
 
 SHEETUPDATE = arg_has("sheetupdate")
 OUTPUT_SPREADSHEET_NAME = "monitor.dailystats"
+SHEET: typing.Any = None
 
 DAILYSTATS_CSV_FILE = Path("monitor.dailystats.csv")
 TRIPINFO_CSV_FILE = Path("monitor.tripinfo.csv")
@@ -389,7 +398,7 @@ def get_trip_for_datetime(
             trip_datetime = splitted_line[0]
             date_elements = trip_datetime.split(" ")
             if len(date_elements) < 2:
-                log(f"Warning: skipping unexpected line: {line}")
+                logging.warning(f"Warning: skipping unexpected line: {line}")
                 reverse_read_next_summary_trip_line()
                 continue
             trip_date = date_elements[0]
@@ -856,6 +865,7 @@ def print_output_queue() -> None:
 
 
 # main program
+RETRIES = -1
 if SHEETUPDATE:
     RETRIES = 2
     while RETRIES > 0:
@@ -864,12 +874,14 @@ if SHEETUPDATE:
             spreadsheet = gc.open(OUTPUT_SPREADSHEET_NAME)
             SHEET = spreadsheet.sheet1
             SHEET.batch_clear(["A:G", "N:V"])
-            RETRIES = 0
+            RETRIES = -1
         except Exception as ex:  # pylint: disable=broad-except
-            log("Exception: " + str(ex))
+            logging.error("Exception: " + str(ex))
             traceback.print_exc()
-            RETRIES = sleep(RETRIES)
+            RETRIES = sleep_a_minute(RETRIES)
 
+if RETRIES != -1:
+    exit(-1)
 
 reverse_print_dailystats(totals=True)  # do the total dailystats summary first
 print_dailystats(
@@ -886,13 +898,18 @@ print_dailystats(
 summary_tripinfo()  # then the total tripinfo
 reverse_print_dailystats(totals=False)  # and then dailystats
 
+RETRIES = -1
 if SHEETUPDATE:
     RETRIES = 2
     while RETRIES > 0:
         try:
             print_output_queue()
-            RETRIES = 0
+            RETRIES = -1
         except Exception as ex:  # pylint: disable=broad-except
-            log("Exception: " + str(ex))
+            logging.error("Exception: " + str(ex))
             traceback.print_exc()
-            RETRIES = sleep(RETRIES)
+            RETRIES = sleep_a_minute(RETRIES)
+
+if RETRIES == -1:
+    exit(0)
+exit(-1)

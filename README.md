@@ -11,7 +11,11 @@
 - [debug.py](#debugpy)
 - [check\_monitor.py](#check_monitorpy)
 - [monitor\_utils.py](#monitor_utilspy)
+- [logging\_config.ini](#logging_configini)
 - [Raspberry pi configuration](#raspberry-pi-configuration)
+  - [Running monitor.py infinitely and only running summary.py and dailystats.py when there is new cached server data received](#running-monitorpy-infinitely-and-only-running-summarypy-and-dailystatspy-when-there-is-new-cached-server-data-received)
+  - [Running monitor.py once](#running-monitorpy-once)
+  - [follow the last content of monitor.csv or run\_monitor\_infinite.log](#follow-the-last-content-of-monitorcsv-or-run_monitor_infinitelog)
 - [Examples](#examples)
   - [monitor.csv](#monitorcsv)
   - [python summary.py](#python-summarypy)
@@ -72,7 +76,7 @@ Example screenshots showing the results in a Google Spreadsheet:
 - Summary
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_GoogleSpreadsheet.png)
 
-Run monitor.py e.g. once per hour (I use it on a Raspberry Pi and on Windows 10 with pure Python, but it will also run on Mac or a linux Operating System) and you can always check afterwards:
+Run monitor.py e.g. once per hour or infinite (I use it on a Raspberry Pi and on Windows 10 with pure Python, but it will also run on Mac or a linux Operating System) and you can always check afterwards:
 - captured locations
 - odometer at specific day/hour
 - how much driven at a specific day
@@ -122,14 +126,14 @@ I have installed the following packages (e.g. use python -m pip install "package
     pytz==2022.2.1
     requests==2.28.1
 
-In hyundai_kia_connect_monitor summary.py also the following packages are used:
+In hyundai_kia_connect_monitor summary.py and dailystats.py also the following packages are used:
 
     gspread==5.6.2
 
-If everything works, it's a matter of regularly collecting the information, for example by running the "python monitor.py" command once an hour.
+If everything works, it's a matter of regularly collecting the information, for example by running the "python monitor.py" command once an hour or infinite.
 A server is of course best, I use a Raspberry Pi, but it can also regularly be done on a Windows 10 or Mac computer, provided the computer is on.
 
-*Note: each time you run monitor.py it makes a snapshot of the latest server cache values. How more often you run it, the better charges and trips can be detected by summary.py.*
+*Note: each time you run monitor.py it makes a snapshot of the latest server cache values. How more often you run it, the better charges and trips can be detected by summary.py. The easiest way is to run monitor.py infinite.*
 
 ---
 # configuration of gspread for "python summary.py sheetupdate" and "python dailystats.py sheetupdate"
@@ -140,29 +144,29 @@ This [authentication configuration is described here](https://docs.gspread.org/e
 The summary.py and dailystats.py script uses access to the Google spreadsheets on behalf of a bot account using Service Account.
 
 Follow the steps in this link above, here is the summary of these steps:
-- Enable API Access for a Project
-- - Head to [Google Developers Console](https://console.developers.google.com/) and create a new project (or select the one you already have).
-- - In the box labeled "Search for APIs and Services", search for "Google Drive API" and enable it.
-- - In the box labeled "Search for APIs and Services", search for "Google Sheets API" and enable it
-- For Bots: Using Service Account
-- - Go to "APIs & Services > Credentials" and choose "Create credentials > Service account key".
-- - Fill out the form
-- - Click "Create" and "Done".
-- - Press "Manage service accounts" above Service Accounts.
-- - Press on : near recently created service account and select "Manage keys" and then click on "ADD KEY > Create new key".
-- - Select JSON key type and press "Create".
-- - You will automatically download a JSON file with credentials
-- - Remember the path to the downloaded credentials json file. Also, in the next step you will need the value of client_email from this file.
-- - Move the downloaded json file to ~/.config/gspread/service_account.json. Windows users should put this file to %APPDATA%\gspread\service_account.json.
-- Setup a Google Spreasheet to be updated by sheetupdate
-- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai-kia-connect-monitor or monitor.VIN (latter if vin=VIN is given as parameter)
-- - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
-- - In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google spreadsheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and change e.g. diagram titles into your own language.
-- - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
-- run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor or monitor.VIN spreadheet will be updated with a summary and the last 122 lines of standard output
-- run "python dailystats.py sheetupdate" and if everything is correct, the monitor.dailystats or monitor.dailystats.VIN spreadheet will be updated with the last 122 lines of standard output
-- configure to run "python summary.py sheetupdate" regularly, after having run "python monitor.py"
-- configure to run "python dailystats.py sheetupdate" regularly, after having run "python summary.py sheetupdate"
+1. Enable API Access for a Project
+  - Head to [Google Developers Console](https://console.developers.google.com/) and create a new project (or select the one you already have).
+  - In the box labeled "Search for APIs and Services", search for "Google Drive API" and enable it.
+  - In the box labeled "Search for APIs and Services", search for "Google Sheets API" and enable it
+2. For Bots: Using Service Account
+  - Go to "APIs & Services > Credentials" and choose "Create credentials > Service account key".
+  - Fill out the form
+  - Click "Create" and "Done".
+  - Press "Manage service accounts" above Service Accounts.
+  - Press on : near recently created service account and select "Manage keys" and then click on "ADD KEY > Create new key".
+  - Select JSON key type and press "Create".
+  - You will automatically download a JSON file with credentials
+  - Remember the path to the downloaded credentials json file. Also, in the next step you will need the value of client_email from this file.
+  - Move the downloaded json file to ~/.config/gspread/service_account.json. Windows users should put this file to %APPDATA%\gspread\service_account.json.
+3. Setup a Google Spreasheet to be updated by sheetupdate
+  - In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai-kia-connect-monitor or monitor.VIN (latter if vin=VIN is given as parameter)
+  - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
+  - In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google spreadsheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and change e.g. diagram titles into your own language.
+  - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
+4. run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor or monitor.VIN spreadheet will be updated with a summary and the last 122 lines of standard output
+5. run "python dailystats.py sheetupdate" and if everything is correct, the monitor.dailystats or monitor.dailystats.VIN spreadheet will be updated with the last 122 lines of standard output
+6. configure to run "python summary.py sheetupdate" regularly, after having run "python monitor.py"
+7. configure to run "python dailystats.py sheetupdate" regularly, after having run "python summary.py sheetupdate"
 
 ---
 # Translations
@@ -211,6 +215,9 @@ odometer_metric = km
 include_regenerate_in_consumption = False
 consumption_efficiency_factor_dailystats = 1.0
 consumption_efficiency_factor_summary = 1.0
+monitor_infinite = False
+monitor_infinite_interval_minutes = 60
+monitor_execute_commands_when_something_written_or_error =
 ```
 
 Explanation of the configuration items:
@@ -221,15 +228,21 @@ Explanation of the configuration items:
 - pin: pincode of your bluelink account, required for CANADA, and potentially USA, otherwise pass a blank string
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
 - use_geocode_email: (default: True) use email to avoid abuse of address lookup
-- language: (default: en) the Bluelink App is reset to English for users who have set another language in the Bluelink App in Europe when using hyundai_kia_connect_api, you can configure another language as workaround. See Note 2
+- language: (default: en) the Bluelink App is reset to English for users who have set another language in the Bluelink App in Europe when using hyundai_kia_connect_api, you can configure another language as workaround. See Note 3
 - odometer_metric, e.g. km or mi
 - include_regenerate_in_consumption, when set to True the regeneration is taken into account for the consumption calculation in daily stats. However, I think that the next 2 configuration items will better match the boardcomputer values.
-- consumption_efficiency_factor_dailystats, see Note 1
-- consumption_efficiency_factor_summary, see Note 1
+- consumption_efficiency_factor_dailystats, see Note 2
+- consumption_efficiency_factor_summary, see Note 2
+- monitor_infinite, if set to True monitor.py keeps running using monitor_infinite_interval_minutes between getting cached server values
+- monitor_infinite_interval_minutes, interval in minutes between getting cached server values
+- monitor_execute_commands_when_something_written_or_error, when new cached server values are retrieved, the specified commands (separated by semicolon ;) are executed. See Note 1.
+  * example: monitor_execute_commands_when_something_written_or_error = python -u summary.py sheetupdate > summary.log;python -u dailystats.py sheetupdate > dailystats.log
 
-*Note 1: I think that the consumption values ​​of the on-board computer are corrected with an efficiency number, e.g. 1 kWh of energy results in 0.9 kWh of real energy (losses when converting battery kWh by the car). So therefor I introduced an efficiency configuration factor in monitor.cfg, consumption_efficiency_factor_dailystats and consumption_efficiency_factor_summary. For example, when setting this to 0.9, 10% of the energy is lost during the conversion and is used in the consumption calculation. Default the values are 1.0, so no correction.*
+*Note 1: in combination with infinite (monitor_infinite = True) summary.py and dailystats.py are only run when something is changed or error occurred (or once a day). You do not need to run summary.py and dailystats.py separately and it is only run when it is needed.*
 
-*Note2: language is only implemented for Europe currently.*
+*Note 2: I think that the consumption values ​​of the on-board computer are corrected with an efficiency number, e.g. 1 kWh of energy results in 0.9 kWh of real energy (losses when converting battery kWh by the car). So therefor I introduced an efficiency configuration factor in monitor.cfg, consumption_efficiency_factor_dailystats and consumption_efficiency_factor_summary. For example, when setting this to 0.9, 10% of the energy is lost during the conversion and is used in the consumption calculation. Default the values are 1.0, so no correction.*
+
+*Note 3: language is only implemented for Europe currently.*
 
 [For a list of language codes, see here.](https://www.science.co.il/language/Codes.php). Currently in Europe the Bluelink App shows the following languages:
 - "en" English
@@ -308,8 +321,11 @@ Region Daily Limits    Per Action  Comments
 - KR   ???
 ```
 
+*Note that a Bluelink USA user has detected that there is a limit in the number of logins, not for the subsequent calls, therefore the option to run monitor.py infinite is a good choice. The monitor.py infinite does only login once per day and then the subsequent calls are done with the retrieved information. Unfortunately for Europe the total is restricted to about 200, so the number of logins does not matter. For the other regions I do not know the limit and behavior.*
+
 So maybe you can capture more than once per hour, but you might run into the problem that you use too much API calls, especially when you also regularly use the Hyndai Bluelink or Kia UVO Connect app.
 You also can consider only to monitor between e.g. 6:00 and 22:00 (saves 1/3 of the calls). Dependent on your regular driving habit, choose the best option for you. Examples:
+- run monitor.py infinite (monitor_infinite = True) with monitor_infinite_interval_minutes = 15 (means 96 requests per day and 1 login per day)
 - twice a day, e.g. 6.00 and 21:00, when you normally do not drive that late in the evening and charge in the night after 21:00
 - each hour means 24 requests per day
 - each hour between 6:00 and 19:00 means 13 requests per day
@@ -496,9 +512,9 @@ OUTPUT:
 The following information is written in the kml file:
 - document name: monitor + now in format "yyyymmdd hh:mm"
 - per placemark
-- - name of place (index of Google Maps): datetime in format "yyyymmdd hh:mm" and optionally "C" when charging and "D" when in drive
-- - description: SOC: nn% 12V: nn% ODO: odometer [(+distance since yyyymmdd hh:mm)] [drive] [charging] [plugged: n]
-- - coordinate (longitude, latitude)
+  * name of place (index of Google Maps): datetime in format "yyyymmdd hh:mm" and optionally "C" when charging and "D" when in drive
+  * description: SOC: nn% 12V: nn% ODO: odometer [(+distance since yyyymmdd hh:mm)] [drive] [charging] [plugged: n]
+  * coordinate (longitude, latitude)
 
 Note:
 - the placemark lines are one-liners, so you can also search in monitor.kml
@@ -539,15 +555,42 @@ Python script for testing: print when the odometer between two monitor.csv entri
 Generic utility methods, used by the other python scripts.
 
 ---
+# logging_config.ini
+Configuration of default logging and formatting of logging.
+
+---
 # Raspberry pi configuration
-Example script [run_monitor_once.sh](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/run_monitor_once.sh) to run monitor.py on a linux based system.
+Examples of running on Raspberry Pi or a linux based system.
+
+There are 2 different options to run monitor.py. Run infinitely or only once. The first one is more efficient, because then only summary.py and dailystats.py are run when there is new cached server data received. Also running infinitely does a login once per day, which is also more efficient and for Bluelink USA the rate limit is not restricted.
+
+## Running monitor.py infinitely and only running summary.py and dailystats.py when there is new cached server data received
+Example script [run_monitor_infinite.sh](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/run_monitor_infinite.sh) to run monitor.py infinitely
 
 Steps:
-- create a directory hyundai_kia_connect_monitor in your home directory
-- copy hyundai_kia_connect_api as subdirectory of directory hyundai_kia_connect_monitor
-- copy run_monitor_once.sh, monitor.py and monitor.cfg in the hyundai_kia_connect_monitor directory
-- change inside monitor.cfg the hyundai_kia_connect settings
-- chmod + x run_monitor_once.sh
+1. create a directory hyundai_kia_connect_monitor in your home directory
+2. copy hyundai_kia_connect_api as subdirectory of directory hyundai_kia_connect_monitor
+3. copy run_monitor_infinite.sh, monitor.py, monitor.cfg, monitor.translations.csv, monitor_utils.py, summary.py, summary.cfg, dailystats.py and logging_config.ini
+4. change inside monitor.cfg the appropriate hyundai_kia_connect settings, e.g. monitor_infinite = True and monitor_execute_commands_when_something_written_or_error = python -u summary.py sheetupdate > summary.log;python -u dailystats.py sheetupdate > dailystats.log
+5. chmod + x run_monitor_infinite.sh
+
+Add to your crontab to run once per hour to restart after crashes or reboot (crontab -e)
+```
+9 * * * * ~/hyundai_kia_connect_monitor/run_monitor_infinite.sh >> ~/hyundai_kia_connect_monitor/crontab_run_monitor_infinite.log 2>&1
+@reboot sleep 125 && ~/hyundai_kia_connect_monitor/run_monitor_infinite.sh >> ~/hyundai_kia_connect_monitor/crontab_run_monitor_infinite.log 2>&1
+```
+
+*Note: there is a limit in the number of request per country, but 1 request per hour should not hamper using the Bluelink or UVO Connect App at the same time*
+
+## Running monitor.py once
+Example script [run_monitor_once.sh](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/run_monitor_once.sh) to run monitor.py once on a linux based system.
+
+Steps:
+1. create a directory hyundai_kia_connect_monitor in your home directory
+2. copy hyundai_kia_connect_api as subdirectory of directory hyundai_kia_connect_monitor
+3. copy run_monitor_once.sh, monitor.py, monitor.cfg, monitor.translations.csv, monitor_utils.py and logging_config.ini in the hyundai_kia_connect_monitor directory
+4. change inside monitor.cfg the appropriate hyundai_kia_connect settings, e.g. monitor_infinite = False
+5. chmod + x run_monitor_once.sh
 
 Add the following line in your crontab -e to run it once per hour (crontab -e):
 ```
@@ -560,6 +603,13 @@ Add the following line in your crontab -e to run it every 15 minutes between 6 a
 ```
 
 *Note: there is a limit in the number of request per country, but 1 request per hour should not hamper using the Bluelink or UVO Connect App at the same time*
+
+
+## follow the last content of monitor.csv or run_monitor_infinite.log
+
+There is another python tool to follow the content of a file on a server and send it to a Google Sheet with the same filename. [See tail2GoogleSheet](https://github.com/ZuinigeRijder/tail2GoogleSheet?tab=readme-ov-file#example-crontab-to-run-on-raspberry-pi-or-another-linux-system).
+
+Another example is [tail_run_monitor_infinite.log.sh](https://raw.githubusercontent.com/ZuinigeRijder/tail2GoogleSheet/main/examples/tail_run_monitor_infinite.log.sh) which is following ~/hyundai_kia_connect_monitor/run_monitor_infinite.log
 
 ---
 # Examples

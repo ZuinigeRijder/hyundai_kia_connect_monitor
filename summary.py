@@ -2,8 +2,12 @@
 """
 Simple Python3 script to make a summary of monitor.csv
 """
+# pylint:disable=logging-fstring-interpolation,logging-not-lazy
 from copy import deepcopy
 from io import TextIOWrapper
+import logging
+import logging.config
+from os import path
 import sys
 import configparser
 import traceback
@@ -11,16 +15,16 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from collections import deque
+import typing
 import gspread
 from dateutil import parser
 from monitor_utils import (
     get_filepath,
-    log,
     arg_has,
     get,
     get_vin_arg,
     safe_divide,
-    sleep,
+    sleep_a_minute,
     split_on_comma,
     to_int,
     to_float,
@@ -36,13 +40,17 @@ from monitor_utils import (
     float_to_string_no_trailing_zero,
 )
 
+SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
+logging.config.fileConfig(f"{SCRIPT_DIRNAME}/logging_config.ini")
 D = arg_has("debug")
+if D:
+    logging.getLogger().setLevel(logging.DEBUG)
 
 
 def dbg(line: str) -> bool:
     """print line if debugging"""
     if D:
-        print(line)
+        logging.debug(line)
     return D  # just to make a lazy evaluation expression possible
 
 
@@ -152,6 +160,7 @@ DAY_COUNTER = 0
 LAST_OUTPUT_QUEUE_MAX_LEN = 122
 LAST_OUTPUT_QUEUE: deque[str] = deque(maxlen=LAST_OUTPUT_QUEUE_MAX_LEN)
 
+SHEET: typing.Any = None
 SHEET_ROW_A = ""
 SHEET_ROW_B = ""
 
@@ -336,7 +345,9 @@ def sheet_append_first_rows(row_a: str, row_b: str) -> None:
     len_a = len(row_a_values)
     len_b = len(row_b_values)
     if len_a != len_b:
-        log(f"ERROR: sheet_append_first_rows, length A {len_a} != length B {len_b}")
+        logging.error(
+            f"ERROR: sheet_append_first_rows, length A {len_a} != length B {len_b}"
+        )
         return  # nothing to do
 
     array = []
@@ -459,7 +470,7 @@ def get_splitted_list_item(the_list: list[str], index: int) -> list[str]:
 
 
 if not MONITOR_CSV_FILENAME.is_file():
-    log(f"ERROR: file does not exist: {MONITOR_CSV_FILENAME}")
+    logging.error(f"ERROR: file does not exist: {MONITOR_CSV_FILENAME}")
     sys.exit(-1)
 
 MONITOR_CSV_FILE: TextIOWrapper = MONITOR_CSV_FILENAME.open("r", encoding="utf-8")
@@ -690,6 +701,9 @@ def print_summary(
         location_last_updated_at = get_splitted_list_item(lastrun_lines, 3)
         last_upd_dt = last_updated_at[1]
         location_last_upd_dt = location_last_updated_at[1]
+        if len(lastrun_lines) > 6:  # error occurred, line 6 contains error_string
+            last_upd_dt = f"{last_upd_dt} ERROR: {lastrun_lines[6]}"
+
         SHEET_ROW_A = f"{TR.last_run},{TR.vehicle_upd},{TR.gps_update},{TR.last_entry},{TR.last_address},{TR.odometer} {ODO_METRIC},{TR.driven} {ODO_METRIC},+kWh,-kWh,{ODO_METRIC}/kWh,kWh/100{ODO_METRIC},{TR.cost} {COST_CURRENCY},{TR.soc_perc},{TR.avg} {TR.soc_perc},{TR.min} {TR.soc_perc},{TR.max} {TR.soc_perc},{TR.volt12_perc},{TR.avg} {TR.volt12_perc},{TR.min} {TR.volt12_perc},{TR.max} {TR.volt12_perc},{TR.charges},{TR.trips},{TR.ev_range}"  # noqa
         SHEET_ROW_B = f"{last_run_dt},{last_upd_dt},{location_last_upd_dt},{last_line},{location_str},{odo:.1f},{float_to_string_no_trailing_zero(delta_odo)},{float_to_string_no_trailing_zero(charged_kwh)},{float_to_string_no_trailing_zero(discharged_kwh)},{km_mi_per_kwh_str},{kwh_per_km_mi_str},{cost_str},{float_to_string_no_trailing_zero(t_soc_cur)},{float_to_string_no_trailing_zero(t_soc_avg)},{float_to_string_no_trailing_zero(t_soc_min)},{float_to_string_no_trailing_zero(t_soc_max)},{t_volt12_cur},{t_volt12_avg},{t_volt12_min},{t_volt12_max},{t_charges},{t_trips},{ev_range}"  # noqa
     else:
@@ -1027,7 +1041,7 @@ def handle_line(
 def summary():
     """summary of monitor.csv file"""
     if not MONITOR_CSV_FILENAME.is_file():
-        log(f"ERROR: file does not exist: {MONITOR_CSV_FILENAME}")
+        logging.error(f"ERROR: file does not exist: {MONITOR_CSV_FILENAME}")
         return
 
     prev_line = ""
@@ -1088,6 +1102,7 @@ CHARGE_CSV_FILE.close()
 DAY_CSV_FILE.close()
 TRIP_CSV_FILE.close()
 
+RETRIES = -1
 if SHEETUPDATE:
     RETRIES = 2
     while RETRIES > 0:
@@ -1098,8 +1113,12 @@ if SHEETUPDATE:
             SHEET.clear()
             sheet_append_first_rows(SHEET_ROW_A, SHEET_ROW_B)
             print_output_queue()
-            RETRIES = 0
+            RETRIES = -1
         except Exception as ex:  # pylint: disable=broad-except
-            log("Exception: " + str(ex))
+            logging.info("Exception: " + str(ex))
             traceback.print_exc()
-            RETRIES = sleep(RETRIES)
+            RETRIES = sleep_a_minute(RETRIES)
+
+if RETRIES == -1:
+    exit(0)
+exit(-1)

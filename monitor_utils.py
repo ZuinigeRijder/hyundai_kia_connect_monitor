@@ -2,19 +2,17 @@
 """
 monitor utils
 """
+# pylint:disable=logging-fstring-interpolation
 import configparser
 import errno
+import logging
+import logging.config
 import sys
 import os
 from datetime import datetime, timezone
 from pathlib import Path
 import time
 from typing import Generator
-
-
-def log(msg: str) -> None:
-    """log a message prefixed with a date/time format yyyymmdd hh:mm:ss"""
-    print(datetime.now().strftime("%Y%m%d %H:%M:%S") + ": " + msg)
 
 
 def arg_has(string: str) -> bool:
@@ -37,12 +35,18 @@ def get_vin_arg() -> str:
     return ""
 
 
-def sleep(retries: int) -> int:
-    """sleep when retries > 0"""
+def sleep_seconds(seconds: int) -> None:
+    """sleep seconds"""
+    logging.debug(f"Sleeping {seconds} seconds")
+    time.sleep(seconds)
+
+
+def sleep_a_minute(retries: int) -> int:
+    """sleep a minute when retries > 0"""
     if retries > 0:
         retries -= 1
         if retries > 0:
-            log("Sleeping a minute")
+            logging.info("Sleeping a minute")
             time.sleep(60)
     return retries
 
@@ -281,7 +285,9 @@ def read_translations() -> dict:
             linecount += 1
             split = split_on_comma(line)
             if len(split) < 15:
-                log(f"Error: unexpected translation csvline {linecount}: {line}")
+                logging.error(
+                    f"Error: unexpected translation csvline {linecount}: {line}"
+                )
                 continue
             key = split[0]
             translation = split[1]

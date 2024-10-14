@@ -30,14 +30,19 @@ e.g. with Excel:
 - charging pattern over time
 - visited places
 """
+# pylint:disable=logging-fstring-interpolation,logging-not-lazy
+from os import path
 import re
+import subprocess
 import sys
 import io
 import configparser
 import traceback
 import logging
+import logging.config
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
+import typing
 from dateutil.relativedelta import relativedelta
 from hyundai_kia_connect_api import VehicleManager, Vehicle, exceptions
 from monitor_utils import (
@@ -49,11 +54,17 @@ from monitor_utils import (
     get_safe_datetime,
     get_safe_float,
     km_to_mile,
-    log,
-    sleep,
+    same_day,
+    sleep_a_minute,
+    sleep_seconds,
     to_int,
 )
 
+SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
+logging.config.fileConfig(f"{SCRIPT_DIRNAME}/logging_config.ini")
+D = arg_has("debug")
+if D:
+    logging.getLogger().setLevel(logging.DEBUG)
 
 # keep forceupdate and cacheupdate as keyword, but do nothing with them
 KEYWORD_LIST = ["forceupdate", "cacheupdate", "debug"]
@@ -66,11 +77,6 @@ for kindex in range(1, len(sys.argv)):
 if KEYWORD_ERROR or arg_has("help"):
     print("Usage: python monitor.py")
     exit()
-
-D = arg_has("debug")
-if D:
-    logging.basicConfig(level=logging.DEBUG)
-
 
 # == read monitor in monitor.cfg ===========================
 parser = configparser.ConfigParser()
@@ -86,18 +92,28 @@ USE_GEOCODE = monitor_settings["use_geocode"].lower() == "true"
 USE_GEOCODE_EMAIL = monitor_settings["use_geocode_email"].lower() == "true"
 LANGUAGE = monitor_settings["language"]
 ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
+MONITOR_INFINITE = get(monitor_settings, "monitor_infinite", "False").lower() == "true"
+MONITOR_INFINITE_INTERVAL_MINUTES = to_int(
+    get(monitor_settings, "monitor_infinite_interval_minutes", "60")
+)
+MONITOR_EXECUTE_COMMANDS_WHEN_SOMETHING_WRITTEN_OR_ERROR = get(
+    monitor_settings, "monitor_execute_commands_when_something_written_or_error", ""
+)
+
+MONITOR_SOMETHING_WRITTEN_OR_ERROR = False
 
 
 # == subroutines =============================================================
 def dbg(line: str) -> bool:
     """print line if debugging"""
     if D:
-        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ": " + line)
+        logging.debug(line)
     return D  # just to make a lazy evaluation expression possible
 
 
 def writeln(filename: str, string: str) -> None:
     """append line at monitor text file with end of line character"""
+    global MONITOR_SOMETHING_WRITTEN_OR_ERROR  # pylint:disable=global-statement
     _ = D and dbg(string)
     monitor_csv_file = Path(filename)
     write_header = False
@@ -112,6 +128,7 @@ def writeln(filename: str, string: str) -> None:
             )
         file.write(string)
         file.write("\n")
+        MONITOR_SOMETHING_WRITTEN_OR_ERROR = True
 
 
 def to_miles_needed(vehicle: Vehicle) -> bool:
@@ -121,6 +138,7 @@ def to_miles_needed(vehicle: Vehicle) -> bool:
 
 def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
     """handle daily stats"""
+    global MONITOR_SOMETHING_WRITTEN_OR_ERROR  # pylint:disable=global-statement
     daily_stats = vehicle.daily_stats
     if len(daily_stats) == 0:
         _ = D and dbg("No daily stats")
@@ -183,6 +201,7 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
                         )
                     file.write(full_line)
                     file.write("\n")
+                    MONITOR_SOMETHING_WRITTEN_OR_ERROR = True
                     last_line = line
                 else:
                     if D:
@@ -220,6 +239,16 @@ def write_last_run(
         file.write(f"{today_daily_stats_line}\n")
 
 
+def append_error_to_last_run(error_string: str) -> None:
+    """append error to last run"""
+    filename = "monitor.lastrun"
+    if MANAGER and MANAGER.vehicles and len(MANAGER.vehicles) > 1:
+        filename = "monitor." + MANAGER.vehicles[0].VIN + ".lastrun"
+    lastrun_file = Path(filename)
+    with lastrun_file.open("a", encoding="utf-8") as file:
+        file.write(f"{error_string}\n")
+
+
 def handle_day_trip_info(
     manager: VehicleManager,
     vehicle: Vehicle,
@@ -229,6 +258,7 @@ def handle_day_trip_info(
     last_hhmmss: str,
 ) -> tuple[str, str]:
     """handle_day_trip_info"""
+    global MONITOR_SOMETHING_WRITTEN_OR_ERROR  # pylint:disable=global-statement
     for day in month_trip_info.day_list:
         yyyymmdd = day.yyyymmdd
         if yyyymmdd >= last_date:
@@ -255,6 +285,7 @@ def handle_day_trip_info(
                         _ = D and dbg(f"Writing tripinfo line:[{line}]")
                         file.write(line)
                         file.write("\n")
+                        MONITOR_SOMETHING_WRITTEN_OR_ERROR = True
                         last_date = yyyymmdd
                         last_hhmmss = hhmmss
                     else:
@@ -324,7 +355,7 @@ def handle_one_vehicle(
     try:
         handle_trip_info(manager, vehicle, number_of_vehicles)
     except Exception as ex:  # pylint: disable=broad-except
-        log("Warning: handle_trip_info Exception: " + str(ex))
+        logging.warning("Warning: handle_trip_info Exception: " + str(ex))
         traceback.print_exc()
 
     geocode = ""
@@ -369,17 +400,18 @@ def handle_one_vehicle(
             )
             if newest_updated_at < previous_updated_at:
                 utcoffset = newest_updated_at.utcoffset()
-                newest_updated_at_corrected = newest_updated_at + utcoffset
-                if newest_updated_at_corrected >= previous_updated_at:
-                    log(
-                        f"fixed newest_updated_at: old: {newest_updated_at} new: {newest_updated_at_corrected} previous: {previous_updated_at}"  # noqa
-                    )
-                    newest_updated_at = newest_updated_at_corrected
+                if utcoffset:
+                    newest_updated_at_corrected = newest_updated_at + utcoffset
+                    if newest_updated_at_corrected >= previous_updated_at:
+                        _ = D and dbg(
+                            f"fixed newest_updated_at: old: {newest_updated_at} new: {newest_updated_at_corrected} previous: {previous_updated_at}"  # noqa
+                        )
+                        newest_updated_at = newest_updated_at_corrected
                 newest_updated_at = max(newest_updated_at, previous_updated_at)
 
     line = f"{newest_updated_at}, {location_longitude}, {location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {float_to_string_no_trailing_zero(odometer)}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa
     if "None, None" in line:  # something gone wrong, retry
-        log(f"Skipping Unexpected line: {line}")
+        logging.warning(f"Skipping Unexpected line: {line}")
         return True  # exit subroutine with error
 
     if line != last_line:
@@ -407,7 +439,7 @@ def handle_one_vehicle(
     return False
 
 
-def handle_exception(ex: Exception, retries: int, stacktrace=False) -> int:
+def handle_exception(ex: Exception, retries: int, stacktrace=False) -> tuple[int, str]:
     """
     If an error is found, an exception is raised.
     retCode known values:
@@ -423,65 +455,172 @@ def handle_exception(ex: Exception, retries: int, stacktrace=False) -> int:
     - 9999: "Undefined Error - Response timeout"
     """
     exception_str = str(ex)
-    log(f"Exception: {exception_str}")
+    error_string = f"Exception: {exception_str}"
+    logging.warning(error_string)
     if stacktrace and "Service Temporary Unavailable" not in exception_str:
         traceback.print_exc()
-    retries = sleep(retries)
-    return retries
+    retries = sleep_a_minute(retries)
+    return retries, error_string
 
 
-def handle_vehicles() -> None:
+def run_commands():
+    """run_commands"""
+    commands = MONITOR_EXECUTE_COMMANDS_WHEN_SOMETHING_WRITTEN_OR_ERROR.split(";")
+    count = 0
+    for command in commands:
+        count += 1
+        command = command.strip()
+        if len(command) > 0:
+            _ = D and dbg(f"full command: {command}")
+            output_filename = f"command{count}.log"
+            open_mode = "w"
+            if ">>" in command:  # append to file
+                open_mode = "a"
+                command = command.replace(">>", ">")
+            if ">" in command:  # write to file
+                splitted = command.split(">")
+                command = splitted[0].strip()
+                output_filename = splitted[1].strip()
+            _ = D and dbg(f"command: {command}")
+            _ = D and dbg(f"output_filename: {output_filename}")
+            _ = D and dbg(f"open_mode: {open_mode}")
+            try:
+                with open(output_filename, open_mode, encoding="utf-8") as outfile:
+                    process = subprocess.run(
+                        command,
+                        check=True,
+                        shell=True,
+                        stderr=subprocess.STDOUT,
+                        stdout=outfile,
+                    )
+                if process.returncode != 0:
+                    logging.error(
+                        f"Error in running {command}: returncode {process.returncode}"
+                    )
+            except Exception as ex:  # pylint: disable=broad-except
+                (_, error_string) = handle_exception(ex, 1, True)
+                logging.error(f"Error in running {command}: {error_string}")
+
+
+# get MANAGER only once
+MANAGER: typing.Union[VehicleManager, None] = None
+
+
+def handle_vehicles(login: bool) -> bool:
     """handle vehicles"""
-    retries = 2
+    global MANAGER, MONITOR_SOMETHING_WRITTEN_OR_ERROR  # pylint:disable=global-statement  # noqa
+    MONITOR_SOMETHING_WRITTEN_OR_ERROR = False
+    retries = 15  # retry for maximum of 15 minutes (15 x 60 seconds sleep)
     while retries > 0:
+        error_string = ""
         try:
-            # get information and add to comma separated file
-            manager = VehicleManager(
-                region=int(REGION),
-                brand=int(BRAND),
-                username=USERNAME,
-                password=PASSWORD,
-                pin=PIN,
-                geocode_api_enable=USE_GEOCODE,
-                geocode_api_use_email=USE_GEOCODE_EMAIL,
-                language=LANGUAGE,
-            )
-            manager.check_and_refresh_token()
-            manager.update_all_vehicles_with_cached_state()  # needed >= 2.0.0
+            if login:
+                logging.info("Login using VehicleManager")
+                # get information and add to comma separated file
+                MANAGER = VehicleManager(
+                    region=int(REGION),
+                    brand=int(BRAND),
+                    username=USERNAME,
+                    password=PASSWORD,
+                    pin=PIN,
+                    geocode_api_enable=USE_GEOCODE,
+                    geocode_api_use_email=USE_GEOCODE_EMAIL,
+                    language=LANGUAGE,
+                )
 
-            number_of_vehicles = len(manager.vehicles)
-            error = False
-            for _, vehicle in manager.vehicles.items():
-                error = handle_one_vehicle(manager, vehicle, number_of_vehicles)
-                if error:  # something gone wrong, exit loop
-                    break
+            if MANAGER:
+                MANAGER.check_and_refresh_token()
+                MANAGER.update_all_vehicles_with_cached_state()  # needed >= 2.0.0
 
-            if error:  # something gone wrong, retry
-                retries -= 1
-                sleep(retries)
+                error = False
+                number_of_vehicles = len(MANAGER.vehicles)
+                for _, vehicle in MANAGER.vehicles.items():
+                    error = handle_one_vehicle(MANAGER, vehicle, number_of_vehicles)
+                    if error:  # something gone wrong, exit vehicles loop
+                        error_string = "Error occurred in handle_one_vehicle()"
+                        break
+
+            if error or MANAGER is None:  # something gone wrong, retry
+                retries = sleep_a_minute(retries)
             else:
-                retries = 0  # successfully end while loop
+                retries = -1  # successfully end while loop without error
         except exceptions.AuthenticationError as ex:
-            retries = handle_exception(ex, retries)
+            (retries, error_string) = handle_exception(ex, retries)
         except exceptions.RateLimitingError as ex:
-            retries = handle_exception(ex, retries)
+            (retries, error_string) = handle_exception(ex, retries)
         except exceptions.NoDataFound as ex:
-            retries = handle_exception(ex, retries)
+            (retries, error_string) = handle_exception(ex, retries)
         except exceptions.DuplicateRequestError as ex:
-            retries = handle_exception(ex, retries)
+            (retries, error_string) = handle_exception(ex, retries)
         except exceptions.RequestTimeoutError as ex:
-            retries = handle_exception(ex, retries)
+            (retries, error_string) = handle_exception(ex, retries)
         # Not yet available, so workaround for now in handle_exception
         # except exceptions.ServiceTemporaryUnavailable as ex:
         #    retries = handle_exception(ex, retries)
         except exceptions.InvalidAPIResponseError as ex:
-            retries = handle_exception(ex, retries, True)
+            (retries, error_string) = handle_exception(ex, retries, True)
         except exceptions.APIError as ex:
-            retries = handle_exception(ex, retries, True)
+            (retries, error_string) = handle_exception(ex, retries, True)
         except exceptions.HyundaiKiaException as ex:
-            retries = handle_exception(ex, retries, True)
+            (retries, error_string) = handle_exception(ex, retries, True)
         except Exception as ex:  # pylint: disable=broad-except
-            retries = handle_exception(ex, retries, True)
+            (retries, error_string) = handle_exception(ex, retries, True)
+
+    error = retries != -1
+    if error:
+        logging.error(error_string)
+        MONITOR_SOMETHING_WRITTEN_OR_ERROR = True  # indicate error
+        try:
+            append_error_to_last_run(error_string)
+        except Exception as ex:  # pylint: disable=broad-except
+            (retries, error_string) = handle_exception(ex, retries, True)
+    else:
+        MONITOR_SOMETHING_WRITTEN_OR_ERROR = False
+
+    return error
 
 
-handle_vehicles()  # do the work
+def monitor():
+    """monitor"""
+    global MONITOR_SOMETHING_WRITTEN_OR_ERROR  # pylint:disable=global-statement
+    prev_time = datetime.now() - timedelta(days=1.0)  # once per day login
+    not_done_once = False
+    error_count = 1
+    while not_done_once or MONITOR_INFINITE:
+        not_done_once = True
+        current_time = datetime.now()
+        # login when 4x15 minutes subsequent errors or once at beginning of new day
+        login = (error_count % 4 == 0) or not same_day(prev_time, current_time)
+        MONITOR_SOMETHING_WRITTEN_OR_ERROR = login  # run commands at least once per day
+        error = handle_vehicles(login)
+        if error:
+            logging.error(f"error count: {error_count}")
+            error_count += 1
+        else:
+            error_count = 1
+        if (
+            MONITOR_SOMETHING_WRITTEN_OR_ERROR
+            and len(MONITOR_EXECUTE_COMMANDS_WHEN_SOMETHING_WRITTEN_OR_ERROR) > 0
+        ):
+            logging.info(
+                "New data added or first run today or errors, running configured commands"  # noqa
+            )
+            run_commands()
+
+        if MONITOR_INFINITE:
+            prev_time = current_time
+
+            # calculate number of seconds to sleep
+            next_time = prev_time + timedelta(minutes=MONITOR_INFINITE_INTERVAL_MINUTES)
+            current_time = datetime.now()
+            delta = next_time - current_time
+            total_seconds = delta.total_seconds()
+            if total_seconds > 0:
+                sleep_seconds(total_seconds)
+
+        if error_count > 96:  # more than 24 hours subsequnt errors
+            logging.error("Too many subsequent errors occurred, exiting monitor.py")
+            sys.exit(-1)
+
+
+monitor()

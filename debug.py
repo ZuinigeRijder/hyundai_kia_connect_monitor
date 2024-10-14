@@ -3,6 +3,7 @@
 import configparser
 from datetime import datetime
 import logging
+import logging.config
 from hyundai_kia_connect_api import VehicleManager, Vehicle
 from monitor_utils import get_filepath
 
