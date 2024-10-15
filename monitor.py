@@ -574,8 +574,6 @@ def handle_vehicles(login: bool) -> bool:
             append_error_to_last_run(error_string)
         except Exception as ex:  # pylint: disable=broad-except
             (retries, error_string) = handle_exception(ex, retries, True)
-    else:
-        MONITOR_SOMETHING_WRITTEN_OR_ERROR = False
 
     return error
 
