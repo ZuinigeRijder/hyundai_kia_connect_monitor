@@ -102,7 +102,7 @@ The following tools are available as pure Python3 scripts:
 - kml.py: transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations
 - shrink.py: Simple Python3 script to shrink monitor.csv, identical lines removed (first date/time column excluded)
 - debug.py: same sort of python script as monitor.py, but debug logging enabled and all the (internal) data is just printed to standard output in pretty print
-- Raspberry pi configuration: example script to run monitor.py once per hour on a linux based system
+- Raspberry pi configuration: example script to run the scripts on a linux based system
 
 ---
 # How to install python, packages and hyundai_connect_monitor
@@ -571,8 +571,8 @@ Steps:
 1. create a directory hyundai_kia_connect_monitor in your home directory
 2. copy hyundai_kia_connect_api as subdirectory of directory hyundai_kia_connect_monitor
 3. copy run_monitor_infinite.sh, monitor.py, monitor.cfg, monitor.translations.csv, monitor_utils.py, summary.py, summary.cfg, dailystats.py and logging_config.ini
-4. change inside monitor.cfg the appropriate hyundai_kia_connect settings, e.g. monitor_infinite = True and monitor_execute_commands_when_something_written_or_error = python -u summary.py sheetupdate > summary.log;python -u dailystats.py sheetupdate > dailystats.log
-5. chmod + x run_monitor_infinite.sh
+4. change inside monitor.cfg the appropriate hyundai_kia_connect settings, e.g. monitor_infinite = True and monitor_execute_commands_when_something_written_or_error = /usr/bin/python -u ~/hyundai_kia_connect_monitor/summary.py sheetupdate > summary.log;/usr/bin/python -u ~/hyundai_kia_connect_monitor/dailystats.py sheetupdate > dailystats.log
+5. chmod +x run_monitor_infinite.sh
 
 Add to your crontab to run once per hour to restart after crashes or reboot (crontab -e)
 ```
@@ -589,8 +589,8 @@ Steps:
 1. create a directory hyundai_kia_connect_monitor in your home directory
 2. copy hyundai_kia_connect_api as subdirectory of directory hyundai_kia_connect_monitor
 3. copy run_monitor_once.sh, monitor.py, monitor.cfg, monitor.translations.csv, monitor_utils.py and logging_config.ini in the hyundai_kia_connect_monitor directory
-4. change inside monitor.cfg the appropriate hyundai_kia_connect settings, e.g. monitor_infinite = False
-5. chmod + x run_monitor_once.sh
+4. change inside monitor.cfg the appropriate hyundai_kia_connect settings, e.g. monitor_infinite = False and monitor_execute_commands_when_something_written_or_error =
+5. chmod +x run_monitor_once.sh
 
 Add the following line in your crontab -e to run it once per hour (crontab -e):
 ```
