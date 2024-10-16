@@ -582,10 +582,10 @@ def monitor():
     """monitor"""
     global MONITOR_SOMETHING_WRITTEN_OR_ERROR  # pylint:disable=global-statement
     prev_time = datetime.now() - timedelta(days=1.0)  # once per day login
-    not_done_once = False
+    not_done_once = True
     error_count = 1
     while not_done_once or MONITOR_INFINITE:
-        not_done_once = True
+        not_done_once = False
         current_time = datetime.now()
         # login when 4x15 minutes subsequent errors or once at beginning of new day
         login = (error_count % 4 == 0) or not same_day(prev_time, current_time)
