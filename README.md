@@ -162,7 +162,13 @@ Follow the steps in this link above, here is the summary of these steps:
   - In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai-kia-connect-monitor or monitor.VIN (latter if vin=VIN is given as parameter)
   - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
   - In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google spreadsheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and change e.g. diagram titles into your own language.
-  - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
+  - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json).
+  - How to share a Google Spreadsheet:
+    1. Open the Sheet you want to share (that you own or have edit access to).
+    2. Click Share.
+    3. Enter the client_email address as mentioned inside service_account.json.
+    4. Choose kind of access: Editor.
+    5. Click Send.
 4. run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor or monitor.VIN spreadheet will be updated with a summary and the last 122 lines of standard output
 5. run "python dailystats.py sheetupdate" and if everything is correct, the monitor.dailystats or monitor.dailystats.VIN spreadheet will be updated with the last 122 lines of standard output
 6. configure to run "python summary.py sheetupdate" regularly, after having run "python monitor.py"
