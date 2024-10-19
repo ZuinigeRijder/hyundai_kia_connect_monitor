@@ -509,7 +509,6 @@ MANAGER: typing.Union[VehicleManager, None] = None
 def handle_vehicles(login: bool) -> bool:
     """handle vehicles"""
     global MANAGER, MONITOR_SOMETHING_WRITTEN_OR_ERROR  # pylint:disable=global-statement  # noqa
-    MONITOR_SOMETHING_WRITTEN_OR_ERROR = False
     retries = 15  # retry for maximum of 15 minutes (15 x 60 seconds sleep)
     while retries > 0:
         error_string = ""
@@ -581,7 +580,8 @@ def handle_vehicles(login: bool) -> bool:
 def monitor():
     """monitor"""
     global MONITOR_SOMETHING_WRITTEN_OR_ERROR  # pylint:disable=global-statement
-    prev_time = datetime.now() - timedelta(days=1.0)  # once per day login
+    current_time = datetime.now()
+    prev_time = current_time - timedelta(days=1.0)  # once per day login
     not_done_once = True
     error_count = 1
     while not_done_once or MONITOR_INFINITE:
@@ -589,16 +589,15 @@ def monitor():
         current_time = datetime.now()
         # login when 4x15 minutes subsequent errors or once at beginning of new day
         login = (error_count % 4 == 0) or not same_day(prev_time, current_time)
-        MONITOR_SOMETHING_WRITTEN_OR_ERROR = login  # run commands at least once per day
+        MONITOR_SOMETHING_WRITTEN_OR_ERROR = False
         error = handle_vehicles(login)
         if error:
             logging.error(f"error count: {error_count}")
             error_count += 1
         else:
             error_count = 1
-        if (
-            MONITOR_SOMETHING_WRITTEN_OR_ERROR
-            and len(MONITOR_EXECUTE_COMMANDS_WHEN_SOMETHING_WRITTEN_OR_ERROR) > 0
+        if (len(MONITOR_EXECUTE_COMMANDS_WHEN_SOMETHING_WRITTEN_OR_ERROR) > 0) and (
+            login or MONITOR_SOMETHING_WRITTEN_OR_ERROR
         ):
             logging.info(
                 "New data added or first run today or errors, running configured commands"  # noqa
