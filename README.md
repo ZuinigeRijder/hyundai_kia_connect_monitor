@@ -251,7 +251,7 @@ mqtt_broker_password =
 mqtt_main_topic = hyundai_kia_connect_monitor
 ```
 
-- set send_to_mqtt to True if you want to send updates to *.csv also to Domoticz
+- set send_to_mqtt to True if you want to send updates to *.csv also to MQTT
 - mqtt_broker_hostname is the URL where to send the updates to
 - mqtt_broker_port is the port where to send the updates to
 - mqtt_broker_username is an optional username
