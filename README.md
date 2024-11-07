@@ -2,6 +2,8 @@
 - [How to install python, packages and hyundai\_connect\_monitor](#how-to-install-python-packages-and-hyundai_connect_monitor)
 - [configuration of gspread for "python summary.py sheetupdate" and "python dailystats.py sheetupdate"](#configuration-of-gspread-for-python-summarypy-sheetupdate-and-python-dailystatspy-sheetupdate)
 - [Translations](#translations)
+- [Domoticz](#domoticz)
+- [MQTT Broker (e.g. HomeAssistant, ioBroker)](#mqtt-broker-eg-homeassistant-iobroker)
 - [monitor.py](#monitorpy)
 - [summary.py](#summarypy)
 - [summary.py sheetupdate](#summarypy-sheetupdate)
@@ -28,7 +30,7 @@
 ---
 # Introduction hyundai_kia_connect_monitor
 Automatic trip administration tools for Hyundai Bluelink or Kia UVO Connect users.
-Determining afterwards your private and/or business trips and information about those trips and usage of the car.
+Determining afterwards your private and/or business trips and information about those trips and usage of the car. Support for Domoticz and/or MQTT Broker (e.g. HomeAssistant, ioBroker).
 Best of all is the fact that it does NOT drain your 12 volt battery of the car, because it only uses the cached server information!
 
 Examples of supported cars (including cars with newer [ccNC Infotainment](https://ifdesign.com/en/winner-ranking/project/hyundai-ccnc-infotainment-system-seon/568244)):
@@ -188,8 +190,82 @@ Remarks:
 - If (some) translations are not correct, please submit an issue with the proposed corrections, but be careful to provide them as unicode text, preferably using monitor.translations.xlsx
 
 ---
+# Domoticz
+[Domoticz](https://www.domoticz.com/) is a very light weight home automation system that lets you monitor and configure miscellaneous devices, including lights, switches, various sensors/meters like temperature, rainfall, wind, ultraviolet (UV) radiation, electricity usage/production, gas consumption, water consumption and many more. Notifications/alerts can be sent to any mobile device.
+
+In the file "monitor.cfg" there is a configuration section for domoticz:
+```
+[Domoticz]
+send_to_domoticz = False
+domot_url = http://192.168.0.222:8081
+
+monitor_datetime = 0
+monitor_longitude = 0
+monitor_latitude = 0
+monitor_engineon = 0
+monitor_battery12v = 0
+monitor_odometer = 0
+monitor_soc = 0
+monitor_charging = 0
+monitor_plugged = 0
+monitor_address = 0
+monitor_evrange = 0
+
+trip_date = 0
+trip_starttime = 0
+trip_drivetime = 0
+trip_idletime = 0
+trip_distance = 0
+trip_avgspeed = 0
+trip_maxspeed = 0
+
+dailystats_date = 0
+dailystats_distance = 0
+dailystats_distance_unit = 0
+dailystats_total_consumed = 0
+dailystats_regenerated_energy = 0
+dailystats_engine_consumption = 0
+dailystats_climate_consumption = 0
+dailystats_onboard_electronics_consumption = 0
+dailystats_battery_care_consumption = 0
+```
+
+- set send_to_domoticz to True if you want to send updates to *.csv also to Domoticz
+- domot_url is the URL where to send the updates to
+- the next items (e.g. monitor_odometer) you can configure the ID/IDX of each item, If the ID/IDX is 0, that item will NOT be send to Domoticz.
+
+
+---
+# MQTT Broker (e.g. HomeAssistant, ioBroker)
+An MQTT broker is a server that receives all messages from the clients and then routes the messages to the appropriate destination clients. Information is organized in a hierarchy of topics. When hyundai_kia_connect_monitor has a new item of data to distribute, it sends a control message with the data to the connected broker. The broker then distributes the information to any clients that have subscribed to that topic. The hyundai_kia_connect_monitor does not need to have any data on the number or locations of subscribers, and subscribers, in turn, do not have to be configured with any data about the publishers.
+
+In the file "monitor.cfg" there is a configuration section for MQTT:
+
+```
+[MQTT]
+send_to_mqtt = False
+mqtt_broker_hostname = localhost
+mqtt_broker_port = 1883
+mqtt_broker_username =
+mqtt_broker_password =
+mqtt_main_topic = hyundai_kia_connect_monitor
+```
+
+- set send_to_mqtt to True if you want to send updates to *.csv also to Domoticz
+- mqtt_broker_hostname is the URL where to send the updates to
+- mqtt_broker_port is the port where to send the updates to
+- mqtt_broker_username is an optional username
+- mqtt_broker_password is an optional password
+- mqtt_main_topic is the main topic
+
+When configured, the data is send to mqtt_main_topic/VIN/subtopic. Example screenshot using MQTT Explorer:
+
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MQTTExplorer.png)
+
+
+---
 # monitor.py
-Simple Python3 script to monitor values using [hyundai_kia_connect_api](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api)
+Simple Python3 script to monitor values using [hyundai_kia_connect_api](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api). Support for Domoticz and/or MQTT Broker (e.g. HomeAssistant, ioBroker).
 
 Usage:
 ```
@@ -204,7 +280,9 @@ OUTPUTFILES:
 - monitor.tripinfo.csv (appended with trip info) or monitor.tripinfo.VIN.csv
 - monitor.lastrun or monitor.VIN.lastrun (rewritten with last run date/time of monitor.py and other vehicle data)
 
-*Note: dailystats and tripinfo are only available in Europe.*
+*Note 1: dailystats and tripinfo are only available in Europe.*
+
+*Note 2: Changes to the output csv files are also send to [Domoticz](#domoticz) and/or [MQTT Broker](#mqtt-broker-eg-homeassistant-iobroker) (e.g. HomeAssistant, ioBroker) when configured.*
 
 Make sure to configure monitor.cfg once:
 ```
@@ -224,6 +302,48 @@ consumption_efficiency_factor_summary = 1.0
 monitor_infinite = False
 monitor_infinite_interval_minutes = 60
 monitor_execute_commands_when_something_written_or_error =
+
+[Domoticz]
+send_to_domoticz = False
+domot_url = http://192.168.0.222:8081
+
+monitor_datetime = 0
+monitor_longitude = 0
+monitor_latitude = 0
+monitor_engineon = 0
+monitor_battery12v = 0
+monitor_odometer = 0
+monitor_soc = 0
+monitor_charging = 0
+monitor_plugged = 0
+monitor_address = 0
+monitor_evrange = 0
+
+trip_date = 0
+trip_starttime = 0
+trip_drivetime = 0
+trip_idletime = 0
+trip_distance = 0
+trip_avgspeed = 0
+trip_maxspeed = 0
+
+dailystats_date = 0
+dailystats_distance = 0
+dailystats_distance_unit = 0
+dailystats_total_consumed = 0
+dailystats_regenerated_energy = 0
+dailystats_engine_consumption = 0
+dailystats_climate_consumption = 0
+dailystats_onboard_electronics_consumption = 0
+dailystats_battery_care_consumption = 0
+
+[MQTT]
+send_to_mqtt = False
+mqtt_broker_hostname = localhost
+mqtt_broker_port = 1883
+mqtt_broker_username =
+mqtt_broker_password =
+mqtt_main_topic = hyundai_kia_connect_monitor
 ```
 
 Explanation of the configuration items:
@@ -243,6 +363,8 @@ Explanation of the configuration items:
 - monitor_infinite_interval_minutes, interval in minutes between getting cached server values
 - monitor_execute_commands_when_something_written_or_error, when new cached server values are retrieved, the specified commands (separated by semicolon ;) are executed. See Note 1.
   * example: monitor_execute_commands_when_something_written_or_error = python -u summary.py sheetupdate > summary.log;python -u dailystats.py sheetupdate > dailystats.log
+- For configuration of Domoticz, [see here](#domoticz)
+- For configuration of MQTT Broker, [see here](#mqtt-broker-eg-homeassistant-iobroker)
 
 *Note 1: in combination with infinite (monitor_infinite = True) summary.py and dailystats.py are only run when something is changed or error occurred (or once a day). You do not need to run summary.py and dailystats.py separately and it is only run when it is needed.*
 

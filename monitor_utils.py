@@ -1,7 +1,5 @@
 # == monitor_utils.py Author: Zuinige Rijder =========
-"""
-monitor utils
-"""
+""" monitor utils """
 # pylint:disable=logging-fstring-interpolation
 import configparser
 import errno
@@ -9,10 +7,64 @@ import logging
 import logging.config
 import sys
 import os
-from datetime import datetime, timezone
+import socket
+import traceback
 from pathlib import Path
 import time
 from typing import Generator
+
+from datetime import datetime, timezone
+from urllib.error import HTTPError, URLError
+from urllib.request import urlopen, Request
+
+
+def get_items_monitor_csv() -> list:
+    """get_items_monitor_csv"""
+    items = "monitor_datetime, monitor_longitude, monitor_latitude, monitor_engineon, monitor_battery12v, monitor_odometer, monitor_soc, monitor_charging, monitor_plugged, monitor_address, monitor_evrange"  # noqa
+    result = [x.strip() for x in items.split(",")]
+    return result
+
+
+def get_items_monitor_tripinfo_csv() -> list:
+    """get_items_monitor_tripinfo_csv"""
+    items = "trip_date, trip_starttime, trip_drivetime, trip_idletime, trip_distance, trip_avgspeed, trip_maxspeed"  # noqa
+    result = [x.strip() for x in items.split(",")]
+    return result
+
+
+def get_items_monitor_dailystats_csv() -> list:
+    """get_items_monitor_dailystats_csv"""
+    items = "dailystats_date, dailystats_distance, dailystats_distance_unit, dailystats_total_consumed, dailystats_regenerated_energy, dailystats_engine_consumption, dailystats_climate_consumption, dailystats_onboard_electronics_consumption, dailystats_battery_care_consumption"  # noqa
+    result = [x.strip() for x in items.split(",")]
+    return result
+
+
+def get_filepath(filename: str) -> str:
+    """get_filepath"""
+    if os.path.isfile(filename):  # current directory
+        filepath = filename
+    else:  # script directory
+        script_dirname = os.path.abspath(os.path.dirname(__file__))
+        filepath = f"{script_dirname}/{filename}"
+
+    if not os.path.isfile(filepath):
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filepath)
+    return filepath
+
+
+def get(dictionary: dict, key: str, default: str = "") -> str:
+    """get key from dictionary"""
+    if key in dictionary:
+        return dictionary[key].strip()
+    return default
+
+
+def get_bool(dictionary: dict, key: str, default: bool = True) -> bool:
+    """get boolean value from dictionary key"""
+    value = get(dictionary, key)
+    if value == "":
+        return default
+    return value.lower() == "true"
 
 
 def arg_has(string: str) -> bool:
@@ -51,30 +103,10 @@ def sleep_a_minute(retries: int) -> int:
     return retries
 
 
-def get_filepath(filename: str) -> str:
-    """get_filepath"""
-    if os.path.isfile(filename):  # current directory
-        filepath = filename
-    else:  # script directory
-        script_dirname = os.path.abspath(os.path.dirname(__file__))
-        filepath = f"{script_dirname}/{filename}"
-
-    if not os.path.isfile(filepath):
-        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filepath)
-    return filepath
-
-
 def km_to_mile(kilometer: float) -> float:
     """Convert km to mile"""
     mile = kilometer * 0.6213711922
     return mile
-
-
-def get(dictionary: dict, key: str, default: str = "") -> str:
-    """get key from dictionary"""
-    if key in dictionary:
-        return dictionary[key].strip()
-    return default
 
 
 def safe_divide(numerator: float, denumerator: float) -> float:
@@ -318,3 +350,35 @@ def get_translation(translations: dict[str, str], text: str) -> str:
         translation = text
 
     return translation
+
+
+# == execute_request ==========================================================
+def execute_request(url: str, data: str, headers: dict) -> str:
+    """execute request and handle errors"""
+    if data != "":
+        post_data = data.encode("utf-8")
+        request = Request(url, data=post_data, headers=headers)
+    else:
+        request = Request(url)
+    errorstring = ""
+    try:
+        with urlopen(request, timeout=30) as response:
+            body = response.read()
+            content = body.decode("utf-8")
+            logging.debug(content)
+            return content
+    except HTTPError as error:
+        errorstring = str(error.status) + ": " + error.reason
+    except URLError as error:
+        errorstring = str(error.reason)
+    except TimeoutError:
+        errorstring = "Request timed out"
+    except socket.timeout:
+        errorstring = "Socket timed out"
+    except Exception as ex:  # pylint: disable=broad-except
+        errorstring = "urlopen exception: " + str(ex)
+        traceback.print_exc()
+
+    logging.error(url + " -> " + errorstring)
+    time.sleep(60)  # retry after 1 minute
+    return "ERROR"

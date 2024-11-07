@@ -49,6 +49,7 @@ from monitor_utils import (
     arg_has,
     float_to_string_no_trailing_zero,
     get,
+    get_bool,
     get_filepath,
     get_last_line,
     get_safe_datetime,
@@ -58,6 +59,19 @@ from monitor_utils import (
     sleep_a_minute,
     sleep_seconds,
     to_int,
+)
+
+from domoticz_utils import (
+    send_dailystats_line_to_domoticz,
+    send_monitor_csv_line_to_domoticz,
+    send_tripinfo_line_to_domoticz,
+)
+from mqtt_utils import (
+    send_dailystats_line_to_mqtt,
+    send_monitor_csv_line_to_mqtt,
+    send_tripinfo_line_to_mqtt,
+    set_vin,
+    stop_mqtt_loop,
 )
 
 SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
@@ -88,11 +102,11 @@ BRAND = monitor_settings["brand"]
 USERNAME = monitor_settings["username"]
 PASSWORD = monitor_settings["password"]
 PIN = monitor_settings["pin"]
-USE_GEOCODE = monitor_settings["use_geocode"].lower() == "true"
-USE_GEOCODE_EMAIL = monitor_settings["use_geocode_email"].lower() == "true"
+USE_GEOCODE = get_bool(monitor_settings, "use_geocode", False)
+USE_GEOCODE_EMAIL = get_bool(monitor_settings, "use_geocode_email", False)
 LANGUAGE = monitor_settings["language"]
 ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
-MONITOR_INFINITE = get(monitor_settings, "monitor_infinite", "False").lower() == "true"
+MONITOR_INFINITE = get_bool(monitor_settings, "monitor_infinite", False)
 MONITOR_INFINITE_INTERVAL_MINUTES = to_int(
     get(monitor_settings, "monitor_infinite_interval_minutes", "60")
 )
@@ -203,6 +217,8 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
                     file.write("\n")
                     MONITOR_SOMETHING_WRITTEN_OR_ERROR = True
                     last_line = line
+                    send_dailystats_line_to_domoticz(full_line)
+                    send_dailystats_line_to_mqtt(full_line)
                 else:
                     if D:
                         print(
@@ -288,6 +304,8 @@ def handle_day_trip_info(
                         MONITOR_SOMETHING_WRITTEN_OR_ERROR = True
                         last_date = yyyymmdd
                         last_hhmmss = hhmmss
+                        send_tripinfo_line_to_domoticz(line)
+                        send_tripinfo_line_to_mqtt(line)
                     else:
                         _ = D and dbg(f"Skipping trip: {yyyymmdd},{hhmmss}")
             else:
@@ -427,7 +445,10 @@ def handle_one_vehicle(
                     break  # finished
         if not same:
             _ = D and dbg(f"Writing1:\nline=[{line}]\nlast=[{last_line}]")
+
             writeln(filename, line)
+            send_monitor_csv_line_to_domoticz(line)
+            send_monitor_csv_line_to_mqtt(line)
     handle_daily_stats(vehicle, number_of_vehicles)
     vehicle_stats = [
         str(newest_updated_at),
@@ -534,6 +555,7 @@ def handle_vehicles(login: bool) -> bool:
                 error = False
                 number_of_vehicles = len(MANAGER.vehicles)
                 for _, vehicle in MANAGER.vehicles.items():
+                    set_vin(vehicle.VIN)
                     error = handle_one_vehicle(MANAGER, vehicle, number_of_vehicles)
                     if error:  # something gone wrong, exit vehicles loop
                         error_string = "Error occurred in handle_one_vehicle()"
@@ -618,6 +640,8 @@ def monitor():
         if error_count > 96:  # more than 24 hours subsequnt errors
             logging.error("Too many subsequent errors occurred, exiting monitor.py")
             sys.exit(-1)
+
+    stop_mqtt_loop()
 
 
 monitor()
