@@ -235,6 +235,8 @@ dailystats_battery_care_consumption = 0
 - the next items (e.g. monitor_odometer) you can configure the ID/IDX of each item, If the ID/IDX is 0, that item will NOT be send to Domoticz.
 
 
+*Note: only when there is something added in monitor.csv, monitor.tripinfo.csv and/or monitor.dailystats.csv the corresponding line is splitted and send to MQTT. You can trigger this for testing by e.g. removing the last line of monitor.csv , monitor.tripinfo.csv and/or monitor.dailystats.csv.*
+
 ---
 # MQTT Broker (e.g. HomeAssistant, ioBroker)
 An MQTT broker is a server that receives all messages from the clients and then routes the messages to the appropriate destination clients. Information is organized in a hierarchy of topics. When hyundai_kia_connect_monitor has a new item of data to distribute, it sends a control message with the data to the connected broker. The broker then distributes the information to any clients that have subscribed to that topic. The hyundai_kia_connect_monitor does not need to have any data on the number or locations of subscribers, and subscribers, in turn, do not have to be configured with any data about the publishers.
@@ -262,6 +264,7 @@ When configured, the data is send to mqtt_main_topic/VIN/subtopic. Example scree
 
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MQTTExplorer.png)
 
+*Note: only when there is something added in monitor.csv, monitor.tripinfo.csv and/or monitor.dailystats.csv the corresponding line is splitted and send to MQTT. You can trigger this for testing by e.g. removing the last line of monitor.csv , monitor.tripinfo.csv and/or monitor.dailystats.csv.*
 
 ---
 # monitor.py
