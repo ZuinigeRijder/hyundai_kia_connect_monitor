@@ -16,6 +16,8 @@
 - [debug.py](#debugpy)
 - [check\_monitor.py](#check_monitorpy)
 - [monitor\_utils.py](#monitor_utilspy)
+- [domoticz\_utils.py](#domoticz_utilspy)
+- [mqtt\_utils.py](#mqtt_utilspy)
 - [logging\_config.ini](#logging_configini)
 - [Raspberry pi configuration](#raspberry-pi-configuration)
   - [Running monitor.py infinitely and only running summary.py and dailystats.py when there is new cached server data received](#running-monitorpy-infinitely-and-only-running-summarypy-and-dailystatspy-when-there-is-new-cached-server-data-received)
@@ -131,9 +133,16 @@ I have installed the following packages (e.g. use python -m pip install "package
     pytz==2022.2.1
     requests==2.28.1
 
-In hyundai_kia_connect_monitor summary.py and dailystats.py also the following packages are used:
+In monitor.py the following package is used:
+
+    paho_mqtt>=1.6.1,<2.0
+
+*Note that paho_mqtt version 2.x is not (yet) supported*
+
+In summary.py and dailystats.py also the following package is used:
 
     gspread==5.6.2
+
 
 If everything works, it's a matter of regularly collecting the information, for example by running the "python monitor.py" command once an hour or infinite.
 A server is of course best, I use a Raspberry Pi, but it can also regularly be done on a Windows 10 or Mac computer, provided the computer is on.
@@ -530,7 +539,7 @@ mqtt_broker_password =
 mqtt_main_topic = hyundai_kia_connect_monitor
 ```
 
-- set send_to_mqtt to True if you want to send updates to *.csv also to MQTT
+- set send_to_mqtt to True if you want to send information also to MQTT
 - mqtt_broker_hostname is the URL where to send the updates to
 - mqtt_broker_port is the port where to send the updates to
 - mqtt_broker_username is an optional username
@@ -1029,7 +1038,7 @@ You also can consider only to monitor between e.g. 6:00 and 22:00 (saves 1/3 of 
 
 ---
 # summary.py
-make summary per TRIP, DAY, WEEK, MONTH, YEAR or a combination with monitor.csv as input or monitor.VIN.csv (latter if vin=VIN is given as parameter)
+make summary per TRIP, DAY, WEEK, MONTH, YEAR or a combination with monitor.csv as input or monitor.VIN.csv (latter if vin=VIN is given as parameter). Support for Domoticz and/or MQTT Broker (e.g. HomeAssistant, ioBroker).
 
 Usage:
 ```
@@ -1150,7 +1159,7 @@ And thereafter the last 122 lines of the summary in reverse order, so you do not
 
 ---
 # dailystats.py
-Read the daily stats, trip info and charge files and represent these in a nice formatted text, including computed totals.
+Read the daily stats, trip info and charge files and represent these in a nice formatted text, including computed totals. Support for Domoticz and/or MQTT Broker (e.g. HomeAssistant, ioBroker).
 
 *Note dailystats and tripinfo from hyundai_kia_connect_api is currently only available for Europe*
 
@@ -1245,6 +1254,14 @@ Python script for testing: print when the odometer between two monitor.csv entri
 ---
 # monitor_utils.py
 Generic utility methods, used by the other python scripts.
+
+---
+# domoticz_utils.py
+Domoticz utility methods, used by the other python scripts.
+
+---
+# mqtt_utils.py
+MQTT utility methods, used by the other python scripts.
 
 ---
 # logging_config.ini
