@@ -1,6 +1,7 @@
 # == monitor_utils.py Author: Zuinige Rijder =========
 """ monitor utils """
 # pylint:disable=logging-fstring-interpolation
+
 import configparser
 import errno
 import logging
@@ -18,24 +19,99 @@ from urllib.error import HTTPError, URLError
 from urllib.request import urlopen, Request
 
 
+VIN = ""  # filled by set_vin() or determine_vin() method
+
+D = False
+
+
+def d() -> bool:
+    """return D"""
+    return D
+
+
+def dbg(line: str) -> bool:
+    """print line if debugging"""
+    if D:
+        logging.debug(line)
+    return D  # just to make a lazy evaluation expression possible
+
+
+def set_dbg() -> None:
+    """set_dbg"""
+    global D  # pylint:disable=global-statement
+    D = True
+    logging.getLogger().setLevel(logging.DEBUG)
+
+
+def get_splitted_list_item(the_list: list[str], index: int) -> list[str]:
+    """get splitted item from list"""
+    if index < 0 or index >= len(the_list):
+        return ["", ""]
+    items = the_list[index].split(";")
+    if len(items) != 2:
+        return ["", ""]
+    return [items[0].strip(), items[1].strip()]
+
+
+def set_vin(vin: str) -> None:
+    """set_vin"""
+    global VIN  # pylint: disable=global-statement
+    VIN = vin
+
+
+def determine_vin(lastrun_filename: Path) -> None:
+    """determine_vin"""
+    # get vin information from monitor.lastrun
+    with lastrun_filename.open("r", encoding="utf-8") as lastrun_file:
+        lastrun_lines = lastrun_file.readlines()
+    vin = get_splitted_list_item(lastrun_lines, 1)[1]
+    set_vin(vin)
+
+
+def get_vin() -> str:
+    """get_vin"""
+    return VIN
+
+
 def get_items_monitor_csv() -> list:
     """get_items_monitor_csv"""
-    items = "monitor_datetime, monitor_longitude, monitor_latitude, monitor_engineon, monitor_battery12v, monitor_odometer, monitor_soc, monitor_charging, monitor_plugged, monitor_address, monitor_evrange"  # noqa
-    result = [x.strip() for x in items.split(",")]
+    items = "datetime, longitude, latitude, engineon, battery12v, odometer, soc, charging, plugged, address, evrange"  # noqa
+    result = [x.strip().lower() for x in items.split(",")]
     return result
 
 
 def get_items_monitor_tripinfo_csv() -> list:
     """get_items_monitor_tripinfo_csv"""
-    items = "trip_date, trip_starttime, trip_drivetime, trip_idletime, trip_distance, trip_avgspeed, trip_maxspeed"  # noqa
-    result = [x.strip() for x in items.split(",")]
+    items = "date, starttime, drivetime, idletime, distance, avgspeed, maxspeed"
+    result = [x.strip().lower() for x in items.split(",")]
     return result
 
 
 def get_items_monitor_dailystats_csv() -> list:
     """get_items_monitor_dailystats_csv"""
-    items = "dailystats_date, dailystats_distance, dailystats_distance_unit, dailystats_total_consumed, dailystats_regenerated_energy, dailystats_engine_consumption, dailystats_climate_consumption, dailystats_onboard_electronics_consumption, dailystats_battery_care_consumption"  # noqa
-    result = [x.strip() for x in items.split(",")]
+    items = "date, distance, distance_unit, total_consumed, regenerated_energy, engine_consumption, climate_consumption, onboard_electronics_consumption, battery_care_consumption"  # noqa
+    result = [x.strip().lower() for x in items.split(",")]
+    return result
+
+
+def get_items_summary() -> list:
+    """get_items_summary"""
+    items = "period, date, info, odometer, delta_distance, kwh_charged, kwh_discharged, distance_unit_per_kwh, kwh_per_100_distance_unit, cost, soc, soc_avg, soc_min, soc_max, battery12v, battery12v_avg, battery12v_min, battery12v_max, charging_sessions, trip_count, range, address"  # noqa
+    result = [x.strip().lower() for x in items.split(",")]
+    return result
+
+
+def get_items_dailystats_day() -> list:
+    """get_items_dailystat_day"""
+    items = "date, total_consumption, regenerated_energy, average_consumption, engine_consumption, climate_consumption, onboard_electronics_consumption, battery_care_consumption, driven, regenerated_energy_percentage, average_consumption_per_100, engine_consumption_percentage, climate_consumption_percentage, onboard_electronics_consumption_percentage, battery_care_consumption_percentage"  # noqa
+    result = [x.strip().lower() for x in items.split(",")]
+    return result
+
+
+def get_items_dailystat_trip() -> list:
+    """get_items_dailystat_trip"""
+    items = "computed_kwh_charged, computed_day_consumption, computed_kwh_used, trip_time, computed_consumption_or_distance, distance, avg_speed, max_speed, idle_time"  # noqa
+    result = [x.strip().lower() for x in items.split(",")]
     return result
 
 
@@ -89,7 +165,7 @@ def get_vin_arg() -> str:
 
 def sleep_seconds(seconds: int) -> None:
     """sleep seconds"""
-    logging.debug(f"Sleeping {seconds} seconds")
+    _ = D and dbg(f"Sleeping {seconds} seconds")
     time.sleep(seconds)
 
 
@@ -365,7 +441,7 @@ def execute_request(url: str, data: str, headers: dict) -> str:
         with urlopen(request, timeout=30) as response:
             body = response.read()
             content = body.decode("utf-8")
-            logging.debug(content)
+            _ = D and dbg(content)
             return content
     except HTTPError as error:
         errorstring = str(error.status) + ": " + error.reason

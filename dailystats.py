@@ -17,13 +17,21 @@ from collections import deque
 import typing
 from dateutil.relativedelta import relativedelta
 import gspread
+from domoticz_utils import (
+    SEND_TO_DOMOTICZ,
+    send_dailystats_day_line_to_domoticz,
+    send_dailystats_trip_line_to_domoticz,
+)
 from monitor_utils import (
+    dbg,
+    determine_vin,
     float_to_string_no_trailing_zero,
     get,
     get_filepath,
     arg_has,
     get_vin_arg,
     safe_divide,
+    set_dbg,
     sleep_a_minute,
     split_on_comma,
     split_output_to_sheet_float_list,
@@ -36,24 +44,22 @@ from monitor_utils import (
     read_reverse_order_init,
     split_output_to_sheet_list,
 )
+from mqtt_utils import (
+    SEND_TO_MQTT,
+    send_dailystats_day_line_to_mqtt,
+    send_dailystats_trip_line_to_mqtt,
+    stop_mqtt,
+)
 
 SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
 logging.config.fileConfig(f"{SCRIPT_DIRNAME}/logging_config.ini")
 D = arg_has("debug")
 if D:
-    logging.getLogger().setLevel(logging.DEBUG)
+    set_dbg()
 
 # Initializing a queue for about 30 days
 MAX_QUEUE_LEN = 122
 PRINTED_OUTPUT_QUEUE: deque[str] = deque(maxlen=MAX_QUEUE_LEN)
-
-
-def dbg(line: str) -> bool:
-    """print line if debugging"""
-    if D:
-        logging.debug(line)
-    return D  # just to make a lazy evaluation expression possible
-
 
 KEYWORD_LIST = ["help", "sheetupdate", "debug"]
 KEYWORD_ERROR = False
@@ -74,6 +80,7 @@ SHEETUPDATE = arg_has("sheetupdate")
 OUTPUT_SPREADSHEET_NAME = "monitor.dailystats"
 SHEET: typing.Any = None
 
+LASTRUN_FILENAME = Path("monitor.lastrun")
 DAILYSTATS_CSV_FILE = Path("monitor.dailystats.csv")
 TRIPINFO_CSV_FILE = Path("monitor.tripinfo.csv")
 SUMMARY_CHARGE_CSV_FILE = Path("summary.charge.csv")
@@ -82,6 +89,7 @@ SUMMARY_DAY_CSV_FILE = Path("summary.day.csv")
 LENCHECK = 1
 VIN = get_vin_arg()
 if VIN != "":
+    LASTRUN_FILENAME = Path(f"monitor.{VIN}.lastrun")
     DAILYSTATS_CSV_FILE = Path(f"monitor.dailystats.{VIN}.csv")
     TRIPINFO_CSV_FILE = Path(f"monitor.tripinfo.{VIN}.csv")
     SUMMARY_CHARGE_CSV_FILE = Path(f"summary.charge.{VIN}.csv")
@@ -118,6 +126,7 @@ BATTERY_CARE = 8
 
 TR_HELPER: dict[str, str] = read_translations()
 COLUMN_WIDTHS = [11, 12, 14, 10, 9, 9, 8]
+EMPTY_ROW = ",,,,,,"
 
 
 def update_width(text: str, index_column_widths: int) -> None:
@@ -320,8 +329,9 @@ def print_output(output: str) -> None:
         print(text, end="")
     print("")
 
-    if SHEETUPDATE and len(PRINTED_OUTPUT_QUEUE) < MAX_QUEUE_LEN:
-        PRINTED_OUTPUT_QUEUE.append(output)
+    if SHEETUPDATE or SEND_TO_DOMOTICZ or SEND_TO_MQTT:
+        if len(PRINTED_OUTPUT_QUEUE) < MAX_QUEUE_LEN:
+            PRINTED_OUTPUT_QUEUE.append(output)
 
 
 def get_charge_for_date(date: str) -> str:
@@ -580,7 +590,7 @@ def print_dailystats(
         time_str = now.strftime("%H:%M")
         tr_last_run = get_translation_and_update_width("Last run", 0)
         print_output(f"{tr_last_run},{date_str},{time_str},{tr_weekday},,,")
-        print_output(",,,,,,")  # empty line/row
+        print_output(EMPTY_ROW)
 
     print_output(
         f"{totals},{TR.recuperation},{TR.consumption},{TR.engine},{TR.climate},{TR.electronic_devices},{TR.battery_care}"  # noqa
@@ -674,7 +684,7 @@ def summary_tripinfo() -> None:
         avg_speed=f"{average_speed}",
         max_speed=f"{TOTAL_TRIPINFO_MAX_SPEED}",
     )
-    print_output(",,,,,,")  # empty line/row
+    print_output(EMPTY_ROW)
 
 
 def reverse_print_dailystats_one_line(val: list[str]) -> None:
@@ -694,7 +704,7 @@ def reverse_print_dailystats_one_line(val: list[str]) -> None:
     )
     if date != "Totals":
         print_day_trip_info(date)
-    print_output(",,,,,,")  # empty line/row
+    print_output(EMPTY_ROW)
 
 
 def compute_cumulative_dailystats(val: list[str], total: list[str]) -> list[str]:
@@ -824,7 +834,7 @@ def print_output_queue() -> None:
                 array.append({"range": f"N{cd_row}", "values": [[cd_date]]})
                 cd_date = ""
             else:
-                if ct_header and queue_output != ",,,,,,":
+                if ct_header and queue_output != EMPTY_ROW:
                     # tripinfo
                     trip = [ct_date, 0, "", 0, 0, 0, 0]  # clear consumption
                     tmp = re.sub(r"[^0-9.,:-]", "", queue_output)
@@ -862,6 +872,45 @@ def print_output_queue() -> None:
         SHEET.batch_update(array)
     if len(formats) > 0:
         SHEET.batch_format(formats)
+
+
+def send_to_mqtt_domoticz() -> None:
+    """send_to_mqtt_domoticz"""
+    idx = 0
+    items = []
+    for item in PRINTED_OUTPUT_QUEUE:
+        idx += 1
+        _ = D and dbg(f"{idx}: {item}")
+        items.append(item)
+        if idx > 13 and item == EMPTY_ROW:  # no more trips
+            break
+
+    # send dailystats day info
+    totals_day = f"{items[0].split(',')[1]},{items[3]},{items[4]}"
+    last_day = f"{items[8].split(',')[0]},{items[9]},{items[10]}"
+
+    if SEND_TO_MQTT:
+        determine_vin(LASTRUN_FILENAME)
+        send_dailystats_day_line_to_mqtt("TOTALS", totals_day)
+        send_dailystats_day_line_to_mqtt("LAST_DAY", last_day)
+
+    if SEND_TO_DOMOTICZ:
+        send_dailystats_day_line_to_domoticz("TOTALS", totals_day)
+        send_dailystats_day_line_to_domoticz("LAST_DAY", last_day)
+
+    # send also the dailystats_trip info
+    totals_trip = f"{items[5].split(',')[0]},{items[5].split(',')[2]}, {items[6]}"
+    last_trip = f"{items[11].split(',')[0]},{items[11].split(',')[2]}, {items[12]}"
+
+    if SEND_TO_MQTT:
+        send_dailystats_trip_line_to_mqtt("TOTALS", totals_trip)
+        send_dailystats_trip_line_to_mqtt("LAST_DAY", last_trip)
+
+    if SEND_TO_DOMOTICZ:
+        send_dailystats_trip_line_to_domoticz("TOTALS", totals_trip)
+        send_dailystats_trip_line_to_domoticz("LAST_DAY", last_trip)
+
+    stop_mqtt()
 
 
 # main program
@@ -910,6 +959,9 @@ if SHEETUPDATE:
             traceback.print_exc()
             RETRIES = sleep_a_minute(RETRIES)
 
+if SEND_TO_DOMOTICZ or SEND_TO_MQTT:
+    send_to_mqtt_domoticz()
+
 if RETRIES == -1:
-    exit(0)
-exit(-1)
+    sys.exit(0)
+sys.exit(-1)

@@ -18,12 +18,17 @@ from collections import deque
 import typing
 import gspread
 from dateutil import parser
+from domoticz_utils import SEND_TO_DOMOTICZ, send_summary_line_to_domoticz
 from monitor_utils import (
+    dbg,
+    determine_vin,
     get_filepath,
     arg_has,
     get,
+    get_splitted_list_item,
     get_vin_arg,
     safe_divide,
+    set_dbg,
     sleep_a_minute,
     split_on_comma,
     to_int,
@@ -39,19 +44,13 @@ from monitor_utils import (
     split_output_to_sheet_list,
     float_to_string_no_trailing_zero,
 )
+from mqtt_utils import SEND_TO_MQTT, send_summary_line_to_mqtt, stop_mqtt
 
 SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
 logging.config.fileConfig(f"{SCRIPT_DIRNAME}/logging_config.ini")
 D = arg_has("debug")
 if D:
-    logging.getLogger().setLevel(logging.DEBUG)
-
-
-def dbg(line: str) -> bool:
-    """print line if debugging"""
-    if D:
-        logging.debug(line)
-    return D  # just to make a lazy evaluation expression possible
+    set_dbg()
 
 
 KEYWORD_LIST = [
@@ -334,8 +333,7 @@ def print_output_and_update_queue(output: str) -> None:
         total_line += ", "
     print(total_line)
 
-    if SHEETUPDATE:
-        LAST_OUTPUT_QUEUE.append(total_line)
+    LAST_OUTPUT_QUEUE.append(total_line)
 
 
 def sheet_append_first_rows(row_a: str, row_b: str) -> None:
@@ -457,16 +455,6 @@ def get_address(split: list[str]) -> str:
             location_str = ' "' + location_str + '"'
 
     return location_str
-
-
-def get_splitted_list_item(the_list: list[str], index: int) -> list[str]:
-    """get splitted item from list"""
-    if index < 0 or index >= len(the_list):
-        return ["", ""]
-    items = the_list[index].split(";")
-    if len(items) != 2:
-        return ["", ""]
-    return [items[0].strip(), items[1].strip()]
 
 
 if not MONITOR_CSV_FILENAME.is_file():
@@ -686,6 +674,14 @@ def print_summary(
                 f"{date} {time_str}, {odo:.1f}, {float_to_string_no_trailing_zero(delta_odo)}, {float_to_string_no_trailing_zero(discharged_kwh)}, {float_to_string_no_trailing_zero(charged_kwh)}"  # noqa
             )
 
+    # get information from monitor.lastrun
+    with LASTRUN_FILENAME.open("r", encoding="utf-8") as lastrun_file:
+        lastrun_lines = lastrun_file.readlines()
+    last_upd_dt = get_splitted_list_item(lastrun_lines, 2)[1]
+    location_last_upd_dt = get_splitted_list_item(lastrun_lines, 3)[1]
+    if len(lastrun_lines) > 6:  # error occurred, line 6 contains error_string
+        last_upd_dt = f"{last_upd_dt} ERROR: {lastrun_lines[6]}"
+
     if SHEETUPDATE and prefix.startswith("SHEET "):
         prefix = prefix.replace("SHEET ", "")
         last_line = get_last_line(MONITOR_CSV_FILENAME).replace(",", ";")
@@ -693,17 +689,6 @@ def print_summary(
         last_run_dt = last_run_datetime.strftime("%Y-%m-%d %H:%M ") + get_translation(
             TR_HELPER, last_run_datetime.strftime("%a")
         )
-        lastrun_lines = []
-        if LASTRUN_FILENAME.is_file():
-            with LASTRUN_FILENAME.open("r", encoding="utf-8") as lastrun_file:
-                lastrun_lines = lastrun_file.readlines()
-        last_updated_at = get_splitted_list_item(lastrun_lines, 2)
-        location_last_updated_at = get_splitted_list_item(lastrun_lines, 3)
-        last_upd_dt = last_updated_at[1]
-        location_last_upd_dt = location_last_updated_at[1]
-        if len(lastrun_lines) > 6:  # error occurred, line 6 contains error_string
-            last_upd_dt = f"{last_upd_dt} ERROR: {lastrun_lines[6]}"
-
         SHEET_ROW_A = f"{TR.last_run},{TR.vehicle_upd},{TR.gps_update},{TR.last_entry},{TR.last_address},{TR.odometer} {ODO_METRIC},{TR.driven} {ODO_METRIC},+kWh,-kWh,{ODO_METRIC}/kWh,kWh/100{ODO_METRIC},{TR.cost} {COST_CURRENCY},{TR.soc_perc},{TR.avg} {TR.soc_perc},{TR.min} {TR.soc_perc},{TR.max} {TR.soc_perc},{TR.volt12_perc},{TR.avg} {TR.volt12_perc},{TR.min} {TR.volt12_perc},{TR.max} {TR.volt12_perc},{TR.charges},{TR.trips},{TR.ev_range}"  # noqa
         SHEET_ROW_B = f"{last_run_dt},{last_upd_dt},{location_last_upd_dt},{last_line},{location_str},{odo:.1f},{float_to_string_no_trailing_zero(delta_odo)},{float_to_string_no_trailing_zero(charged_kwh)},{float_to_string_no_trailing_zero(discharged_kwh)},{km_mi_per_kwh_str},{kwh_per_km_mi_str},{cost_str},{float_to_string_no_trailing_zero(t_soc_cur)},{float_to_string_no_trailing_zero(t_soc_avg)},{float_to_string_no_trailing_zero(t_soc_min)},{float_to_string_no_trailing_zero(t_soc_max)},{t_volt12_cur},{t_volt12_avg},{t_volt12_min},{t_volt12_max},{t_charges},{t_trips},{ev_range}"  # noqa
     else:
@@ -1084,6 +1069,20 @@ def summary():
     print_header_and_update_queue()
 
 
+def send_to_mqtt_domoticz() -> None:
+    """send_to_mqtt_domoticz"""
+    idx = 0
+    for item in LAST_OUTPUT_QUEUE:
+        idx += 1
+        if idx >= (len(LAST_OUTPUT_QUEUE) - 10) and idx != len(
+            LAST_OUTPUT_QUEUE
+        ):  # last 10 items excluding last header item
+            send_summary_line_to_mqtt(item)
+            send_summary_line_to_domoticz(item)
+
+    stop_mqtt()
+
+
 # always rewrite charge file, because input might be changed
 CHARGE_CSV_FILE = CHARGE_CSV_FILENAME.open("w", encoding="utf-8")
 write_charge_csv("date, odometer, +kWh, end charged SOC%")
@@ -1119,6 +1118,12 @@ if SHEETUPDATE:
             traceback.print_exc()
             RETRIES = sleep_a_minute(RETRIES)
 
+if SEND_TO_DOMOTICZ or SEND_TO_MQTT:
+    if SEND_TO_MQTT:
+        determine_vin(LASTRUN_FILENAME)
+    send_to_mqtt_domoticz()
+
+
 if RETRIES == -1:
-    exit(0)
-exit(-1)
+    sys.exit(0)
+sys.exit(-1)

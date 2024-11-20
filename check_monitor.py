@@ -1,20 +1,19 @@
 # == check_monitor.py Author: Zuinige Rijder =========
 """ Simple Python3 script to check monitor.csv """
+from os import path
 from datetime import datetime
 from io import TextIOWrapper
+import logging
+import logging.config
 from pathlib import Path
 
-from monitor_utils import arg_has, split_on_comma
+from monitor_utils import arg_has, dbg, set_dbg, split_on_comma
 
+SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
+logging.config.fileConfig(f"{SCRIPT_DIRNAME}/logging_config.ini")
 D = arg_has("debug")
-
-
-def dbg(line: str) -> bool:
-    """print line if debugging"""
-    if D:
-        print(line)
-    return D  # just to make a lazy evaluation expression possible
-
+if D:
+    set_dbg()
 
 # indexes to splitted monitor.csv items
 DT = 0  # datetime

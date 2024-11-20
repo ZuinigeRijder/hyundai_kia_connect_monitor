@@ -4,6 +4,9 @@
 - [Translations](#translations)
 - [Domoticz](#domoticz)
 - [MQTT Broker (e.g. HomeAssistant, ioBroker)](#mqtt-broker-eg-homeassistant-iobroker)
+  - [MQTT-Explorer screenshot after running monitor.py](#mqtt-explorer-screenshot-after-running-monitorpy)
+  - [MQTT-Explorer screenshot after running summary.py](#mqtt-explorer-screenshot-after-running-summarypy)
+  - [MQTT-Explorer screenshot after running dailystats.py:](#mqtt-explorer-screenshot-after-running-dailystatspy)
 - [monitor.py](#monitorpy)
 - [summary.py](#summarypy)
 - [summary.py sheetupdate](#summarypy-sheetupdate)
@@ -199,43 +202,317 @@ In the file "monitor.cfg" there is a configuration section for domoticz:
 send_to_domoticz = False
 domot_url = http://192.168.0.222:8081
 
-monitor_datetime = 0
-monitor_longitude = 0
-monitor_latitude = 0
-monitor_engineon = 0
-monitor_battery12v = 0
-monitor_odometer = 0
-monitor_soc = 0
-monitor_charging = 0
-monitor_plugged = 0
-monitor_address = 0
-monitor_evrange = 0
+monitor_monitor_datetime = 0
+monitor_monitor_longitude = 0
+monitor_monitor_latitude = 0
+monitor_monitor_engineon = 0
+monitor_monitor_battery12v = 0
+monitor_monitor_odometer = 0
+monitor_monitor_soc = 0
+monitor_monitor_charging = 0
+monitor_monitor_plugged = 0
+monitor_monitor_address = 0
+monitor_monitor_evrange = 0
 
-trip_date = 0
-trip_starttime = 0
-trip_drivetime = 0
-trip_idletime = 0
-trip_distance = 0
-trip_avgspeed = 0
-trip_maxspeed = 0
+monitor_tripinfo_date = 0
+monitor_tripinfo_starttime = 0
+monitor_tripinfo_drivetime = 0
+monitor_tripinfo_idletime = 0
+monitor_tripinfo_distance = 0
+monitor_tripinfo_avgspeed = 0
+monitor_tripinfo_maxspeed = 0
 
-dailystats_date = 0
-dailystats_distance = 0
-dailystats_distance_unit = 0
-dailystats_total_consumed = 0
-dailystats_regenerated_energy = 0
-dailystats_engine_consumption = 0
-dailystats_climate_consumption = 0
-dailystats_onboard_electronics_consumption = 0
-dailystats_battery_care_consumption = 0
+monitor_dailystats_date = 0
+monitor_dailystats_distance = 0
+monitor_dailystats_distance_unit = 0
+monitor_dailystats_total_consumed = 0
+monitor_dailystats_regenerated_energy = 0
+monitor_dailystats_engine_consumption = 0
+monitor_dailystats_climate_consumption = 0
+monitor_dailystats_onboard_electronics_consumption = 0
+monitor_dailystats_battery_care_consumption = 0
+
+summary_TRIP_date = 0
+summary_TRIP_info = 0
+summary_TRIP_odometer = 0
+summary_TRIP_delta_distance = 0
+summary_TRIP_kwh_charged = 0
+summary_TRIP_kwh_discharged = 0
+summary_TRIP_distance_unit_per_kwh = 0
+summary_TRIP_kwh_per_100_distance_unit = 0
+summary_TRIP_cost = 0
+summary_TRIP_soc = 0
+summary_TRIP_soc_avg = 0
+summary_TRIP_soc_min = 0
+summary_TRIP_soc_max = 0
+summary_TRIP_battery12v = 0
+summary_TRIP_battery12v_avg = 0
+summary_TRIP_battery12v_min = 0
+summary_TRIP_battery12v_max = 0
+summary_TRIP_charging_sessions = 0
+summary_TRIP_trip_count = 0
+summary_TRIP_range = 0
+summary_TRIP_address = 0
+
+summary_DAY_date = 0
+summary_DAY_info = 0
+summary_DAY_odometer = 0
+summary_DAY_delta_distance = 0
+summary_DAY_kwh_charged = 0
+summary_DAY_kwh_discharged = 0
+summary_DAY_distance_unit_per_kwh = 0
+summary_DAY_kwh_per_100_distance_unit = 0
+summary_DAY_cost = 0
+summary_DAY_soc = 0
+summary_DAY_soc_avg = 0
+summary_DAY_soc_min = 0
+summary_DAY_soc_max = 0
+summary_DAY_battery12v = 0
+summary_DAY_battery12v_avg = 0
+summary_DAY_battery12v_min = 0
+summary_DAY_battery12v_max = 0
+summary_DAY_charging_sessions = 0
+summary_DAY_trip_count = 0
+summary_DAY_range = 0
+summary_DAY_address = 0
+
+summary_WEEK_date = 0
+summary_WEEK_info = 0
+summary_WEEK_odometer = 0
+summary_WEEK_delta_distance = 0
+summary_WEEK_kwh_charged = 0
+summary_WEEK_kwh_discharged = 0
+summary_WEEK_distance_unit_per_kwh = 0
+summary_WEEK_kwh_per_100_distance_unit = 0
+summary_WEEK_cost = 0
+summary_WEEK_soc = 0
+summary_WEEK_soc_avg = 0
+summary_WEEK_soc_min = 0
+summary_WEEK_soc_max = 0
+summary_WEEK_battery12v = 0
+summary_WEEK_battery12v_avg = 0
+summary_WEEK_battery12v_min = 0
+summary_WEEK_battery12v_max = 0
+summary_WEEK_charging_sessions = 0
+summary_WEEK_trip_count = 0
+summary_WEEK_range = 0
+summary_WEEK_address = 0
+
+summary_MONTH_date = 0
+summary_MONTH_info = 0
+summary_MONTH_odometer = 0
+summary_MONTH_delta_distance = 0
+summary_MONTH_kwh_charged = 0
+summary_MONTH_kwh_discharged = 0
+summary_MONTH_distance_unit_per_kwh = 0
+summary_MONTH_kwh_per_100_distance_unit = 0
+summary_MONTH_cost = 0
+summary_MONTH_soc = 0
+summary_MONTH_soc_avg = 0
+summary_MONTH_soc_min = 0
+summary_MONTH_soc_max = 0
+summary_MONTH_battery12v = 0
+summary_MONTH_battery12v_avg = 0
+summary_MONTH_battery12v_min = 0
+summary_MONTH_battery12v_max = 0
+summary_MONTH_charging_sessions = 0
+summary_MONTH_trip_count = 0
+summary_MONTH_range = 0
+summary_MONTH_address = 0
+
+summary_YEAR_date = 0
+summary_YEAR_info = 0
+summary_YEAR_odometer = 0
+summary_YEAR_delta_distance = 0
+summary_YEAR_kwh_charged = 0
+summary_YEAR_kwh_discharged = 0
+summary_YEAR_distance_unit_per_kwh = 0
+summary_YEAR_kwh_per_100_distance_unit = 0
+summary_YEAR_cost = 0
+summary_YEAR_soc = 0
+summary_YEAR_soc_avg = 0
+summary_YEAR_soc_min = 0
+summary_YEAR_soc_max = 0
+summary_YEAR_battery12v = 0
+summary_YEAR_battery12v_avg = 0
+summary_YEAR_battery12v_min = 0
+summary_YEAR_battery12v_max = 0
+summary_YEAR_charging_sessions = 0
+summary_YEAR_trip_count = 0
+summary_YEAR_range = 0
+summary_YEAR_address = 0
+
+summary_TRIPAVG_date = 0
+summary_TRIPAVG_info = 0
+summary_TRIPAVG_odometer = 0
+summary_TRIPAVG_delta_distance = 0
+summary_TRIPAVG_kwh_charged = 0
+summary_TRIPAVG_kwh_discharged = 0
+summary_TRIPAVG_distance_unit_per_kwh = 0
+summary_TRIPAVG_kwh_per_100_distance_unit = 0
+summary_TRIPAVG_cost = 0
+summary_TRIPAVG_soc = 0
+summary_TRIPAVG_soc_avg = 0
+summary_TRIPAVG_soc_min = 0
+summary_TRIPAVG_soc_max = 0
+summary_TRIPAVG_battery12v = 0
+summary_TRIPAVG_battery12v_avg = 0
+summary_TRIPAVG_battery12v_min = 0
+summary_TRIPAVG_battery12v_max = 0
+summary_TRIPAVG_charging_sessions = 0
+summary_TRIPAVG_trip_count = 0
+summary_TRIPAVG_range = 0
+summary_TRIPAVG_address = 0
+
+summary_DAYAVG_date = 0
+summary_DAYAVG_info = 0
+summary_DAYAVG_odometer = 0
+summary_DAYAVG_delta_distance = 0
+summary_DAYAVG_kwh_charged = 0
+summary_DAYAVG_kwh_discharged = 0
+summary_DAYAVG_distance_unit_per_kwh = 0
+summary_DAYAVG_kwh_per_100_distance_unit = 0
+summary_DAYAVG_cost = 0
+summary_DAYAVG_soc = 0
+summary_DAYAVG_soc_avg = 0
+summary_DAYAVG_soc_min = 0
+summary_DAYAVG_soc_max = 0
+summary_DAYAVG_battery12v = 0
+summary_DAYAVG_battery12v_avg = 0
+summary_DAYAVG_battery12v_min = 0
+summary_DAYAVG_battery12v_max = 0
+summary_DAYAVG_charging_sessions = 0
+summary_DAYAVG_trip_count = 0
+summary_DAYAVG_range = 0
+summary_DAYAVG_address = 0
+
+summary_WEEKAVG_date = 0
+summary_WEEKAVG_info = 0
+summary_WEEKAVG_odometer = 0
+summary_WEEKAVG_delta_distance = 0
+summary_WEEKAVG_kwh_charged = 0
+summary_WEEKAVG_kwh_discharged = 0
+summary_WEEKAVG_distance_unit_per_kwh = 0
+summary_WEEKAVG_kwh_per_100_distance_unit = 0
+summary_WEEKAVG_cost = 0
+summary_WEEKAVG_soc = 0
+summary_WEEKAVG_soc_avg = 0
+summary_WEEKAVG_soc_min = 0
+summary_WEEKAVG_soc_max = 0
+summary_WEEKAVG_battery12v = 0
+summary_WEEKAVG_battery12v_avg = 0
+summary_WEEKAVG_battery12v_min = 0
+summary_WEEKAVG_battery12v_max = 0
+summary_WEEKAVG_charging_sessions = 0
+summary_WEEKAVG_trip_count = 0
+summary_WEEKAVG_range = 0
+summary_WEEKAVG_address = 0
+
+summary_MONTHAVG_date = 0
+summary_MONTHAVG_info = 0
+summary_MONTHAVG_odometer = 0
+summary_MONTHAVG_delta_distance = 0
+summary_MONTHAVG_kwh_charged = 0
+summary_MONTHAVG_kwh_discharged = 0
+summary_MONTHAVG_distance_unit_per_kwh = 0
+summary_MONTHAVG_kwh_per_100_distance_unit = 0
+summary_MONTHAVG_cost = 0
+summary_MONTHAVG_soc = 0
+summary_MONTHAVG_soc_avg = 0
+summary_MONTHAVG_soc_min = 0
+summary_MONTHAVG_soc_max = 0
+summary_MONTHAVG_battery12v = 0
+summary_MONTHAVG_battery12v_avg = 0
+summary_MONTHAVG_battery12v_min = 0
+summary_MONTHAVG_battery12v_max = 0
+summary_MONTHAVG_charging_sessions = 0
+summary_MONTHAVG_trip_count = 0
+summary_MONTHAVG_range = 0
+summary_MONTHAVG_address = 0
+
+summary_YEARLY_date = 0
+summary_YEARLY_info = 0
+summary_YEARLY_odometer = 0
+summary_YEARLY_delta_distance = 0
+summary_YEARLY_kwh_charged = 0
+summary_YEARLY_kwh_discharged = 0
+summary_YEARLY_distance_unit_per_kwh = 0
+summary_YEARLY_kwh_per_100_distance_unit = 0
+summary_YEARLY_cost = 0
+summary_YEARLY_soc = 0
+summary_YEARLY_soc_avg = 0
+summary_YEARLY_soc_min = 0
+summary_YEARLY_soc_max = 0
+summary_YEARLY_battery12v = 0
+summary_YEARLY_battery12v_avg = 0
+summary_YEARLY_battery12v_min = 0
+summary_YEARLY_battery12v_max = 0
+summary_YEARLY_charging_sessions = 0
+summary_YEARLY_trip_count = 0
+summary_YEARLY_range = 0
+summary_YEARLY_address = 0
+
+dailystats_day_TOTALS_date = 0
+dailystats_day_TOTALS_total_consumption = 0
+dailystats_day_TOTALS_regenerated_energy = 0
+dailystats_day_TOTALS_average_consumption = 0
+dailystats_day_TOTALS_engine_consumption = 0
+dailystats_day_TOTALS_climate_consumption = 0
+dailystats_day_TOTALS_onboard_electronics_consumption = 0
+dailystats_day_TOTALS_battery_care_consumption = 0
+dailystats_day_TOTALS_driven = 0
+dailystats_day_TOTALS_regenerated_energy_percentage = 0
+dailystats_day_TOTALS_average_consumption_per_100 = 0
+dailystats_day_TOTALS_engine_consumption_percentage = 0
+dailystats_day_TOTALS_climate_consumption_percentage = 0
+dailystats_day_TOTALS_onboard_electronics_consumption_percentage = 0
+dailystats_day_TOTALS_battery_care_consumption_percentage = 0
+
+dailystats_day_LAST_DAY_date = 0
+dailystats_day_LAST_DAY_total_consumption = 0
+dailystats_day_LAST_DAY_regenerated_energy = 0
+dailystats_day_LAST_DAY_average_consumption = 0
+dailystats_day_LAST_DAY_engine_consumption = 0
+dailystats_day_LAST_DAY_climate_consumption = 0
+dailystats_day_LAST_DAY_onboard_electronics_consumption = 0
+dailystats_day_LAST_DAY_battery_care_consumption = 0
+dailystats_day_LAST_DAY_driven = 0
+dailystats_day_LAST_DAY_regenerated_energy_percentage = 0
+dailystats_day_LAST_DAY_average_consumption_per_100 = 0
+dailystats_day_LAST_DAY_engine_consumption_percentage = 0
+dailystats_day_LAST_DAY_climate_consumption_percentage = 0
+dailystats_day_LAST_DAY_onboard_electronics_consumption_percentage = 0
+dailystats_day_LAST_DAY_battery_care_consumption_percentage = 0
+
+dailystats_trip_TOTALS_computed_kwh_charged = 0
+dailystats_trip_TOTALS_computed_day_consumption = 0
+dailystats_trip_TOTALS_computed_kwh_used = 0
+dailystats_trip_TOTALS_trip_time = 0
+dailystats_trip_TOTALS_computed_consumption_or_distance = 0
+dailystats_trip_TOTALS_distance = 0
+dailystats_trip_TOTALS_avg_speed = 0
+dailystats_trip_TOTALS_max_speed = 0
+dailystats_trip_TOTALS_idle_time = 0
+
+dailystats_trip_LAST_DAY_computed_kwh_charged = 0
+dailystats_trip_LAST_DAY_computed_day_consumption = 0
+dailystats_trip_LAST_DAY_computed_kwh_used = 0
+dailystats_trip_LAST_DAY_trip_time = 0
+dailystats_trip_LAST_DAY_computed_consumption_or_distance = 0
+dailystats_trip_LAST_DAY_distance = 0
+dailystats_trip_LAST_DAY_avg_speed = 0
+dailystats_trip_LAST_DAY_max_speed = 0
+dailystats_trip_LAST_DAY_idle_time = 0
 ```
 
 - set send_to_domoticz to True if you want to send updates to *.csv also to Domoticz
 - domot_url is the URL where to send the updates to
-- the next items (e.g. monitor_odometer) you can configure the ID/IDX of each item, If the ID/IDX is 0, that item will NOT be send to Domoticz.
+- the next items (e.g. monitor_monitor_odometer) you can configure the ID/IDX of each item, If the ID/IDX is 0, that item will NOT be send to Domoticz.
+- the Domoticz configuration lines starting with monitor_ are the configuration items for monitor.py
+- the Domoticz configuration lines starting with summary_ are the configuration items for summary.py
+- the Domoticz configuration lines starting with dailystats_ are the configuration items for dailystats.py
 
-
-*Note: only when there is something added in monitor.csv, monitor.tripinfo.csv and/or monitor.dailystats.csv the corresponding line is splitted and send to MQTT. You can trigger this for testing by e.g. removing the last line of monitor.csv , monitor.tripinfo.csv and/or monitor.dailystats.csv.*
+*Note: only when there is something added when running monitor.py (in monitor.csv, monitor.tripinfo.csv and/or monitor.dailystats.csv) the corresponding line is splitted and send to Domoticz. You can trigger this for testing by e.g. removing the last line of monitor.csv , monitor.tripinfo.csv and/or monitor.dailystats.csv. However, summary.py and dailystats.py will always send the latest values to Domoticz.*
 
 ---
 # MQTT Broker (e.g. HomeAssistant, ioBroker)
@@ -260,11 +537,19 @@ mqtt_main_topic = hyundai_kia_connect_monitor
 - mqtt_broker_password is an optional password
 - mqtt_main_topic is the main topic
 
-When configured, the data is send to mqtt_main_topic/VIN/subtopic. Example screenshot using MQTT Explorer:
+When configured, the data is send to mqtt_main_topic/VIN/subtopic.
 
-![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MQTTExplorer.png)
+*Note: only when there is something added when running monitor.py (in monitor.csv, monitor.tripinfo.csv and/or monitor.dailystats.csv) the corresponding line is splitted and send to MQTT. You can trigger this for testing by e.g. removing the last line of monitor.csv , monitor.tripinfo.csv and/or monitor.dailystats.csv. However, summary.py and dailystats.py will always send the latest values to MQTT.*
 
-*Note: only when there is something added in monitor.csv, monitor.tripinfo.csv and/or monitor.dailystats.csv the corresponding line is splitted and send to MQTT. You can trigger this for testing by e.g. removing the last line of monitor.csv , monitor.tripinfo.csv and/or monitor.dailystats.csv.*
+
+## MQTT-Explorer screenshot after running monitor.py
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MQTTExplorer_monitor.png)
+
+## MQTT-Explorer screenshot after running summary.py
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MQTTExplorer_summary.png)
+
+##  MQTT-Explorer screenshot after running dailystats.py:
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MQTTExplorer_dailystats.png)
 
 ---
 # monitor.py
@@ -306,40 +591,6 @@ monitor_infinite = False
 monitor_infinite_interval_minutes = 60
 monitor_execute_commands_when_something_written_or_error =
 
-[Domoticz]
-send_to_domoticz = False
-domot_url = http://192.168.0.222:8081
-
-monitor_datetime = 0
-monitor_longitude = 0
-monitor_latitude = 0
-monitor_engineon = 0
-monitor_battery12v = 0
-monitor_odometer = 0
-monitor_soc = 0
-monitor_charging = 0
-monitor_plugged = 0
-monitor_address = 0
-monitor_evrange = 0
-
-trip_date = 0
-trip_starttime = 0
-trip_drivetime = 0
-trip_idletime = 0
-trip_distance = 0
-trip_avgspeed = 0
-trip_maxspeed = 0
-
-dailystats_date = 0
-dailystats_distance = 0
-dailystats_distance_unit = 0
-dailystats_total_consumed = 0
-dailystats_regenerated_energy = 0
-dailystats_engine_consumption = 0
-dailystats_climate_consumption = 0
-dailystats_onboard_electronics_consumption = 0
-dailystats_battery_care_consumption = 0
-
 [MQTT]
 send_to_mqtt = False
 mqtt_broker_hostname = localhost
@@ -347,6 +598,312 @@ mqtt_broker_port = 1883
 mqtt_broker_username =
 mqtt_broker_password =
 mqtt_main_topic = hyundai_kia_connect_monitor
+
+[Domoticz]
+send_to_domoticz = False
+domot_url = http://192.168.0.222:8081
+
+monitor_monitor_datetime = 0
+monitor_monitor_longitude = 0
+monitor_monitor_latitude = 0
+monitor_monitor_engineon = 0
+monitor_monitor_battery12v = 0
+monitor_monitor_odometer = 0
+monitor_monitor_soc = 0
+monitor_monitor_charging = 0
+monitor_monitor_plugged = 0
+monitor_monitor_address = 0
+monitor_monitor_evrange = 0
+
+monitor_tripinfo_date = 0
+monitor_tripinfo_starttime = 0
+monitor_tripinfo_drivetime = 0
+monitor_tripinfo_idletime = 0
+monitor_tripinfo_distance = 0
+monitor_tripinfo_avgspeed = 0
+monitor_tripinfo_maxspeed = 0
+
+monitor_dailystats_date = 0
+monitor_dailystats_distance = 0
+monitor_dailystats_distance_unit = 0
+monitor_dailystats_total_consumed = 0
+monitor_dailystats_regenerated_energy = 0
+monitor_dailystats_engine_consumption = 0
+monitor_dailystats_climate_consumption = 0
+monitor_dailystats_onboard_electronics_consumption = 0
+monitor_dailystats_battery_care_consumption = 0
+
+summary_TRIP_date = 0
+summary_TRIP_info = 0
+summary_TRIP_odometer = 0
+summary_TRIP_delta_distance = 0
+summary_TRIP_kwh_charged = 0
+summary_TRIP_kwh_discharged = 0
+summary_TRIP_distance_unit_per_kwh = 0
+summary_TRIP_kwh_per_100_distance_unit = 0
+summary_TRIP_cost = 0
+summary_TRIP_soc = 0
+summary_TRIP_soc_avg = 0
+summary_TRIP_soc_min = 0
+summary_TRIP_soc_max = 0
+summary_TRIP_battery12v = 0
+summary_TRIP_battery12v_avg = 0
+summary_TRIP_battery12v_min = 0
+summary_TRIP_battery12v_max = 0
+summary_TRIP_charging_sessions = 0
+summary_TRIP_trip_count = 0
+summary_TRIP_range = 0
+summary_TRIP_address = 0
+
+summary_DAY_date = 0
+summary_DAY_info = 0
+summary_DAY_odometer = 0
+summary_DAY_delta_distance = 0
+summary_DAY_kwh_charged = 0
+summary_DAY_kwh_discharged = 0
+summary_DAY_distance_unit_per_kwh = 0
+summary_DAY_kwh_per_100_distance_unit = 0
+summary_DAY_cost = 0
+summary_DAY_soc = 0
+summary_DAY_soc_avg = 0
+summary_DAY_soc_min = 0
+summary_DAY_soc_max = 0
+summary_DAY_battery12v = 0
+summary_DAY_battery12v_avg = 0
+summary_DAY_battery12v_min = 0
+summary_DAY_battery12v_max = 0
+summary_DAY_charging_sessions = 0
+summary_DAY_trip_count = 0
+summary_DAY_range = 0
+summary_DAY_address = 0
+
+summary_WEEK_date = 0
+summary_WEEK_info = 0
+summary_WEEK_odometer = 0
+summary_WEEK_delta_distance = 0
+summary_WEEK_kwh_charged = 0
+summary_WEEK_kwh_discharged = 0
+summary_WEEK_distance_unit_per_kwh = 0
+summary_WEEK_kwh_per_100_distance_unit = 0
+summary_WEEK_cost = 0
+summary_WEEK_soc = 0
+summary_WEEK_soc_avg = 0
+summary_WEEK_soc_min = 0
+summary_WEEK_soc_max = 0
+summary_WEEK_battery12v = 0
+summary_WEEK_battery12v_avg = 0
+summary_WEEK_battery12v_min = 0
+summary_WEEK_battery12v_max = 0
+summary_WEEK_charging_sessions = 0
+summary_WEEK_trip_count = 0
+summary_WEEK_range = 0
+summary_WEEK_address = 0
+
+summary_MONTH_date = 0
+summary_MONTH_info = 0
+summary_MONTH_odometer = 0
+summary_MONTH_delta_distance = 0
+summary_MONTH_kwh_charged = 0
+summary_MONTH_kwh_discharged = 0
+summary_MONTH_distance_unit_per_kwh = 0
+summary_MONTH_kwh_per_100_distance_unit = 0
+summary_MONTH_cost = 0
+summary_MONTH_soc = 0
+summary_MONTH_soc_avg = 0
+summary_MONTH_soc_min = 0
+summary_MONTH_soc_max = 0
+summary_MONTH_battery12v = 0
+summary_MONTH_battery12v_avg = 0
+summary_MONTH_battery12v_min = 0
+summary_MONTH_battery12v_max = 0
+summary_MONTH_charging_sessions = 0
+summary_MONTH_trip_count = 0
+summary_MONTH_range = 0
+summary_MONTH_address = 0
+
+summary_YEAR_date = 0
+summary_YEAR_info = 0
+summary_YEAR_odometer = 0
+summary_YEAR_delta_distance = 0
+summary_YEAR_kwh_charged = 0
+summary_YEAR_kwh_discharged = 0
+summary_YEAR_distance_unit_per_kwh = 0
+summary_YEAR_kwh_per_100_distance_unit = 0
+summary_YEAR_cost = 0
+summary_YEAR_soc = 0
+summary_YEAR_soc_avg = 0
+summary_YEAR_soc_min = 0
+summary_YEAR_soc_max = 0
+summary_YEAR_battery12v = 0
+summary_YEAR_battery12v_avg = 0
+summary_YEAR_battery12v_min = 0
+summary_YEAR_battery12v_max = 0
+summary_YEAR_charging_sessions = 0
+summary_YEAR_trip_count = 0
+summary_YEAR_range = 0
+summary_YEAR_address = 0
+
+summary_TRIPAVG_date = 0
+summary_TRIPAVG_info = 0
+summary_TRIPAVG_odometer = 0
+summary_TRIPAVG_delta_distance = 0
+summary_TRIPAVG_kwh_charged = 0
+summary_TRIPAVG_kwh_discharged = 0
+summary_TRIPAVG_distance_unit_per_kwh = 0
+summary_TRIPAVG_kwh_per_100_distance_unit = 0
+summary_TRIPAVG_cost = 0
+summary_TRIPAVG_soc = 0
+summary_TRIPAVG_soc_avg = 0
+summary_TRIPAVG_soc_min = 0
+summary_TRIPAVG_soc_max = 0
+summary_TRIPAVG_battery12v = 0
+summary_TRIPAVG_battery12v_avg = 0
+summary_TRIPAVG_battery12v_min = 0
+summary_TRIPAVG_battery12v_max = 0
+summary_TRIPAVG_charging_sessions = 0
+summary_TRIPAVG_trip_count = 0
+summary_TRIPAVG_range = 0
+summary_TRIPAVG_address = 0
+
+summary_DAYAVG_date = 0
+summary_DAYAVG_info = 0
+summary_DAYAVG_odometer = 0
+summary_DAYAVG_delta_distance = 0
+summary_DAYAVG_kwh_charged = 0
+summary_DAYAVG_kwh_discharged = 0
+summary_DAYAVG_distance_unit_per_kwh = 0
+summary_DAYAVG_kwh_per_100_distance_unit = 0
+summary_DAYAVG_cost = 0
+summary_DAYAVG_soc = 0
+summary_DAYAVG_soc_avg = 0
+summary_DAYAVG_soc_min = 0
+summary_DAYAVG_soc_max = 0
+summary_DAYAVG_battery12v = 0
+summary_DAYAVG_battery12v_avg = 0
+summary_DAYAVG_battery12v_min = 0
+summary_DAYAVG_battery12v_max = 0
+summary_DAYAVG_charging_sessions = 0
+summary_DAYAVG_trip_count = 0
+summary_DAYAVG_range = 0
+summary_DAYAVG_address = 0
+
+summary_WEEKAVG_date = 0
+summary_WEEKAVG_info = 0
+summary_WEEKAVG_odometer = 0
+summary_WEEKAVG_delta_distance = 0
+summary_WEEKAVG_kwh_charged = 0
+summary_WEEKAVG_kwh_discharged = 0
+summary_WEEKAVG_distance_unit_per_kwh = 0
+summary_WEEKAVG_kwh_per_100_distance_unit = 0
+summary_WEEKAVG_cost = 0
+summary_WEEKAVG_soc = 0
+summary_WEEKAVG_soc_avg = 0
+summary_WEEKAVG_soc_min = 0
+summary_WEEKAVG_soc_max = 0
+summary_WEEKAVG_battery12v = 0
+summary_WEEKAVG_battery12v_avg = 0
+summary_WEEKAVG_battery12v_min = 0
+summary_WEEKAVG_battery12v_max = 0
+summary_WEEKAVG_charging_sessions = 0
+summary_WEEKAVG_trip_count = 0
+summary_WEEKAVG_range = 0
+summary_WEEKAVG_address = 0
+
+summary_MONTHAVG_date = 0
+summary_MONTHAVG_info = 0
+summary_MONTHAVG_odometer = 0
+summary_MONTHAVG_delta_distance = 0
+summary_MONTHAVG_kwh_charged = 0
+summary_MONTHAVG_kwh_discharged = 0
+summary_MONTHAVG_distance_unit_per_kwh = 0
+summary_MONTHAVG_kwh_per_100_distance_unit = 0
+summary_MONTHAVG_cost = 0
+summary_MONTHAVG_soc = 0
+summary_MONTHAVG_soc_avg = 0
+summary_MONTHAVG_soc_min = 0
+summary_MONTHAVG_soc_max = 0
+summary_MONTHAVG_battery12v = 0
+summary_MONTHAVG_battery12v_avg = 0
+summary_MONTHAVG_battery12v_min = 0
+summary_MONTHAVG_battery12v_max = 0
+summary_MONTHAVG_charging_sessions = 0
+summary_MONTHAVG_trip_count = 0
+summary_MONTHAVG_range = 0
+summary_MONTHAVG_address = 0
+
+summary_YEARLY_date = 0
+summary_YEARLY_info = 0
+summary_YEARLY_odometer = 0
+summary_YEARLY_delta_distance = 0
+summary_YEARLY_kwh_charged = 0
+summary_YEARLY_kwh_discharged = 0
+summary_YEARLY_distance_unit_per_kwh = 0
+summary_YEARLY_kwh_per_100_distance_unit = 0
+summary_YEARLY_cost = 0
+summary_YEARLY_soc = 0
+summary_YEARLY_soc_avg = 0
+summary_YEARLY_soc_min = 0
+summary_YEARLY_soc_max = 0
+summary_YEARLY_battery12v = 0
+summary_YEARLY_battery12v_avg = 0
+summary_YEARLY_battery12v_min = 0
+summary_YEARLY_battery12v_max = 0
+summary_YEARLY_charging_sessions = 0
+summary_YEARLY_trip_count = 0
+summary_YEARLY_range = 0
+summary_YEARLY_address = 0
+
+dailystats_day_TOTALS_date = 0
+dailystats_day_TOTALS_total_consumption = 0
+dailystats_day_TOTALS_regenerated_energy = 0
+dailystats_day_TOTALS_average_consumption = 0
+dailystats_day_TOTALS_engine_consumption = 0
+dailystats_day_TOTALS_climate_consumption = 0
+dailystats_day_TOTALS_onboard_electronics_consumption = 0
+dailystats_day_TOTALS_battery_care_consumption = 0
+dailystats_day_TOTALS_driven = 0
+dailystats_day_TOTALS_regenerated_energy_percentage = 0
+dailystats_day_TOTALS_average_consumption_per_100 = 0
+dailystats_day_TOTALS_engine_consumption_percentage = 0
+dailystats_day_TOTALS_climate_consumption_percentage = 0
+dailystats_day_TOTALS_onboard_electronics_consumption_percentage = 0
+dailystats_day_TOTALS_battery_care_consumption_percentage = 0
+
+dailystats_day_LAST_DAY_date = 0
+dailystats_day_LAST_DAY_total_consumption = 0
+dailystats_day_LAST_DAY_regenerated_energy = 0
+dailystats_day_LAST_DAY_average_consumption = 0
+dailystats_day_LAST_DAY_engine_consumption = 0
+dailystats_day_LAST_DAY_climate_consumption = 0
+dailystats_day_LAST_DAY_onboard_electronics_consumption = 0
+dailystats_day_LAST_DAY_battery_care_consumption = 0
+dailystats_day_LAST_DAY_driven = 0
+dailystats_day_LAST_DAY_regenerated_energy_percentage = 0
+dailystats_day_LAST_DAY_average_consumption_per_100 = 0
+dailystats_day_LAST_DAY_engine_consumption_percentage = 0
+dailystats_day_LAST_DAY_climate_consumption_percentage = 0
+dailystats_day_LAST_DAY_onboard_electronics_consumption_percentage = 0
+dailystats_day_LAST_DAY_battery_care_consumption_percentage = 0
+
+dailystats_trip_TOTALS_computed_kwh_charged = 0
+dailystats_trip_TOTALS_computed_day_consumption = 0
+dailystats_trip_TOTALS_computed_kwh_used = 0
+dailystats_trip_TOTALS_trip_time = 0
+dailystats_trip_TOTALS_computed_consumption_or_distance = 0
+dailystats_trip_TOTALS_distance = 0
+dailystats_trip_TOTALS_avg_speed = 0
+dailystats_trip_TOTALS_max_speed = 0
+dailystats_trip_TOTALS_idle_time = 0
+
+dailystats_trip_LAST_DAY_computed_kwh_charged = 0
+dailystats_trip_LAST_DAY_computed_day_consumption = 0
+dailystats_trip_LAST_DAY_computed_kwh_used = 0
+dailystats_trip_LAST_DAY_trip_time = 0
+dailystats_trip_LAST_DAY_computed_consumption_or_distance = 0
+dailystats_trip_LAST_DAY_distance = 0
+dailystats_trip_LAST_DAY_avg_speed = 0
+dailystats_trip_LAST_DAY_max_speed = 0
+dailystats_trip_LAST_DAY_idle_time = 0
 ```
 
 Explanation of the configuration items:
@@ -373,7 +930,9 @@ Explanation of the configuration items:
 
 *Note 2: I think that the consumption values ​​of the on-board computer are corrected with an efficiency number, e.g. 1 kWh of energy results in 0.9 kWh of real energy (losses when converting battery kWh by the car). So therefor I introduced an efficiency configuration factor in monitor.cfg, consumption_efficiency_factor_dailystats and consumption_efficiency_factor_summary. For example, when setting this to 0.9, 10% of the energy is lost during the conversion and is used in the consumption calculation. Default the values are 1.0, so no correction.*
 
-*Note 3: language is only implemented for Europe currently.*
+*Note 3: The last TRIP, DAY, WEEK, MONTH, YEAR, TRIPAVG, DAYAVG, WEEKAVG, MONTHAVG, YEARLY lines are also send to [Domoticz](#domoticz) and/or [MQTT Broker](#mqtt-broker-eg-homeassistant-iobroker) (e.g. HomeAssistant, ioBroker) when configured.*
+
+*Note 4: language is only implemented for Europe currently.*
 
 [For a list of language codes, see here.](https://www.science.co.il/language/Codes.php). Currently in Europe the Bluelink App shows the following languages:
 - "en" English
@@ -528,6 +1087,8 @@ Explanation of configuration items:
 - ignore_small_positive_delta_soc, do not see this as charge% when not charging/moved, because with temperature changes the percentage can increase
 - ignore_small_negative_delta_soc, do not see this as discharge% when not moved, because with temperature changes the percentage can decrease
 - show_zero_values = True shows also zero values in the standard output, can be easier for spreadsheets, but more difficult to read
+
+*Note: The dailystats DAY totals, TRIP Totals and last DAY and TRIP lines are also send to [Domoticz](#domoticz) and/or [MQTT Broker](#mqtt-broker-eg-homeassistant-iobroker) (e.g. HomeAssistant, ioBroker) when configured.*
 
 ---
 # summary.py sheetupdate

@@ -47,6 +47,7 @@ from dateutil.relativedelta import relativedelta
 from hyundai_kia_connect_api import VehicleManager, Vehicle, exceptions
 from monitor_utils import (
     arg_has,
+    dbg,
     float_to_string_no_trailing_zero,
     get,
     get_bool,
@@ -56,32 +57,33 @@ from monitor_utils import (
     get_safe_float,
     km_to_mile,
     same_day,
+    set_dbg,
+    set_vin,
     sleep_a_minute,
     sleep_seconds,
     to_int,
 )
 
-from domoticz_utils import (
-    send_dailystats_line_to_domoticz,
-    send_monitor_csv_line_to_domoticz,
-    send_tripinfo_line_to_domoticz,
-)
 from mqtt_utils import (
-    send_dailystats_line_to_mqtt,
+    send_dailystats_csv_line_to_mqtt,
     send_monitor_csv_line_to_mqtt,
-    send_tripinfo_line_to_mqtt,
-    set_vin,
-    stop_mqtt_loop,
+    send_tripinfo_csv_line_to_mqtt,
+    stop_mqtt,
+)
+from domoticz_utils import (
+    send_dailystats_csv_line_to_domoticz,
+    send_monitor_csv_line_to_domoticz,
+    send_tripinfo_csv_line_to_domoticz,
 )
 
 SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
 logging.config.fileConfig(f"{SCRIPT_DIRNAME}/logging_config.ini")
 D = arg_has("debug")
 if D:
-    logging.getLogger().setLevel(logging.DEBUG)
+    set_dbg()
 
 # keep forceupdate and cacheupdate as keyword, but do nothing with them
-KEYWORD_LIST = ["forceupdate", "cacheupdate", "debug"]
+KEYWORD_LIST = ["forceupdate", "cacheupdate", "debug", "test"]
 KEYWORD_ERROR = False
 for kindex in range(1, len(sys.argv)):
     if sys.argv[kindex].lower() not in KEYWORD_LIST:
@@ -92,6 +94,7 @@ if KEYWORD_ERROR or arg_has("help"):
     print("Usage: python monitor.py")
     exit()
 
+TEST = arg_has("test")
 # == read monitor in monitor.cfg ===========================
 parser = configparser.ConfigParser()
 parser.read(get_filepath("monitor.cfg"))
@@ -115,14 +118,6 @@ MONITOR_EXECUTE_COMMANDS_WHEN_SOMETHING_WRITTEN_OR_ERROR = get(
 )
 
 MONITOR_SOMETHING_WRITTEN_OR_ERROR = False
-
-
-# == subroutines =============================================================
-def dbg(line: str) -> bool:
-    """print line if debugging"""
-    if D:
-        logging.debug(line)
-    return D  # just to make a lazy evaluation expression possible
 
 
 def writeln(filename: str, string: str) -> None:
@@ -175,6 +170,7 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
         usa = int(REGION) == 3
         today_time_str = datetime.now().strftime("%H:%M")
         last_line = get_last_line(Path(filename))
+        last_line_file = last_line
         last_date = last_line.split(",")[0].strip()  # get yyymmdd hh:mm
         if not usa:
             # get rid of timestamp, always write new cumulative data from today
@@ -213,12 +209,19 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
                         print(
                             f"Writing dailystats {dailystats_date} {last_date}\nflin=[{full_line}]\nline=[{line}]\nlast=[{last_line}]"  # noqa
                         )
-                    file.write(full_line)
-                    file.write("\n")
+
                     MONITOR_SOMETHING_WRITTEN_OR_ERROR = True
+                    if TEST:
+                        send_dailystats_csv_line_to_mqtt(last_line_file)
+                        send_dailystats_csv_line_to_domoticz(last_line_file)
+                    else:
+                        file.write(full_line)
+                        file.write("\n")
+                        send_dailystats_csv_line_to_mqtt(full_line)
+                        send_dailystats_csv_line_to_domoticz(full_line)
+
                     last_line = line
-                    send_dailystats_line_to_domoticz(full_line)
-                    send_dailystats_line_to_mqtt(full_line)
+
                 else:
                     if D:
                         print(
@@ -235,6 +238,8 @@ def write_last_run(
     vehicle: Vehicle, number_of_vehicles: int, vehicle_stats: list[str]
 ) -> None:
     """write last run"""
+    if TEST:  # do not write last run
+        return
     filename = "monitor.lastrun"
     vin = vehicle.VIN
     if number_of_vehicles > 1:
@@ -272,6 +277,7 @@ def handle_day_trip_info(
     month_trip_info,
     last_date: str,
     last_hhmmss: str,
+    last_line: str,
 ) -> tuple[str, str]:
     """handle_day_trip_info"""
     global MONITOR_SOMETHING_WRITTEN_OR_ERROR  # pylint:disable=global-statement
@@ -299,13 +305,18 @@ def handle_day_trip_info(
                             max_speed = km_to_mile(max_speed)
                         line = f"{yyyymmdd},{hhmmss},{trip.drive_time},{trip.idle_time},{float_to_string_no_trailing_zero(distance)},{avg_speed:.0f},{max_speed:.0f}"  # noqa
                         _ = D and dbg(f"Writing tripinfo line:[{line}]")
-                        file.write(line)
-                        file.write("\n")
                         MONITOR_SOMETHING_WRITTEN_OR_ERROR = True
+                        if TEST:
+                            send_tripinfo_csv_line_to_mqtt(last_line)
+                            send_tripinfo_csv_line_to_domoticz(last_line)
+                        else:
+                            file.write(line)
+                            file.write("\n")
+                            send_tripinfo_csv_line_to_mqtt(line)
+                            send_tripinfo_csv_line_to_domoticz(line)
+
                         last_date = yyyymmdd
                         last_hhmmss = hhmmss
-                        send_tripinfo_line_to_domoticz(line)
-                        send_tripinfo_line_to_mqtt(line)
                     else:
                         _ = D and dbg(f"Skipping trip: {yyyymmdd},{hhmmss}")
             else:
@@ -363,6 +374,7 @@ def handle_trip_info(
                     month_trip_info,
                     last_date,
                     last_hhmmss,
+                    last_line,
                 )
 
 
@@ -445,10 +457,14 @@ def handle_one_vehicle(
                     break  # finished
         if not same:
             _ = D and dbg(f"Writing1:\nline=[{line}]\nlast=[{last_line}]")
+            if TEST:
+                send_monitor_csv_line_to_mqtt(last_line)
+                send_monitor_csv_line_to_domoticz(last_line)
+            else:
+                writeln(filename, line)
+                send_monitor_csv_line_to_mqtt(line)
+                send_monitor_csv_line_to_domoticz(line)
 
-            writeln(filename, line)
-            send_monitor_csv_line_to_domoticz(line)
-            send_monitor_csv_line_to_mqtt(line)
     handle_daily_stats(vehicle, number_of_vehicles)
     vehicle_stats = [
         str(newest_updated_at),
@@ -555,7 +571,10 @@ def handle_vehicles(login: bool) -> bool:
                 error = False
                 number_of_vehicles = len(MANAGER.vehicles)
                 for _, vehicle in MANAGER.vehicles.items():
-                    set_vin(vehicle.VIN)
+                    if TEST:  # use fake VIN
+                        set_vin("KMHKR81CPNU012345")
+                    else:
+                        set_vin(vehicle.VIN)
                     error = handle_one_vehicle(MANAGER, vehicle, number_of_vehicles)
                     if error:  # something gone wrong, exit vehicles loop
                         error_string = "Error occurred in handle_one_vehicle()"
@@ -641,7 +660,8 @@ def monitor():
             logging.error("Too many subsequent errors occurred, exiting monitor.py")
             sys.exit(-1)
 
-    stop_mqtt_loop()
+    stop_mqtt()
+    sys.exit(0)
 
 
 monitor()

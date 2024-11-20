@@ -27,8 +27,8 @@ IF EXIST monitor.kml del /Q monitor.kml
 echo ################## copying  INPUT #############
 copy /Y tests\INPUT\* .
 
-echo ################## python monitor.py #############
-call python monitor.py > test.monitor.log 2>&1
+echo ################## python monitor.py test #####
+call python monitor.py test > test.monitor.log 2>&1
 type test.monitor.log
 
 echo ################## check manually differences with Beyond Compare ####

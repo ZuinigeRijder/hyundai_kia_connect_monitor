@@ -44,6 +44,10 @@ call :CHECK_DAILYSTATS "" test.dailystats.logday
 call :CHECK_SUMMARY sheetupdate test.summary.log
 call :CHECK_DAILYSTATS sheetupdate test.dailystats.log
 
+call :CHECK_SUMMARY_MQTT_DOMOTICZ
+
+call :CHECK_DAILYSTATS_MQTT_DOMOTICZ
+
 call :CHECK_TRANSLATIONS
 
 rem restore original monitor.cfg
@@ -184,6 +188,31 @@ if "%args%" == "sheetupdate" (
     call :CHECK_FILE hyundai-kia-connect-monitor.dump.tmp hyundai-kia-connect-monitor.dump
 )
 EXIT /B
+
+rem #######################
+:CHECK_SUMMARY_MQTT_DOMOTICZ
+set args=debug trip day week month year
+set output=test.summary.mqtt_domoticz.log
+    
+echo ################## python summary.py %args% ^> %output% #############
+call python summary.py  %args% | findstr "send_to_domoticz send_to_mqtt" | %SED% -e "s?^.*send_to_mqtt: ??" | %SED% -e "s?^.*send_to_domoticz: ??" > %output%
+
+call :CHECK_FILE %output% %output%
+
+EXIT /B
+
+rem #######################
+:CHECK_DAILYSTATS_MQTT_DOMOTICZ
+set args=debug
+set output=test.dailystats.mqtt_domoticz.log
+    
+echo ################## python dailystats.py %args% ^> %output% #############
+call python dailystats.py  %args% | findstr "send_to_domoticz send_to_mqtt" | %SED% -e "s?^.*send_to_mqtt: ??" | %SED% -e "s?^.*send_to_domoticz: ??" | %SED% -e "s?^dailystats_day_TOTALS_date =.*?dailystats_day_TOTALS_date =?" | %SED% -e "s?^hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/date =.*?hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/date =?" > %output%
+
+call :CHECK_FILE %output% %output%
+
+EXIT /B
+
 
 rem #######################
 :CHECK_FILE
