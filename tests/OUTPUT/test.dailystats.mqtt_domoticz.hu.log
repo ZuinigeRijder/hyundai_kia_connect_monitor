@@ -1,0 +1,144 @@
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/date =
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/total_consumption = 303.7kWh
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/regenerated_energy = 43kWh
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/average_consumption = 5.6km/kWh
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/engine_consumption = 262kWh
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/climate_consumption = 12.7kWh
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/onboard_electronics_consumption = 28.6kWh
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/battery_care_consumption = 0.4kWh
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/driven = 1698km
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/regenerated_energy_percentage = 14.2%
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/average_consumption_per_100 = 17.9kWh/100km
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/engine_consumption_percentage = 86%
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/climate_consumption_percentage = 4.2%
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/onboard_electronics_consumption_percentage = 9.4%
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/battery_care_consumption_percentage = 0.1%
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/date = 2023-02-19
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/total_consumption = 2.3kWh
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/regenerated_energy = 0.8kWh
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/average_consumption = 5.7km/kWh
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/engine_consumption = 1.8kWh
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/climate_consumption = 0.1kWh
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/onboard_electronics_consumption = 0.4kWh
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/battery_care_consumption = 0kWh
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/driven = 13km
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/regenerated_energy_percentage = 35.5%
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/average_consumption_per_100 = 17.6kWh/100km
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/engine_consumption_percentage = 80%
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/climate_consumption_percentage = 3.4%
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/onboard_electronics_consumption_percentage = 17%
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/battery_care_consumption_percentage = 0%
+idx = 1, dailystats_day_TOTALS_date = 2024-11-27
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=2024-11-27
+idx = 1, dailystats_day_TOTALS_total_consumption = 303.7kWh
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=303.7kWh
+idx = 1, dailystats_day_TOTALS_regenerated_energy = 43kWh
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=43kWh
+idx = 1, dailystats_day_TOTALS_average_consumption = 5.6km/kWh
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=5.6km/kWh
+idx = 1, dailystats_day_TOTALS_engine_consumption = 262kWh
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=262kWh
+idx = 1, dailystats_day_TOTALS_climate_consumption = 12.7kWh
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=12.7kWh
+idx = 1, dailystats_day_TOTALS_onboard_electronics_consumption = 28.6kWh
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=28.6kWh
+idx = 1, dailystats_day_TOTALS_battery_care_consumption = 0.4kWh
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=0.4kWh
+idx = 1, dailystats_day_TOTALS_driven = 1698km
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=1698km
+idx = 1, dailystats_day_TOTALS_regenerated_energy_percentage = 14.2%
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=14.2%
+idx = 1, dailystats_day_TOTALS_average_consumption_per_100 = 17.9kWh/100km
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=17.9kWh/100km
+idx = 1, dailystats_day_TOTALS_engine_consumption_percentage = 86%
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=86%
+idx = 1, dailystats_day_TOTALS_climate_consumption_percentage = 4.2%
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=4.2%
+idx = 1, dailystats_day_TOTALS_onboard_electronics_consumption_percentage = 9.4%
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=9.4%
+idx = 1, dailystats_day_TOTALS_battery_care_consumption_percentage = 0.1%
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=0.1%
+idx = 1, dailystats_day_LAST_DAY_date = 2023-02-19
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=2023-02-19
+idx = 1, dailystats_day_LAST_DAY_total_consumption = 2.3kWh
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=2.3kWh
+idx = 1, dailystats_day_LAST_DAY_regenerated_energy = 0.8kWh
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=0.8kWh
+idx = 1, dailystats_day_LAST_DAY_average_consumption = 5.7km/kWh
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=5.7km/kWh
+idx = 1, dailystats_day_LAST_DAY_engine_consumption = 1.8kWh
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=1.8kWh
+idx = 1, dailystats_day_LAST_DAY_climate_consumption = 0.1kWh
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=0.1kWh
+idx = 1, dailystats_day_LAST_DAY_onboard_electronics_consumption = 0.4kWh
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=0.4kWh
+idx = 1, dailystats_day_LAST_DAY_battery_care_consumption = 0kWh
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=0kWh
+idx = 1, dailystats_day_LAST_DAY_driven = 13km
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=13km
+idx = 1, dailystats_day_LAST_DAY_regenerated_energy_percentage = 35.5%
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=35.5%
+idx = 1, dailystats_day_LAST_DAY_average_consumption_per_100 = 17.6kWh/100km
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=17.6kWh/100km
+idx = 1, dailystats_day_LAST_DAY_engine_consumption_percentage = 80%
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=80%
+idx = 1, dailystats_day_LAST_DAY_climate_consumption_percentage = 3.4%
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=3.4%
+idx = 1, dailystats_day_LAST_DAY_onboard_electronics_consumption_percentage = 17%
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=17%
+idx = 1, dailystats_day_LAST_DAY_battery_care_consumption_percentage = 0%
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=0%
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/computed_kwh_charged = (+302.7kWh)
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/computed_day_consumption = (5.6km/kWh)
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/computed_kwh_used = 
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/trip_time = 2551min
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/computed_consumption_or_distance = 
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/distance = 2002km
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/avg_speed = 55km/h
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/max_speed = 125km/h
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/idle_time = 352min
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_kwh_charged = (+27.6kWh)
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_day_consumption = (6.3km/kWh)
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_kwh_used = (0.7kWh)
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/trip_time = 17:36-17:44
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_consumption_or_distance = (9.6km/kWh)
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/distance = 6km
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/avg_speed = 52km/h
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/max_speed = 116km/h
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/idle_time = 0min
+idx = 1, dailystats_trip_TOTALS_computed_kwh_charged = (+302.7kWh)
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=(+302.7kWh)
+idx = 1, dailystats_trip_TOTALS_computed_day_consumption = (5.6km/kWh)
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=(5.6km/kWh)
+idx = 1, dailystats_trip_TOTALS_computed_kwh_used = 
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=
+idx = 1, dailystats_trip_TOTALS_trip_time = 2551min
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=2551min
+idx = 1, dailystats_trip_TOTALS_computed_consumption_or_distance = 
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=
+idx = 1, dailystats_trip_TOTALS_distance = 2002km
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=2002km
+idx = 1, dailystats_trip_TOTALS_avg_speed = 55km/h
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=55km/h
+idx = 1, dailystats_trip_TOTALS_max_speed = 125km/h
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=125km/h
+idx = 1, dailystats_trip_TOTALS_idle_time = 352min
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=352min
+idx = 1, dailystats_trip_LAST_DAY_computed_kwh_charged = (+27.6kWh)
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=(+27.6kWh)
+idx = 1, dailystats_trip_LAST_DAY_computed_day_consumption = (6.3km/kWh)
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=(6.3km/kWh)
+idx = 1, dailystats_trip_LAST_DAY_computed_kwh_used = (0.7kWh)
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=(0.7kWh)
+idx = 1, dailystats_trip_LAST_DAY_trip_time = 17:36-17:44
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=17:36-17:44
+idx = 1, dailystats_trip_LAST_DAY_computed_consumption_or_distance = (9.6km/kWh)
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=(9.6km/kWh)
+idx = 1, dailystats_trip_LAST_DAY_distance = 6km
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=6km
+idx = 1, dailystats_trip_LAST_DAY_avg_speed = 52km/h
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=52km/h
+idx = 1, dailystats_trip_LAST_DAY_max_speed = 116km/h
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=116km/h
+idx = 1, dailystats_trip_LAST_DAY_idle_time = 0min
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=0min

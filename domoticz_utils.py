@@ -1,6 +1,6 @@
 # == domoticz_utils.py Author: Zuinige Rijder =========
 """ domoticz utils """
-# pylint:disable=logging-fstring-interpolation
+# pylint:disable=logging-fstring-interpolation, consider-using-enumerate
 
 import configparser
 import logging
@@ -19,6 +19,7 @@ from monitor_utils import (
     get_items_monitor_dailystats_csv,
     get_items_monitor_tripinfo_csv,
     get_items_summary,
+    get_summary_headers,
 )
 
 PARSER = configparser.ConfigParser()
@@ -29,31 +30,31 @@ domoticz_settings = dict(PARSER.items("Domoticz"))
 SEND_TO_DOMOTICZ = get_bool(domoticz_settings, "send_to_domoticz", False)
 DOMOTICZ_URL = get(domoticz_settings, "domot_url")
 
-ITEMS_MONITOR_CSV = get_items_monitor_csv()
-for IDX in range(len(ITEMS_MONITOR_CSV)):  # pylint:disable=consider-using-enumerate
-    ITEMS_MONITOR_CSV[IDX] = f"monitor_monitor_{ITEMS_MONITOR_CSV[IDX]}"
+if SEND_TO_DOMOTICZ:
+    ITEMS_MONITOR_CSV = get_items_monitor_csv()
+    for IDX in range(len(ITEMS_MONITOR_CSV)):
+        ITEMS_MONITOR_CSV[IDX] = f"monitor_monitor_{ITEMS_MONITOR_CSV[IDX]}"
 
-ITEMS_TRIPINFO_CSV = get_items_monitor_tripinfo_csv()
-for IDX in range(len(ITEMS_TRIPINFO_CSV)):  # pylint:disable=consider-using-enumerate
-    ITEMS_TRIPINFO_CSV[IDX] = f"monitor_tripinfo_{ITEMS_TRIPINFO_CSV[IDX]}"
+    ITEMS_TRIPINFO_CSV = get_items_monitor_tripinfo_csv()
+    for IDX in range(len(ITEMS_TRIPINFO_CSV)):
+        ITEMS_TRIPINFO_CSV[IDX] = f"monitor_tripinfo_{ITEMS_TRIPINFO_CSV[IDX]}"
 
-ITEMS_DAILYSTATS_CSV = get_items_monitor_dailystats_csv()
-for IDX in range(len(ITEMS_DAILYSTATS_CSV)):  # pylint:disable=consider-using-enumerate
-    ITEMS_DAILYSTATS_CSV[IDX] = f"monitor_dailystats_{ITEMS_DAILYSTATS_CSV[IDX]}"
+    ITEMS_DAILYSTATS_CSV = get_items_monitor_dailystats_csv()
+    for IDX in range(len(ITEMS_DAILYSTATS_CSV)):
+        ITEMS_DAILYSTATS_CSV[IDX] = f"monitor_dailystats_{ITEMS_DAILYSTATS_CSV[IDX]}"
 
-ITEMS_SUMMARY = get_items_summary()
-
-ITEMS_DAILYSTATS_DAY = get_items_dailystats_day()
-
-ITEMS_DAILYSTATS_TRIP = get_items_dailystat_trip()
+    ITEMS_SUMMARY = get_items_summary()
+    ITEMS_DAILYSTATS_DAY = get_items_dailystats_day()
+    ITEMS_DAILYSTATS_TRIP = get_items_dailystat_trip()
 
 
 # == send to Domoticz ========================================================
 def send_to_domoticz(header: str, value: str) -> None:
     """send_to_Domoticz"""
     reference_test = DOMOTICZ_URL == "domoticz_reference_test"
-    idx = get(domoticz_settings, header, "0")
-    if idx == "0" and not reference_test:
+    idx = get(domoticz_settings, header.lower(), "0")
+    _ = d() and dbg(f"send_to_domoticz: idx = {idx}, {header} = {value}")
+    if idx == "0":
         return  # nothing to do
 
     url = (
@@ -63,10 +64,7 @@ def send_to_domoticz(header: str, value: str) -> None:
         + "&svalue="
         + value
     )
-    if reference_test:
-        _ = d() and dbg(f"send_to_domoticz: {header} = {value}")
-    else:
-        _ = d() and dbg(url)
+    _ = d() and dbg(f"send_to_domoticz: {url}")
     retry = 0
     while not reference_test:
         retry += 1
@@ -138,12 +136,15 @@ def send_summary_line_to_domoticz(line: str) -> None:
     if SEND_TO_DOMOTICZ:
         splitted = [x.strip() for x in line.split(",")]
         period = splitted[0].replace(" ", "")
-        if (
-            period
-            in "TRIP, DAY, WEEK, MONTH, YEAR, TRIPAVG, DAYAVG, WEEKAVG, MONTHAVG, YEARLY"  # noqa
-        ):
+        summary_headers_dict = get_summary_headers()
+        if period in summary_headers_dict:
+            key = summary_headers_dict[period]
             send_splitted_line(
-                get_items(f"summary_{period}", ITEMS_SUMMARY), splitted, True, True
+                get_items(f"summary_{key}", ITEMS_SUMMARY), splitted, True, True
+            )
+        else:
+            _ = d() and dbg(
+                f"Skipping: period={period}, headers={summary_headers_dict}"
             )
 
 

@@ -1,6 +1,6 @@
 # == mqtt_utils.py Author: Zuinige Rijder =========
 """ mqtt utils """
-# pylint:disable=logging-fstring-interpolation
+# pylint:disable=logging-fstring-interpolation, consider-using-enumerate
 
 import configparser
 import logging
@@ -22,26 +22,9 @@ from monitor_utils import (
     get_items_monitor_dailystats_csv,
     get_items_monitor_tripinfo_csv,
     get_items_summary,
+    get_summary_headers,
     get_vin,
 )
-
-ITEMS_MONITOR_CSV = get_items_monitor_csv()
-for IDX in range(len(ITEMS_MONITOR_CSV)):  # pylint:disable=consider-using-enumerate
-    ITEMS_MONITOR_CSV[IDX] = f"monitor/monitor/{ITEMS_MONITOR_CSV[IDX]}"
-
-ITEMS_TRIPINFO_CSV = get_items_monitor_tripinfo_csv()
-for IDX in range(len(ITEMS_TRIPINFO_CSV)):  # pylint:disable=consider-using-enumerate
-    ITEMS_TRIPINFO_CSV[IDX] = f"monitor/tripinfo/{ITEMS_TRIPINFO_CSV[IDX]}"
-
-ITEMS_DAILYSTATS_CSV = get_items_monitor_dailystats_csv()
-for IDX in range(len(ITEMS_DAILYSTATS_CSV)):  # pylint:disable=consider-using-enumerate
-    ITEMS_DAILYSTATS_CSV[IDX] = f"monitor/dailystats/{ITEMS_DAILYSTATS_CSV[IDX]}"
-
-ITEMS_SUMMARY = get_items_summary()
-
-ITEMS_DAILYSTATS_DAY = get_items_dailystats_day()
-
-ITEMS_DAILYSTATS_TRIP = get_items_dailystat_trip()
 
 PARSER = configparser.ConfigParser()
 PARSER.read(get_filepath("monitor.cfg"))
@@ -56,6 +39,23 @@ MQTT_BROKER_PASSWORD = get(mqtt_settings, "mqtt_broker_password", "")
 MQTT_MAIN_TOPIC = get(mqtt_settings, "mqtt_main_topic", "hyundai_kia_connect_monitor")
 
 MQTT_CLIENT = None  # will be filled at MQTT connect if configured
+
+if SEND_TO_MQTT:
+    ITEMS_MONITOR_CSV = get_items_monitor_csv()
+    for IDX in range(len(ITEMS_MONITOR_CSV)):
+        ITEMS_MONITOR_CSV[IDX] = f"monitor/monitor/{ITEMS_MONITOR_CSV[IDX]}"
+
+    ITEMS_TRIPINFO_CSV = get_items_monitor_tripinfo_csv()
+    for IDX in range(len(ITEMS_TRIPINFO_CSV)):
+        ITEMS_TRIPINFO_CSV[IDX] = f"monitor/tripinfo/{ITEMS_TRIPINFO_CSV[IDX]}"
+
+    ITEMS_DAILYSTATS_CSV = get_items_monitor_dailystats_csv()
+    for IDX in range(len(ITEMS_DAILYSTATS_CSV)):
+        ITEMS_DAILYSTATS_CSV[IDX] = f"monitor/dailystats/{ITEMS_DAILYSTATS_CSV[IDX]}"
+
+    ITEMS_SUMMARY = get_items_summary()
+    ITEMS_DAILYSTATS_DAY = get_items_dailystats_day()
+    ITEMS_DAILYSTATS_TRIP = get_items_dailystat_trip()
 
 
 # == connect MQTT ========================================================
@@ -106,7 +106,7 @@ def connect_mqtt() -> mqtt_client.Client:
 def start_mqtt_loop() -> None:
     """start_mqtt_loop"""
     global MQTT_CLIENT  # pylint: disable=global-statement
-    if not MQTT_CLIENT:
+    if not MQTT_CLIENT and SEND_TO_MQTT:
         while True:
             try:
                 _ = d() and dbg("Trying to connected to MQTT Broker")
@@ -229,12 +229,15 @@ def send_summary_line_to_mqtt(line: str) -> None:
     if SEND_TO_MQTT:
         splitted = [x.strip() for x in line.split(",")]
         period = splitted[0].replace(" ", "")
-        if (
-            period
-            in "TRIP, DAY, WEEK, MONTH, YEAR, TRIPAVG, DAYAVG, WEEKAVG, MONTHAVG, YEARLY"  # noqa
-        ):
+        summary_headers_dict = get_summary_headers()
+        if period in summary_headers_dict:
+            key = summary_headers_dict[period]
             send_splitted_line(
-                get_items(f"summary/{period}", ITEMS_SUMMARY), splitted, True, True
+                get_items(f"summary/{key}", ITEMS_SUMMARY), splitted, True, True
+            )
+        else:
+            _ = d() and dbg(
+                f"Skipping: period={period}, headers={summary_headers_dict}"
             )
 
 

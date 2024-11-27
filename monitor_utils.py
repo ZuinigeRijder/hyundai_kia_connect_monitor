@@ -23,6 +23,9 @@ VIN = ""  # filled by set_vin() or determine_vin() method
 
 D = False
 
+TR_HELPER: dict[str, str] = {}
+TR_SUMMARY_HEADERS_DICT: dict[str, str] = {}
+
 
 def d() -> bool:
     """return D"""
@@ -380,40 +383,61 @@ def reverse_read_next_line(
 
 def read_translations() -> dict:
     """read translations"""
-    translations: dict = {}
-    parser = configparser.ConfigParser()
-    parser.read(get_filepath("monitor.cfg"))
-    monitor_settings = dict(parser.items("monitor"))
-    language = monitor_settings["language"].lower().strip()
-    translations_csv_file = Path(get_filepath("monitor.translations.csv"))
-    with translations_csv_file.open("r", encoding="utf-8") as inputfile:
-        linecount = 0
-        column = 1
-        for line in inputfile:
-            linecount += 1
-            split = split_on_comma(line)
-            if len(split) < 15:
-                logging.error(
-                    f"Error: unexpected translation csvline {linecount}: {line}"
-                )
-                continue
-            key = split[0]
-            translation = split[1]
-            if linecount == 1:
-                continue  # skip first line
-            elif linecount == 2:
-                # determine column index
-                for index, value in enumerate(split):
-                    if value.lower() == language:
-                        column = index
-                        break
-            else:
-                current = split[column]
-                if current != "":
-                    translation = current
+    if len(TR_HELPER) == 0:
+        parser = configparser.ConfigParser()
+        parser.read(get_filepath("monitor.cfg"))
+        monitor_settings = dict(parser.items("monitor"))
+        language = monitor_settings["language"].lower().strip()
+        translations_csv_file = Path(get_filepath("monitor.translations.csv"))
+        with translations_csv_file.open("r", encoding="utf-8") as inputfile:
+            linecount = 0
+            column = 1
+            for line in inputfile:
+                linecount += 1
+                split = split_on_comma(line)
+                if len(split) < 15:
+                    logging.error(
+                        f"Error: unexpected translation csvline {linecount}: {line}"
+                    )
+                    continue
+                key = split[0]
+                translation = split[1]
+                if linecount == 1:
+                    continue  # skip first line
+                elif linecount == 2:
+                    # determine column index
+                    for index, value in enumerate(split):
+                        if value.lower() == language:
+                            column = index
+                            break
+                else:
+                    current = split[column]
+                    if current != "":
+                        translation = current
 
-            translations[key] = translation
-    return translations
+                TR_HELPER[key] = translation
+    return TR_HELPER
+
+
+def get_summary_headers() -> dict:
+    """get summary headers"""
+    _ = read_translations()
+    if len(TR_SUMMARY_HEADERS_DICT) == 0:
+        keys = [
+            "TRIP",
+            "DAY",
+            "WEEK",
+            "MONTH",
+            "YEAR",
+            "TRIPAVG",
+            "DAYAVG",
+            "WEEKAVG",
+            "MONTHAVG",
+            "YEARLY",
+        ]
+        for key in keys:
+            TR_SUMMARY_HEADERS_DICT[TR_HELPER[key].replace(" ", "")] = key
+    return TR_SUMMARY_HEADERS_DICT
 
 
 def get_translation(translations: dict[str, str], text: str) -> str:
