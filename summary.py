@@ -120,7 +120,7 @@ HIGHEST_ODO = 0.0
 # == read monitor in monitor.cfg ===========================
 config_parser = configparser.ConfigParser()
 config_parser.read(get_filepath("monitor.cfg"))
-monitor_settings = dict(config_parser.items("monitor"))
+monitor_settings = dict(config_parser.items("monitor", raw=True))
 ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
 CONSUMPTION_EFFICIENCY_FACTOR_SUMMARY = to_float(
     get(monitor_settings, "consumption_efficiency_factor_summary", "1.0")

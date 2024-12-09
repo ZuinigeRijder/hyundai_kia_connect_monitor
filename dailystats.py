@@ -101,9 +101,9 @@ _ = D and dbg(f"DAILYSTATS_CSV_FILE: {DAILYSTATS_CSV_FILE.name}")
 
 parser = configparser.ConfigParser()
 parser.read(get_filepath("monitor.cfg"))
-monitor_settings = dict(parser.items("monitor"))
+monitor_settings = dict(parser.items("monitor", raw=True))
 ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
-REGION = monitor_settings["region"]
+REGION = get(monitor_settings, "region", "1")
 INCLUDE_REGENERATE_IN_CONSUMPTION = (
     get(monitor_settings, "include_regenerate_in_consumption", "False").lower()
     == "true"

@@ -88,15 +88,7 @@ copy /Y tests\INPUT\* .
 exit /B
 
 :RUN_MYPY
-if "%FULL%" == "" exit /B
-echo ################## running mypy ###############
-mypy monitor_utils.py | egrep -v "^Success"
-mypy monitor.py | egrep -v "^Found|hyundai_kia_connect_api"
-mypy summary.py | egrep -v "^Found|gspread|: note:"
-mypy dailystats.py | egrep -v "^Found|gspread|: note:|: error: Argument 1 to .next."
-mypy kml.py | egrep -v "^Success"
-mypy shrink.py | egrep -v "^Success"
-mypy debug.py | egrep -v "^Found|hyundai_kia_connect_api"
+call tests\run_mypy.bat
 
 exit /B
 
@@ -219,7 +211,7 @@ for %%x in (nl de fr it es sv no da fi pt pl cs sk hu en) do (
     set output=test.dailystats.mqtt_domoticz.%%x.log
     
     echo ################## python dailystats.py %args% %%x ^> !output! #############
-    call python dailystats.py  %args% | findstr "send_to_domoticz send_to_mqtt" | %SED% -e "s?^.*send_to_mqtt: ??" | %SED% -e "s?^.*send_to_domoticz: ??" | %SED% -e "s?^dailystats_day_TOTALS_date =.*?dailystats_day_TOTALS_date =?" | %SED% -e "s?^hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/date =.*?hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/date =?" > !output!
+    call python dailystats.py  %args% | findstr "send_to_domoticz send_to_mqtt" | %SED% -e "s?^.*send_to_mqtt: ??" | %SED% -e "s?^.*send_to_domoticz: ??" | %SED% -e "s?^dailystats_day_TOTALS_date =.*?dailystats_day_TOTALS_date =?" | %SED% -e "s?^hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/date =.*?hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/date =?" | %SED% -e "s?idx = 1, dailystats_day_TOTALS_date = 202.-..-..?idx = 1, dailystats_day_TOTALS_date = 2024-11-27?" | %SED% -e "s@svalue=202[4-9]-[0-1][0-9]-[0-3][0-9]@svalue=2024-11-27@" > !output!
 
     call :CHECK_FILE !output! !output!
 )

@@ -386,8 +386,8 @@ def read_translations() -> dict:
     if len(TR_HELPER) == 0:
         parser = configparser.ConfigParser()
         parser.read(get_filepath("monitor.cfg"))
-        monitor_settings = dict(parser.items("monitor"))
-        language = monitor_settings["language"].lower().strip()
+        monitor_settings = dict(parser.items("monitor", raw=True))
+        language = get(monitor_settings, "language", "en").lower().strip()
         translations_csv_file = Path(get_filepath("monitor.translations.csv"))
         with translations_csv_file.open("r", encoding="utf-8") as inputfile:
             linecount = 0
