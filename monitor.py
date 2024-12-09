@@ -53,6 +53,7 @@ from monitor_utils import (
     get_bool,
     get_filepath,
     get_last_line,
+    get_safe_bool,
     get_safe_datetime,
     get_safe_float,
     km_to_mile,
@@ -439,7 +440,13 @@ def handle_one_vehicle(
                         newest_updated_at = newest_updated_at_corrected
                 newest_updated_at = max(newest_updated_at, previous_updated_at)
 
-    line = f"{newest_updated_at}, {location_longitude}, {location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {float_to_string_no_trailing_zero(odometer)}, {vehicle.ev_battery_percentage}, {vehicle.ev_battery_is_charging}, {vehicle.ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa
+    ev_battery_percentage = vehicle.ev_battery_percentage
+    if ev_battery_percentage is None:
+        ev_battery_percentage = 100
+    ev_battery_is_charging = get_safe_bool(vehicle.ev_battery_is_charging)
+    ev_battery_is_plugged_in = get_safe_bool(vehicle.ev_battery_is_plugged_in)
+
+    line = f"{newest_updated_at}, {location_longitude}, {location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {float_to_string_no_trailing_zero(odometer)}, {ev_battery_percentage}, {ev_battery_is_charging}, {ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa
     if "None, None" in line:  # something gone wrong, retry
         logging.warning(f"Skipping Unexpected line: {line}")
         return True  # exit subroutine with error

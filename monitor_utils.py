@@ -221,6 +221,13 @@ def float_to_string_no_trailing_zero(input_value: float) -> str:
     return (f"{input_value:.1f}").rstrip("0").rstrip(".")
 
 
+def get_safe_bool(value: bool) -> bool:
+    """get safe bool"""
+    if value is None:
+        return False
+    return value
+
+
 def is_true(string: str) -> bool:
     """return if string is true (True or not 0 digit)"""
     if "None" in string:
