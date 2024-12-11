@@ -1,5 +1,4 @@
-- platform: MQTT
-  sensor:
+sensor:
     - name: "MQTT_dailystats_trip_LAST_DAY_computed_day_consumption"\
       state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_day_consumption"\
       unique_id: "MQTT_dailystats_trip_LAST_DAY_computed_day_consumption"\
