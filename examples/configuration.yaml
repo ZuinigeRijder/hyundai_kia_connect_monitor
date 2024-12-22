@@ -1,1155 +1,1142 @@
+---
 sensor:
-    - name: "MQTT_dailystats_trip_LAST_DAY_computed_day_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_day_consumption"\
-      unique_id: "MQTT_dailystats_trip_LAST_DAY_computed_day_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_LAST_DAY_trip_time"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/trip_time"\
-      unique_id: "MQTT_dailystats_trip_LAST_DAY_trip_time"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_LAST_DAY_computed_consumption_or_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_consumption_or_distance"\
-      unique_id: "MQTT_dailystats_trip_LAST_DAY_computed_consumption_or_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_LAST_DAY_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/distance"\
-      unique_id: "MQTT_dailystats_trip_LAST_DAY_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_LAST_DAY_avg_speed"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/avg_speed"\
-      unique_id: "MQTT_dailystats_trip_LAST_DAY_avg_speed"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_LAST_DAY_max_speed"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/max_speed"\
-      unique_id: "MQTT_dailystats_trip_LAST_DAY_max_speed"\
-      value_template: "\{\{ value \}\}" \
-    - name: "MQTT_dailystats_trip_LAST_DAY_idle_time"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/idle_time"\
-      unique_id: "MQTT_dailystats_trip_LAST_DAY_idle_time"\
-      value_template: "\{\{ value \}\}"      \
-    - name: "MQTT_dailystats_trip_LAST_DAY_computed_kwh_charged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_kwh_charged"\
-      unique_id: "MQTT_dailystats_trip_LAST_DAY_computed_kwh_charged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_LAST_DAY_computed_kwh_used"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_kwh_charged"\
-      unique_id: "MQTT_dailystats_trip_LAST_DAY_computed_kwh_used"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_TOTALS_idle_time"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/idle_time"\
-      unique_id: "MQTT_dailystats_trip_TOTALS_idle_time"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_TOTALS_max_speed"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/max_speed"\
-      unique_id: "MQTT_dailystats_trip_TOTALS_max_speed"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_TOTALS_avg_speed"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/avg_speed"\
-      unique_id: "MQTT_dailystats_trip_TOTALS_avg_speed"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_TOTALS_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/distance"\
-      unique_id: "MQTT_dailystats_trip_TOTALS_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_TOTALS_trip_time"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/trip_time"\
-      unique_id: "MQTT_dailystats_trip_TOTALS_trip_time"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_TOTALS_computed_day_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/computed_day_consumption"\
-      unique_id: "MQTT_dailystats_trip_TOTALS_computed_day_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_TOTALS_computed_consumption_or_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_consumption_or_distance"\
-      unique_id: "MQTT_dailystats_trip_TOTALS_computed_consumption_or_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_TOTALS_computed_kwh_charged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/computed_kwh_charged"\
-      unique_id: "MQTT_dailystats_trip_TOTALS_computed_kwh_charged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_trip_TOTALS_computed_kwh_used"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/computed_kwh_charged"\
-      unique_id: "MQTT_dailystats_trip_TOTALS_computed_kwh_used"\
-      value_template: "\{\{ value \}\}"\
-#####\
-    - name: "MQTT_dailystats_day_LAST_DAY_battery_care_consumption_percentage"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/battery_care_consumption_percentage"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_battery_care_consumption_percentage"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_LAST_DAY_onboard_electronics_consumption_percentage"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/onboard_electronics_consumption_percentage"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_onboard_electronics_consumption_percentage"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_LAST_DAY_climate_consumption_percentage"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/climate_consumption_percentage"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_climate_consumption_percentage"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_LAST_DAY_engine_consumption_percentage"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/engine_consumption_percentage"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_engine_consumption_percentage"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_LAST_DAY_average_consumption_per_100"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/average_consumption_per_100"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_average_consumption_per_100"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_LAST_DAY_regenerated_energy_percentage"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/regenerated_energy_percentage"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_regenerated_energy_percentage"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_LAST_DAY_driven"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/driven"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_driven"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_LAST_DAY_battery_care_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/battery_care_consumption"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_battery_care_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_LAST_DAY_onboard_electronics_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/onboard_electronics_consumption"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_onboard_electronics_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_LAST_DAY_climate_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/climate_consumption"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_climate_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_LAST_DAY_engine_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/engine_consumption"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_engine_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_LAST_DAY_average_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/average_consumption"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_average_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_LAST_DAY_regenerated_energy"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/regenerated_energy"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_regenerated_energy"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_LAST_DAY_total_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/total_consumption"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_total_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_LAST_DAY_date"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/date"\
-      unique_id: "MQTT_dailystats_day_LAST_DAY_date"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_battery_care_consumption_percentage"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/battery_care_consumption_percentage"\
-      unique_id: "MQTT_dailystats_day_TOTALS_battery_care_consumption_percentage"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_onboard_electronics_consumption_percentage"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/onboard_electronics_consumption_percentage"\
-      unique_id: "MQTT_dailystats_day_TOTALS_onboard_electronics_consumption_percentage"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_climate_consumption_percentage"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/climate_consumption_percentage"\
-      unique_id: "MQTT_dailystats_day_TOTALS_climate_consumption_percentage"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_engine_consumption_percentage"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/engine_consumption_percentage"\
-      unique_id: "MQTT_dailystats_day_TOTALS_engine_consumption_percentage"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_average_consumption_per_100"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/average_consumption_per_100"\
-      unique_id: "MQTT_dailystats_day_TOTALS_average_consumption_per_100"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_regenerated_energy_percentage"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/regenerated_energy_percentage"\
-      unique_id: "MQTT_dailystats_day_TOTALS_regenerated_energy_percentage"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_driven"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/driven"\
-      unique_id: "MQTT_dailystats_day_TOTALS_driven"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_battery_care_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/battery_care_consumption"\
-      unique_id: "MQTT_dailystats_day_TOTALS_battery_care_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_onboard_electronics_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/onboard_electronics_consumption"\
-      unique_id: "MQTT_dailystats_day_TOTALS_onboard_electronics_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_climate_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/climate_consumption"\
-      unique_id: "MQTT_dailystats_day_TOTALS_climate_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_engine_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/engine_consumption"\
-      unique_id: "MQTT_dailystats_day_TOTALS_engine_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_average_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/average_consumption"\
-      unique_id: "MQTT_dailystats_day_TOTALS_average_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_regenerated_energy"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/regenerated_energy"\
-      unique_id: "MQTT_dailystats_day_TOTALS_regenerated_energy"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_total_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/total_consumption"\
-      unique_id: "MQTT_dailystats_day_TOTALS_total_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_dailystats_day_TOTALS_date"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/date"\
-      unique_id: "MQTT_dailystats_day_TOTALS_date"\
-      value_template: "\{\{ value \}\}"\
-#####\
-    - name: "MQTT_monitor_dailystats_battery_care_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/battery_care_consumption"\
-      unique_id: "MQTT_monitor_dailystats_battery_care_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_dailystats_onboard_electronics_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/onboard_electronics_consumption"\
-      unique_id: "MQTT_monitor_dailystats_onboard_electronics_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_dailystats_climate_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/climate_consumption"\
-      unique_id: "MQTT_monitor_dailystats_climate_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_dailystats_engine_consumption"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/engine_consumption"\
-      unique_id: "MQTT_monitor_dailystats_engine_consumption"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_dailystats_regenerated_energy"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/regenerated_energy"\
-      unique_id: "MQTT_monitor_dailystats_regenerated_energy"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_dailystats_total_consumed"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/total_consumed"\
-      unique_id: "MQTT_monitor_dailystats_total_consumed"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_dailystats_distance_unit"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/distance_unit"\
-      unique_id: "MQTT_monitor_dailystats_distance_unit"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_dailystats_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/distance"\
-      unique_id: "MQTT_monitor_dailystats_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_dailystats_date"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/date"\
-      unique_id: "MQTT_monitor_dailystats_date"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_monitor_evrange"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/evrange"\
-      unique_id: "MQTT_monitor_monitor_evrange"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_monitor_address"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/address"\
-      unique_id: "MQTT_monitor_monitor_address"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_monitor_plugged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/plugged"\
-      unique_id: "MQTT_monitor_monitor_plugged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_monitor_charging"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/charging"\
-      unique_id: "MQTT_monitor_monitor_charging"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_monitor_soc"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/soc"\
-      unique_id: "MQTT_monitor_monitor_soc"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_monitor_odometer"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/odometer"\
-      unique_id: "MQTT_monitor_monitor_odometer"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_monitor_battery12v"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/battery12v"\
-      unique_id: "MQTT_monitor_monitor_battery12v"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_monitor_engineon"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/engineon"\
-      unique_id: "MQTT_monitor_monitor_engineon"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_monitor_latitude"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/latitude"\
-      unique_id: "MQTT_monitor_monitor_latitude"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_monitor_longitude"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/longitude"\
-      unique_id: "MQTT_monitor_monitor_longitude"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_monitor_datetime"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/datetime"\
-      unique_id: "MQTT_monitor_monitor_datetime"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_tripinfo_maxspeed"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/tripinfo/maxspeed"\
-      unique_id: "MQTT_monitor_tripinfo_maxspeed"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_tripinfo_avgspeed"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/tripinfo/avgspeed"\
-      unique_id: "MQTT_monitor_tripinfo_avgspeed"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_tripinfo_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/tripinfo/distance"\
-      unique_id: "MQTT_monitor_tripinfo_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_tripinfo_idletime"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/tripinfo/idletime"\
-      unique_id: "MQTT_monitor_tripinfo_idletime"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_tripinfo_drivetime"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/tripinfo/drivetime"\
-      unique_id: "MQTT_monitor_tripinfo_drivetime"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_tripinfo_starttime"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/tripinfo/starttime"\
-      unique_id: "MQTT_monitor_tripinfo_starttime"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_monitor_tripinfo_date"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/tripinfo/date"\
-      unique_id: "MQTT_monitor_tripinfo_date"\
-      value_template: "\{\{ value \}\}"\
-#####\
-    - name: "MQTT_summary_TRIP_address"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/address"\
-      unique_id: "MQTT_summary_TRIP_address"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_range"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/range"\
-      unique_id: "MQTT_summary_TRIP_range"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_trip_count"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/trip_count"\
-      unique_id: "MQTT_summary_TRIP_trip_count"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_charging_sessions"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/charging_sessions"\
-      unique_id: "MQTT_summary_TRIP_charging_sessions"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_battery12v_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/battery12v_max"\
-      unique_id: "MQTT_summary_TRIP_battery12v_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_battery12v_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/battery12v_min"\
-      unique_id: "MQTT_summary_TRIP_battery12v_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_battery12v_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/battery12v_avg"\
-      unique_id: "MQTT_summary_TRIP_battery12v_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_battery12v"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/battery12v"\
-      unique_id: "MQTT_summary_TRIP_battery12v"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_soc_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/soc_max"\
-      unique_id: "MQTT_summary_TRIP_soc_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_soc_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/soc_min"\
-      unique_id: "MQTT_summary_TRIP_soc_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_soc_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/soc_avg"\
-      unique_id: "MQTT_summary_TRIP_soc_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_soc"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/soc"\
-      unique_id: "MQTT_summary_TRIP_soc"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_cost"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/cost"\
-      unique_id: "MQTT_summary_TRIP_cost"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_kwh_per_100_distance_unit"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/kwh_per_100_distance_unit"\
-      unique_id: "MQTT_summary_TRIP_kwh_per_100_distance_unit"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_distance_unit_per_kwh"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/distance_unit_per_kwh"\
-      unique_id: "MQTT_summary_TRIP_distance_unit_per_kwh"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_kwh_discharged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/kwh_discharged"\
-      unique_id: "MQTT_summary_TRIP_kwh_discharged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_kwh_charged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/kwh_charged"\
-      unique_id: "MQTT_summary_TRIP_kwh_charged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_delta_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/delta_distance"\
-      unique_id: "MQTT_summary_TRIP_delta_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_odometer"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/odometer"\
-      unique_id: "MQTT_summary_TRIP_odometer"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_info"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/info"\
-      unique_id: "MQTT_summary_TRIP_info"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIP_date"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/date"\
-      unique_id: "MQTT_summary_TRIP_date"\
-      value_template: "\{\{ value \}\}"\
-#####\
-    - name: "MQTT_summary_DAY_address"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/address"\
-      unique_id: "MQTT_summary_DAY_address"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_range"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/range"\
-      unique_id: "MQTT_summary_DAY_range"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_trip_count"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/trip_count"\
-      unique_id: "MQTT_summary_DAY_trip_count"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_charging_sessions"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/charging_sessions"\
-      unique_id: "MQTT_summary_DAY_charging_sessions"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_battery12v_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/battery12v_max"\
-      unique_id: "MQTT_summary_DAY_battery12v_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_battery12v_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/battery12v_min"\
-      unique_id: "MQTT_summary_DAY_battery12v_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_battery12v_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/battery12v_avg"\
-      unique_id: "MQTT_summary_DAY_battery12v_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_battery12v"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/battery12v"\
-      unique_id: "MQTT_summary_DAY_battery12v"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_soc_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/soc_max"\
-      unique_id: "MQTT_summary_DAY_soc_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_soc_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/soc_min"\
-      unique_id: "MQTT_summary_DAY_soc_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_soc_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/soc_avg"\
-      unique_id: "MQTT_summary_DAY_soc_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_soc"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/soc"\
-      unique_id: "MQTT_summary_DAY_soc"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_cost"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/cost"\
-      unique_id: "MQTT_summary_DAY_cost"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_kwh_per_100_distance_unit"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/kwh_per_100_distance_unit"\
-      unique_id: "MQTT_summary_DAY_kwh_per_100_distance_unit"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_distance_unit_per_kwh"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/distance_unit_per_kwh"\
-      unique_id: "MQTT_summary_DAY_distance_unit_per_kwh"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_kwh_discharged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/kwh_discharged"\
-      unique_id: "MQTT_summary_DAY_kwh_discharged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_kwh_charged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/kwh_charged"\
-      unique_id: "MQTT_summary_DAY_kwh_charged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_delta_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/delta_distance"\
-      unique_id: "MQTT_summary_DAY_delta_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_odometer"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/odometer"\
-      unique_id: "MQTT_summary_DAY_odometer"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_info"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/info"\
-      unique_id: "MQTT_summary_DAY_info"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAY_date"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/date"\
-      unique_id: "MQTT_summary_DAY_date"\
-      value_template: "\{\{ value \}\}"\
-##### \
-    - name: "MQTT_summary_WEEK_address"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/address"\
-      unique_id: "MQTT_summary_WEEK_address"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_range"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/range"\
-      unique_id: "MQTT_summary_WEEK_range"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_trip_count"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/trip_count"\
-      unique_id: "MQTT_summary_WEEK_trip_count"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_charging_sessions"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/charging_sessions"\
-      unique_id: "MQTT_summary_WEEK_charging_sessions"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_battery12v_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/battery12v_max"\
-      unique_id: "MQTT_summary_WEEK_battery12v_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_battery12v_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/battery12v_min"\
-      unique_id: "MQTT_summary_WEEK_battery12v_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_battery12v_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/battery12v_avg"\
-      unique_id: "MQTT_summary_WEEK_battery12v_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_battery12v"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/battery12v"\
-      unique_id: "MQTT_summary_WEEK_battery12v"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_soc_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/soc_max"\
-      unique_id: "MQTT_summary_WEEK_soc_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_soc_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/soc_min"\
-      unique_id: "MQTT_summary_WEEK_soc_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_soc_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/soc_avg"\
-      unique_id: "MQTT_summary_WEEK_soc_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_soc"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/soc"\
-      unique_id: "MQTT_summary_WEEK_soc"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_cost"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/cost"\
-      unique_id: "MQTT_summary_WEEK_cost"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_kwh_per_100_distance_unit"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/kwh_per_100_distance_unit"\
-      unique_id: "MQTT_summary_WEEK_kwh_per_100_distance_unit"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_distance_unit_per_kwh"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/distance_unit_per_kwh"\
-      unique_id: "MQTT_summary_WEEK_distance_unit_per_kwh"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_kwh_discharged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/kwh_discharged"\
-      unique_id: "MQTT_summary_WEEK_kwh_discharged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_kwh_charged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/kwh_charged"\
-      unique_id: "MQTT_summary_WEEK_kwh_charged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_delta_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/delta_distance"\
-      unique_id: "MQTT_summary_WEEK_delta_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_odometer"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/odometer"\
-      unique_id: "MQTT_summary_WEEK_odometer"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_info"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/info"\
-      unique_id: "MQTT_summary_WEEK_info"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEK_date"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/date"\
-      unique_id: "MQTT_summary_WEEK_date"\
-      value_template: "\{\{ value \}\}"\
-#####\
-    - name: "MQTT_summary_MONTH_address"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/address"\
-      unique_id: "MQTT_summary_MONTH_address"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_range"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/range"\
-      unique_id: "MQTT_summary_MONTH_range"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_trip_count"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/trip_count"\
-      unique_id: "MQTT_summary_MONTH_trip_count"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_charging_sessions"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/charging_sessions"\
-      unique_id: "MQTT_summary_MONTH_charging_sessions"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_battery12v_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/battery12v_max"\
-      unique_id: "MQTT_summary_MONTH_battery12v_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_battery12v_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/battery12v_min"\
-      unique_id: "MQTT_summary_MONTH_battery12v_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_battery12v_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/battery12v_avg"\
-      unique_id: "MQTT_summary_MONTH_battery12v_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_battery12v"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/battery12v"\
-      unique_id: "MQTT_summary_MONTH_battery12v"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_soc_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/soc_max"\
-      unique_id: "MQTT_summary_MONTH_soc_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_soc_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/soc_min"\
-      unique_id: "MQTT_summary_MONTH_soc_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_soc_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/soc_avg"\
-      unique_id: "MQTT_summary_MONTH_soc_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_soc"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/soc"\
-      unique_id: "MQTT_summary_MONTH_soc"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_cost"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/cost"\
-      unique_id: "MQTT_summary_MONTH_cost"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_kwh_per_100_distance_unit"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/kwh_per_100_distance_unit"\
-      unique_id: "MQTT_summary_MONTH_kwh_per_100_distance_unit"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_distance_unit_per_kwh"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/distance_unit_per_kwh"\
-      unique_id: "MQTT_summary_MONTH_distance_unit_per_kwh"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_kwh_discharged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/kwh_discharged"\
-      unique_id: "MQTT_summary_MONTH_kwh_discharged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_kwh_charged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/kwh_charged"\
-      unique_id: "MQTT_summary_MONTH_kwh_charged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_delta_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/delta_distance"\
-      unique_id: "MQTT_summary_MONTH_delta_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_odometer"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/odometer"\
-      unique_id: "MQTT_summary_MONTH_odometer"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_info"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/info"\
-      unique_id: "MQTT_summary_MONTH_info"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTH_date"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/date"\
-      unique_id: "MQTT_summary_MONTH_date"\
-      value_template: "\{\{ value \}\}"\
-#####\
-    - name: "MQTT_summary_YEAR_address"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/address"\
-      unique_id: "MQTT_summary_YEAR_address"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_range"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/range"\
-      unique_id: "MQTT_summary_YEAR_range"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_trip_count"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/trip_count"\
-      unique_id: "MQTT_summary_YEAR_trip_count"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_charging_sessions"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/charging_sessions"\
-      unique_id: "MQTT_summary_YEAR_charging_sessions"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_battery12v"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/battery12v_max"\
-      unique_id: "MQTT_summary_YEAR_battery12v"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_battery12v_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/battery12v_max"\
-      unique_id: "MQTT_summary_YEAR_battery12v_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_battery12v_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/battery12v_min"\
-      unique_id: "MQTT_summary_YEAR_battery12v_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_battery12v_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/battery12v_avg"\
-      unique_id: "MQTT_summary_YEAR_battery12v_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_soc"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/soc"\
-      unique_id: "MQTT_summary_YEAR_soc"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_soc_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/soc"\
-      unique_id: "MQTT_summary_YEAR_soc_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_soc_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/soc"\
-      unique_id: "MQTT_summary_YEAR_soc_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_soc_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/soc"\
-      unique_id: "MQTT_summary_YEAR_soc_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_cost"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/cost"\
-      unique_id: "MQTT_summary_YEAR_cost"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_kwh_per_100_distance_unit"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/kwh_per_100_distance_unit"\
-      unique_id: "MQTT_summary_YEAR_kwh_per_100_distance_unit"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_distance_unit_per_kwh"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/distance_unit_per_kwh"\
-      unique_id: "MQTT_summary_YEAR_distance_unit_per_kwh"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_kwh_discharged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/kwh_discharged"\
-      unique_id: "MQTT_summary_YEAR_kwh_discharged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_kwh_charged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/kwh_charged"\
-      unique_id: "MQTT_summary_YEAR_kwh_charged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_delta_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/delta_distance"\
-      unique_id: "MQTT_summary_YEAR_delta_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_odometer"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/odometer"\
-      unique_id: "MQTT_summary_YEAR_odometer"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_info"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/info"\
-      unique_id: "MQTT_summary_YEAR_info"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEAR_date"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/date"\
-      unique_id: "MQTT_summary_YEAR_date"\
-      value_template: "\{\{ value \}\}"\
-#####\
-    - name: "MQTT_summary_TRIPAVG_address"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/address"\
-      unique_id: "MQTT_summary_TRIPAVG_address"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_range"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/range"\
-      unique_id: "MQTT_summary_TRIPAVG_range"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_trip_count"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/trip_count"\
-      unique_id: "MQTT_summary_TRIPAVG_trip_count"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_charging_sessions"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/charging_sessions"\
-      unique_id: "MQTT_summary_TRIPAVG_charging_sessions"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_battery12v_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/battery12v_max"\
-      unique_id: "MQTT_summary_TRIPAVG_battery12v_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_battery12v_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/battery12v_min"\
-      unique_id: "MQTT_summary_TRIPAVG_battery12v_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_battery12v_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/battery12v_avg"\
-      unique_id: "MQTT_summary_TRIPAVG_battery12v_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_battery12v"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/battery12v"\
-      unique_id: "MQTT_summary_TRIPAVG_battery12v"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_soc_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/soc_max"\
-      unique_id: "MQTT_summary_TRIPAVG_soc_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_soc_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/soc_min"\
-      unique_id: "MQTT_summary_TRIPAVG_soc_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_soc_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/soc_avg"\
-      unique_id: "MQTT_summary_TRIPAVG_soc_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_soc"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/soc"\
-      unique_id: "MQTT_summary_TRIPAVG_soc"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_cost"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/cost"\
-      unique_id: "MQTT_summary_TRIPAVG_cost"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_kwh_per_100_distance_unit"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/kwh_per_100_distance_unit"\
-      unique_id: "MQTT_summary_TRIPAVG_kwh_per_100_distance_unit"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_distance_unit_per_kwh"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/distance_unit_per_kwh"\
-      unique_id: "MQTT_summary_TRIPAVG_distance_unit_per_kwh"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_kwh_discharged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/kwh_discharged"\
-      unique_id: "MQTT_summary_TRIPAVG_kwh_discharged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_kwh_charged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/kwh_charged"\
-      unique_id: "MQTT_summary_TRIPAVG_kwh_charged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_delta_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/delta_distance"\
-      unique_id: "MQTT_summary_TRIPAVG_delta_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_odometer"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/odometer"\
-      unique_id: "MQTT_summary_TRIPAVG_odometer"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_info"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/info"\
-      unique_id: "MQTT_summary_TRIPAVG_info"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_TRIPAVG_date"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/date"\
-      unique_id: "MQTT_summary_TRIPAVG_date"\
-      value_template: "\{\{ value \}\}"\
-#####\
-    - name: "MQTT_summary_DAYAVG_address"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/address"\
-      unique_id: "MQTT_summary_DAYAVG_address"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_range"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/range"\
-      unique_id: "MQTT_summary_DAYAVG_range"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_trip_count"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/trip_count"\
-      unique_id: "MQTT_summary_DAYAVG_trip_count"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_charging_sessions"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/charging_sessions"\
-      unique_id: "MQTT_summary_DAYAVG_charging_sessions"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_battery12v_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/battery12v_max"\
-      unique_id: "MQTT_summary_DAYAVG_battery12v_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_battery12v_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/battery12v_min"\
-      unique_id: "MQTT_summary_DAYAVG_battery12v_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_battery12v_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/battery12v_avg"\
-      unique_id: "MQTT_summary_DAYAVG_battery12v_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_battery12v"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/battery12v"\
-      unique_id: "MQTT_summary_DAYAVG_battery12v"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_soc_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/soc_max"\
-      unique_id: "MQTT_summary_DAYAVG_soc_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_soc_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/soc_min"\
-      unique_id: "MQTT_summary_DAYAVG_soc_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_soc_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/soc_avg"\
-      unique_id: "MQTT_summary_DAYAVG_soc_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_soc"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/soc"\
-      unique_id: "MQTT_summary_DAYAVG_soc"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_cost"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/cost"\
-      unique_id: "MQTT_summary_DAYAVG_cost"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_kwh_per_100_distance_unit"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/kwh_per_100_distance_unit"\
-      unique_id: "MQTT_summary_DAYAVG_kwh_per_100_distance_unit"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_distance_unit_per_kwh"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/distance_unit_per_kwh"\
-      unique_id: "MQTT_summary_DAYAVG_distance_unit_per_kwh"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_kwh_discharged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/kwh_discharged"\
-      unique_id: "MQTT_summary_DAYAVG_kwh_discharged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_kwh_charged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/kwh_charged"\
-      unique_id: "MQTT_summary_DAYAVG_kwh_charged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_delta_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/delta_distance"\
-      unique_id: "MQTT_summary_DAYAVG_delta_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_odometer"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/odometer"\
-      unique_id: "MQTT_summary_DAYAVG_odometer"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_info"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/info"\
-      unique_id: "MQTT_summary_DAYAVG_info"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_DAYAVG_date"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/date"\
-      unique_id: "MQTT_summary_DAYAVG_date"\
-      value_template: "\{\{ value \}\}"\
-#####\
-    - name: "MQTT_summary_WEEKAVG_address"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/address"\
-      unique_id: "MQTT_summary_WEEKAVG_address"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_range"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/range"\
-      unique_id: "MQTT_summary_WEEKAVG_range"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_trip_count"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/trip_count"\
-      unique_id: "MQTT_summary_WEEKAVG_trip_count"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_charging_sessions"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/charging_sessions"\
-      unique_id: "MQTT_summary_WEEKAVG_charging_sessions"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_battery12v_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/battery12v_max"\
-      unique_id: "MQTT_summary_WEEKAVG_battery12v_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_battery12v_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/battery12v_min"\
-      unique_id: "MQTT_summary_WEEKAVG_battery12v_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_battery12v_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/battery12v_avg"\
-      unique_id: "MQTT_summary_WEEKAVG_battery12v_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_battery12v"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/battery12v"\
-      unique_id: "MQTT_summary_WEEKAVG_battery12v"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_soc_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/soc_max"\
-      unique_id: "MQTT_summary_WEEKAVG_soc_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_soc_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/soc_min"\
-      unique_id: "MQTT_summary_WEEKAVG_soc_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_soc_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/soc_avg"\
-      unique_id: "MQTT_summary_WEEKAVG_soc_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_soc"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/soc"\
-      unique_id: "MQTT_summary_WEEKAVG_soc"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_cost"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/cost"\
-      unique_id: "MQTT_summary_WEEKAVG_cost"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_kwh_per_100_distance_unit"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/kwh_per_100_distance_unit"\
-      unique_id: "MQTT_summary_WEEKAVG_kwh_per_100_distance_unit"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_distance_unit_per_kwh"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/distance_unit_per_kwh"\
-      unique_id: "MQTT_summary_WEEKAVG_distance_unit_per_kwh"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_kwh_discharged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/kwh_discharged"\
-      unique_id: "MQTT_summary_WEEKAVG_kwh_discharged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_kwh_charged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/kwh_charged"\
-      unique_id: "MQTT_summary_WEEKAVG_kwh_charged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_delta_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/delta_distance"\
-      unique_id: "MQTT_summary_WEEKAVG_delta_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_odometer"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/odometer"\
-      unique_id: "MQTT_summary_WEEKAVG_odometer"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_info"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/info"\
-      unique_id: "MQTT_summary_WEEKAVG_info"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_WEEKAVG_date"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/date"\
-      unique_id: "MQTT_summary_WEEKAVG_date"\
-#####\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_address"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/address"\
-      unique_id: "MQTT_summary_MONTHAVG_address"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_range"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/range"\
-      unique_id: "MQTT_summary_MONTHAVG_range"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_trip_count"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/trip_count"\
-      unique_id: "MQTT_summary_MONTHAVG_trip_count"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_charging_sessions"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/charging_sessions"\
-      unique_id: "MQTT_summary_MONTHAVG_charging_sessions"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_battery12v_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/battery12v_max"\
-      unique_id: "MQTT_summary_MONTHAVG_battery12v_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_battery12v_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/battery12v_min"\
-      unique_id: "MQTT_summary_MONTHAVG_battery12v_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_battery12v_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/battery12v_avg"\
-      unique_id: "MQTT_summary_MONTHAVG_battery12v_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_battery12v"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/battery12v"\
-      unique_id: "MQTT_summary_MONTHAVG_battery12v"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_soc_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/soc_max"\
-      unique_id: "MQTT_summary_MONTHAVG_soc_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_soc_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/soc_min"\
-      unique_id: "MQTT_summary_MONTHAVG_soc_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_soc_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/soc_avg"\
-      unique_id: "MQTT_summary_MONTHAVG_soc_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_soc"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/soc"\
-      unique_id: "MQTT_summary_MONTHAVG_soc"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_cost"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/cost"\
-      unique_id: "MQTT_summary_MONTHAVG_cost"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_kwh_per_100_distance_unit"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/kwh_per_100_distance_unit"\
-      unique_id: "MQTT_summary_MONTHAVG_kwh_per_100_distance_unit"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_distance_unit_per_kwh"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/distance_unit_per_kwh"\
-      unique_id: "MQTT_summary_MONTHAVG_distance_unit_per_kwh"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_kwh_discharged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/kwh_discharged"\
-      unique_id: "MQTT_summary_MONTHAVG_kwh_discharged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_kwh_charged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/kwh_charged"\
-      unique_id: "MQTT_summary_MONTHAVG_kwh_charged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_delta_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/delta_distance"\
-      unique_id: "MQTT_summary_MONTHAVG_delta_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_odometer"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/odometer"\
-      unique_id: "MQTT_summary_MONTHAVG_odometer"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_info"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/info"\
-      unique_id: "MQTT_summary_MONTHAVG_info"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_MONTHAVG_date"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/date"\
-      unique_id: "MQTT_summary_MONTHAVG_date"\
-      value_template: "\{\{ value \}\}"\
-#####\
-    - name: "MQTT_summary_YEARLY_address"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/address"\
-      unique_id: "MQTT_summary_YEARLY_address"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_range"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/range"\
-      unique_id: "MQTT_summary_YEARLY_range"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_trip_count"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/trip_count"\
-      unique_id: "MQTT_summary_YEARLY_trip_count"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_charging_sessions"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/charging_sessions"\
-      unique_id: "MQTT_summary_YEARLY_charging_sessions"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_battery12v_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/battery12v_max"\
-      unique_id: "MQTT_summary_YEARLY_battery12v_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_battery12v_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/battery12v_min"\
-      unique_id: "MQTT_summary_YEARLY_battery12v_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_battery12v_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/battery12v_avg"\
-      unique_id: "MQTT_summary_YEARLY_battery12v_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_battery12v"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/battery12v"\
-      unique_id: "MQTT_summary_YEARLY_battery12v"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_soc_max"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/soc_max"\
-      unique_id: "MQTT_summary_YEARLY_soc_max"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_soc_min"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/soc_min"\
-      unique_id: "MQTT_summary_YEARLY_soc_min"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_soc_avg"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/soc_avg"\
-      unique_id: "MQTT_summary_YEARLY_soc_avg"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_soc"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/soc"\
-      unique_id: "MQTT_summary_YEARLY_soc"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_cost"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/cost"\
-      unique_id: "MQTT_summary_YEARLY_cost"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_kwh_per_100_distance_unit"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/kwh_per_100_distance_unit"\
-      unique_id: "MQTT_summary_YEARLY_kwh_per_100_distance_unit"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_distance_unit_per_kwh"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/distance_unit_per_kwh"\
-      unique_id: "MQTT_summary_YEARLY_distance_unit_per_kwh"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_kwh_discharged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/kwh_discharged"\
-      unique_id: "MQTT_summary_YEARLY_kwh_discharged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_kwh_charged"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/kwh_charged"\
-      unique_id: "MQTT_summary_YEARLY_kwh_charged"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_delta_distance"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/delta_distance"\
-      unique_id: "MQTT_summary_YEARLY_delta_distance"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_odometer"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/odometer"\
-      unique_id: "MQTT_summary_YEARLY_odometer"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_info"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/info"\
-      unique_id: "MQTT_summary_YEARLY_info"\
-      value_template: "\{\{ value \}\}"\
-    - name: "MQTT_summary_YEARLY_date"\
-      state_topic: "hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/date"\
-      unique_id: "MQTT_summary_YEARLY_date"\
-      value_template: "\{\{ value \}\}"\
-\
-}
+  - name: MQTT_dailystats_trip_LAST_DAY_computed_day_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_day_consumption
+    unique_id: MQTT_dailystats_trip_LAST_DAY_computed_day_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_LAST_DAY_trip_time
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/trip_time
+    unique_id: MQTT_dailystats_trip_LAST_DAY_trip_time
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_LAST_DAY_computed_consumption_or_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_consumption_or_distance
+    unique_id: MQTT_dailystats_trip_LAST_DAY_computed_consumption_or_distance
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_LAST_DAY_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/distance
+    unique_id: MQTT_dailystats_trip_LAST_DAY_distance
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_LAST_DAY_avg_speed
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/avg_speed
+    unique_id: MQTT_dailystats_trip_LAST_DAY_avg_speed
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_LAST_DAY_max_speed
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/max_speed
+    unique_id: MQTT_dailystats_trip_LAST_DAY_max_speed
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_LAST_DAY_idle_time
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/idle_time
+    unique_id: MQTT_dailystats_trip_LAST_DAY_idle_time
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_LAST_DAY_computed_kwh_charged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_kwh_charged
+    unique_id: MQTT_dailystats_trip_LAST_DAY_computed_kwh_charged
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_LAST_DAY_computed_kwh_used
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_kwh_charged
+    unique_id: MQTT_dailystats_trip_LAST_DAY_computed_kwh_used
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_TOTALS_idle_time
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/idle_time
+    unique_id: MQTT_dailystats_trip_TOTALS_idle_time
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_TOTALS_max_speed
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/max_speed
+    unique_id: MQTT_dailystats_trip_TOTALS_max_speed
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_TOTALS_avg_speed
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/avg_speed
+    unique_id: MQTT_dailystats_trip_TOTALS_avg_speed
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_TOTALS_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/distance
+    unique_id: MQTT_dailystats_trip_TOTALS_distance
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_TOTALS_trip_time
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/trip_time
+    unique_id: MQTT_dailystats_trip_TOTALS_trip_time
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_TOTALS_computed_day_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/computed_day_consumption
+    unique_id: MQTT_dailystats_trip_TOTALS_computed_day_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_TOTALS_computed_consumption_or_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/LAST_DAY/computed_consumption_or_distance
+    unique_id: MQTT_dailystats_trip_TOTALS_computed_consumption_or_distance
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_TOTALS_computed_kwh_charged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/computed_kwh_charged
+    unique_id: MQTT_dailystats_trip_TOTALS_computed_kwh_charged
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_trip_TOTALS_computed_kwh_used
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_trip/TOTALS/computed_kwh_charged
+    unique_id: MQTT_dailystats_trip_TOTALS_computed_kwh_used
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_battery_care_consumption_percentage
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/battery_care_consumption_percentage
+    unique_id: MQTT_dailystats_day_LAST_DAY_battery_care_consumption_percentage
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_onboard_electronics_consumption_percentage
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/onboard_electronics_consumption_percentage
+    unique_id: MQTT_dailystats_day_LAST_DAY_onboard_electronics_consumption_percentage
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_climate_consumption_percentage
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/climate_consumption_percentage
+    unique_id: MQTT_dailystats_day_LAST_DAY_climate_consumption_percentage
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_engine_consumption_percentage
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/engine_consumption_percentage
+    unique_id: MQTT_dailystats_day_LAST_DAY_engine_consumption_percentage
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_average_consumption_per_100
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/average_consumption_per_100
+    unique_id: MQTT_dailystats_day_LAST_DAY_average_consumption_per_100
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_regenerated_energy_percentage
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/regenerated_energy_percentage
+    unique_id: MQTT_dailystats_day_LAST_DAY_regenerated_energy_percentage
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_driven
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/driven
+    unique_id: MQTT_dailystats_day_LAST_DAY_driven
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_battery_care_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/battery_care_consumption
+    unique_id: MQTT_dailystats_day_LAST_DAY_battery_care_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_onboard_electronics_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/onboard_electronics_consumption
+    unique_id: MQTT_dailystats_day_LAST_DAY_onboard_electronics_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_climate_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/climate_consumption
+    unique_id: MQTT_dailystats_day_LAST_DAY_climate_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_engine_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/engine_consumption
+    unique_id: MQTT_dailystats_day_LAST_DAY_engine_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_average_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/average_consumption
+    unique_id: MQTT_dailystats_day_LAST_DAY_average_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_regenerated_energy
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/regenerated_energy
+    unique_id: MQTT_dailystats_day_LAST_DAY_regenerated_energy
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_total_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/total_consumption
+    unique_id: MQTT_dailystats_day_LAST_DAY_total_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_LAST_DAY_date
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/LAST_DAY/date
+    unique_id: MQTT_dailystats_day_LAST_DAY_date
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_battery_care_consumption_percentage
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/battery_care_consumption_percentage
+    unique_id: MQTT_dailystats_day_TOTALS_battery_care_consumption_percentage
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_onboard_electronics_consumption_percentage
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/onboard_electronics_consumption_percentage
+    unique_id: MQTT_dailystats_day_TOTALS_onboard_electronics_consumption_percentage
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_climate_consumption_percentage
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/climate_consumption_percentage
+    unique_id: MQTT_dailystats_day_TOTALS_climate_consumption_percentage
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_engine_consumption_percentage
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/engine_consumption_percentage
+    unique_id: MQTT_dailystats_day_TOTALS_engine_consumption_percentage
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_average_consumption_per_100
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/average_consumption_per_100
+    unique_id: MQTT_dailystats_day_TOTALS_average_consumption_per_100
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_regenerated_energy_percentage
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/regenerated_energy_percentage
+    unique_id: MQTT_dailystats_day_TOTALS_regenerated_energy_percentage
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_driven
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/driven
+    unique_id: MQTT_dailystats_day_TOTALS_driven
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_battery_care_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/battery_care_consumption
+    unique_id: MQTT_dailystats_day_TOTALS_battery_care_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_onboard_electronics_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/onboard_electronics_consumption
+    unique_id: MQTT_dailystats_day_TOTALS_onboard_electronics_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_climate_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/climate_consumption
+    unique_id: MQTT_dailystats_day_TOTALS_climate_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_engine_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/engine_consumption
+    unique_id: MQTT_dailystats_day_TOTALS_engine_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_average_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/average_consumption
+    unique_id: MQTT_dailystats_day_TOTALS_average_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_regenerated_energy
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/regenerated_energy
+    unique_id: MQTT_dailystats_day_TOTALS_regenerated_energy
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_total_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/total_consumption
+    unique_id: MQTT_dailystats_day_TOTALS_total_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_dailystats_day_TOTALS_date
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/dailystats_day/TOTALS/date
+    unique_id: MQTT_dailystats_day_TOTALS_date
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_dailystats_battery_care_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/battery_care_consumption
+    unique_id: MQTT_monitor_dailystats_battery_care_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_dailystats_onboard_electronics_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/onboard_electronics_consumption
+    unique_id: MQTT_monitor_dailystats_onboard_electronics_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_dailystats_climate_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/climate_consumption
+    unique_id: MQTT_monitor_dailystats_climate_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_dailystats_engine_consumption
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/engine_consumption
+    unique_id: MQTT_monitor_dailystats_engine_consumption
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_dailystats_regenerated_energy
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/regenerated_energy
+    unique_id: MQTT_monitor_dailystats_regenerated_energy
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_dailystats_total_consumed
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/total_consumed
+    unique_id: MQTT_monitor_dailystats_total_consumed
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_dailystats_distance_unit
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/distance_unit
+    unique_id: MQTT_monitor_dailystats_distance_unit
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_dailystats_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/distance
+    unique_id: MQTT_monitor_dailystats_distance
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_dailystats_date
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/dailystats/date
+    unique_id: MQTT_monitor_dailystats_date
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_monitor_evrange
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/evrange
+    unique_id: MQTT_monitor_monitor_evrange
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_monitor_address
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/address
+    unique_id: MQTT_monitor_monitor_address
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_monitor_plugged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/plugged
+    unique_id: MQTT_monitor_monitor_plugged
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_monitor_charging
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/charging
+    unique_id: MQTT_monitor_monitor_charging
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_monitor_soc
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/soc
+    unique_id: MQTT_monitor_monitor_soc
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_monitor_odometer
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/odometer
+    unique_id: MQTT_monitor_monitor_odometer
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_monitor_battery12v
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/battery12v
+    unique_id: MQTT_monitor_monitor_battery12v
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_monitor_engineon
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/engineon
+    unique_id: MQTT_monitor_monitor_engineon
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_monitor_latitude
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/latitude
+    unique_id: MQTT_monitor_monitor_latitude
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_monitor_longitude
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/longitude
+    unique_id: MQTT_monitor_monitor_longitude
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_monitor_datetime
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/monitor/datetime
+    unique_id: MQTT_monitor_monitor_datetime
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_tripinfo_maxspeed
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/tripinfo/maxspeed
+    unique_id: MQTT_monitor_tripinfo_maxspeed
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_tripinfo_avgspeed
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/tripinfo/avgspeed
+    unique_id: MQTT_monitor_tripinfo_avgspeed
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_tripinfo_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/tripinfo/distance
+    unique_id: MQTT_monitor_tripinfo_distance
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_tripinfo_idletime
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/tripinfo/idletime
+    unique_id: MQTT_monitor_tripinfo_idletime
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_tripinfo_drivetime
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/tripinfo/drivetime
+    unique_id: MQTT_monitor_tripinfo_drivetime
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_tripinfo_starttime
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/tripinfo/starttime
+    unique_id: MQTT_monitor_tripinfo_starttime
+    value_template: "{{ value }}"
+  - name: MQTT_monitor_tripinfo_date
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/monitor/tripinfo/date
+    unique_id: MQTT_monitor_tripinfo_date
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_address
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/address
+    unique_id: MQTT_summary_TRIP_address
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_range
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/range
+    unique_id: MQTT_summary_TRIP_range
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_trip_count
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/trip_count
+    unique_id: MQTT_summary_TRIP_trip_count
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_charging_sessions
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/charging_sessions
+    unique_id: MQTT_summary_TRIP_charging_sessions
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_battery12v_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/battery12v_max
+    unique_id: MQTT_summary_TRIP_battery12v_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_battery12v_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/battery12v_min
+    unique_id: MQTT_summary_TRIP_battery12v_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_battery12v_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/battery12v_avg
+    unique_id: MQTT_summary_TRIP_battery12v_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_battery12v
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/battery12v
+    unique_id: MQTT_summary_TRIP_battery12v
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_soc_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/soc_max
+    unique_id: MQTT_summary_TRIP_soc_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_soc_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/soc_min
+    unique_id: MQTT_summary_TRIP_soc_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_soc_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/soc_avg
+    unique_id: MQTT_summary_TRIP_soc_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_soc
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/soc
+    unique_id: MQTT_summary_TRIP_soc
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_cost
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/cost
+    unique_id: MQTT_summary_TRIP_cost
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_kwh_per_100_distance_unit
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/kwh_per_100_distance_unit
+    unique_id: MQTT_summary_TRIP_kwh_per_100_distance_unit
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_distance_unit_per_kwh
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/distance_unit_per_kwh
+    unique_id: MQTT_summary_TRIP_distance_unit_per_kwh
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_kwh_discharged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/kwh_discharged
+    unique_id: MQTT_summary_TRIP_kwh_discharged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_kwh_charged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/kwh_charged
+    unique_id: MQTT_summary_TRIP_kwh_charged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_delta_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/delta_distance
+    unique_id: MQTT_summary_TRIP_delta_distance
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_odometer
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/odometer
+    unique_id: MQTT_summary_TRIP_odometer
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_info
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/info
+    unique_id: MQTT_summary_TRIP_info
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIP_date
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIP/date
+    unique_id: MQTT_summary_TRIP_date
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_address
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/address
+    unique_id: MQTT_summary_DAY_address
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_range
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/range
+    unique_id: MQTT_summary_DAY_range
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_trip_count
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/trip_count
+    unique_id: MQTT_summary_DAY_trip_count
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_charging_sessions
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/charging_sessions
+    unique_id: MQTT_summary_DAY_charging_sessions
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_battery12v_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/battery12v_max
+    unique_id: MQTT_summary_DAY_battery12v_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_battery12v_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/battery12v_min
+    unique_id: MQTT_summary_DAY_battery12v_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_battery12v_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/battery12v_avg
+    unique_id: MQTT_summary_DAY_battery12v_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_battery12v
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/battery12v
+    unique_id: MQTT_summary_DAY_battery12v
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_soc_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/soc_max
+    unique_id: MQTT_summary_DAY_soc_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_soc_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/soc_min
+    unique_id: MQTT_summary_DAY_soc_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_soc_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/soc_avg
+    unique_id: MQTT_summary_DAY_soc_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_soc
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/soc
+    unique_id: MQTT_summary_DAY_soc
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_cost
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/cost
+    unique_id: MQTT_summary_DAY_cost
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_kwh_per_100_distance_unit
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/kwh_per_100_distance_unit
+    unique_id: MQTT_summary_DAY_kwh_per_100_distance_unit
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_distance_unit_per_kwh
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/distance_unit_per_kwh
+    unique_id: MQTT_summary_DAY_distance_unit_per_kwh
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_kwh_discharged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/kwh_discharged
+    unique_id: MQTT_summary_DAY_kwh_discharged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_kwh_charged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/kwh_charged
+    unique_id: MQTT_summary_DAY_kwh_charged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_delta_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/delta_distance
+    unique_id: MQTT_summary_DAY_delta_distance
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_odometer
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/odometer
+    unique_id: MQTT_summary_DAY_odometer
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_info
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/info
+    unique_id: MQTT_summary_DAY_info
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAY_date
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAY/date
+    unique_id: MQTT_summary_DAY_date
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_address
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/address
+    unique_id: MQTT_summary_WEEK_address
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_range
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/range
+    unique_id: MQTT_summary_WEEK_range
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_trip_count
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/trip_count
+    unique_id: MQTT_summary_WEEK_trip_count
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_charging_sessions
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/charging_sessions
+    unique_id: MQTT_summary_WEEK_charging_sessions
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_battery12v_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/battery12v_max
+    unique_id: MQTT_summary_WEEK_battery12v_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_battery12v_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/battery12v_min
+    unique_id: MQTT_summary_WEEK_battery12v_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_battery12v_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/battery12v_avg
+    unique_id: MQTT_summary_WEEK_battery12v_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_battery12v
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/battery12v
+    unique_id: MQTT_summary_WEEK_battery12v
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_soc_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/soc_max
+    unique_id: MQTT_summary_WEEK_soc_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_soc_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/soc_min
+    unique_id: MQTT_summary_WEEK_soc_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_soc_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/soc_avg
+    unique_id: MQTT_summary_WEEK_soc_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_soc
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/soc
+    unique_id: MQTT_summary_WEEK_soc
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_cost
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/cost
+    unique_id: MQTT_summary_WEEK_cost
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_kwh_per_100_distance_unit
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/kwh_per_100_distance_unit
+    unique_id: MQTT_summary_WEEK_kwh_per_100_distance_unit
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_distance_unit_per_kwh
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/distance_unit_per_kwh
+    unique_id: MQTT_summary_WEEK_distance_unit_per_kwh
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_kwh_discharged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/kwh_discharged
+    unique_id: MQTT_summary_WEEK_kwh_discharged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_kwh_charged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/kwh_charged
+    unique_id: MQTT_summary_WEEK_kwh_charged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_delta_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/delta_distance
+    unique_id: MQTT_summary_WEEK_delta_distance
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_odometer
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/odometer
+    unique_id: MQTT_summary_WEEK_odometer
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_info
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/info
+    unique_id: MQTT_summary_WEEK_info
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEK_date
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEK/date
+    unique_id: MQTT_summary_WEEK_date
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_address
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/address
+    unique_id: MQTT_summary_MONTH_address
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_range
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/range
+    unique_id: MQTT_summary_MONTH_range
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_trip_count
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/trip_count
+    unique_id: MQTT_summary_MONTH_trip_count
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_charging_sessions
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/charging_sessions
+    unique_id: MQTT_summary_MONTH_charging_sessions
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_battery12v_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/battery12v_max
+    unique_id: MQTT_summary_MONTH_battery12v_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_battery12v_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/battery12v_min
+    unique_id: MQTT_summary_MONTH_battery12v_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_battery12v_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/battery12v_avg
+    unique_id: MQTT_summary_MONTH_battery12v_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_battery12v
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/battery12v
+    unique_id: MQTT_summary_MONTH_battery12v
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_soc_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/soc_max
+    unique_id: MQTT_summary_MONTH_soc_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_soc_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/soc_min
+    unique_id: MQTT_summary_MONTH_soc_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_soc_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/soc_avg
+    unique_id: MQTT_summary_MONTH_soc_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_soc
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/soc
+    unique_id: MQTT_summary_MONTH_soc
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_cost
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/cost
+    unique_id: MQTT_summary_MONTH_cost
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_kwh_per_100_distance_unit
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/kwh_per_100_distance_unit
+    unique_id: MQTT_summary_MONTH_kwh_per_100_distance_unit
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_distance_unit_per_kwh
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/distance_unit_per_kwh
+    unique_id: MQTT_summary_MONTH_distance_unit_per_kwh
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_kwh_discharged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/kwh_discharged
+    unique_id: MQTT_summary_MONTH_kwh_discharged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_kwh_charged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/kwh_charged
+    unique_id: MQTT_summary_MONTH_kwh_charged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_delta_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/delta_distance
+    unique_id: MQTT_summary_MONTH_delta_distance
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_odometer
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/odometer
+    unique_id: MQTT_summary_MONTH_odometer
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_info
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/info
+    unique_id: MQTT_summary_MONTH_info
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTH_date
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTH/date
+    unique_id: MQTT_summary_MONTH_date
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_address
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/address
+    unique_id: MQTT_summary_YEAR_address
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_range
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/range
+    unique_id: MQTT_summary_YEAR_range
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_trip_count
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/trip_count
+    unique_id: MQTT_summary_YEAR_trip_count
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_charging_sessions
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/charging_sessions
+    unique_id: MQTT_summary_YEAR_charging_sessions
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_battery12v
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/battery12v_max
+    unique_id: MQTT_summary_YEAR_battery12v
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_battery12v_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/battery12v_max
+    unique_id: MQTT_summary_YEAR_battery12v_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_battery12v_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/battery12v_min
+    unique_id: MQTT_summary_YEAR_battery12v_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_battery12v_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/battery12v_avg
+    unique_id: MQTT_summary_YEAR_battery12v_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_soc
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/soc
+    unique_id: MQTT_summary_YEAR_soc
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_soc_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/soc
+    unique_id: MQTT_summary_YEAR_soc_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_soc_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/soc
+    unique_id: MQTT_summary_YEAR_soc_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_soc_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/soc
+    unique_id: MQTT_summary_YEAR_soc_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_cost
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/cost
+    unique_id: MQTT_summary_YEAR_cost
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_kwh_per_100_distance_unit
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/kwh_per_100_distance_unit
+    unique_id: MQTT_summary_YEAR_kwh_per_100_distance_unit
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_distance_unit_per_kwh
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/distance_unit_per_kwh
+    unique_id: MQTT_summary_YEAR_distance_unit_per_kwh
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_kwh_discharged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/kwh_discharged
+    unique_id: MQTT_summary_YEAR_kwh_discharged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_kwh_charged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/kwh_charged
+    unique_id: MQTT_summary_YEAR_kwh_charged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_delta_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/delta_distance
+    unique_id: MQTT_summary_YEAR_delta_distance
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_odometer
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/odometer
+    unique_id: MQTT_summary_YEAR_odometer
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_info
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/info
+    unique_id: MQTT_summary_YEAR_info
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEAR_date
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/date
+    unique_id: MQTT_summary_YEAR_date
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_address
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/address
+    unique_id: MQTT_summary_TRIPAVG_address
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_range
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/range
+    unique_id: MQTT_summary_TRIPAVG_range
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_trip_count
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/trip_count
+    unique_id: MQTT_summary_TRIPAVG_trip_count
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_charging_sessions
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/charging_sessions
+    unique_id: MQTT_summary_TRIPAVG_charging_sessions
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_battery12v_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/battery12v_max
+    unique_id: MQTT_summary_TRIPAVG_battery12v_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_battery12v_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/battery12v_min
+    unique_id: MQTT_summary_TRIPAVG_battery12v_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_battery12v_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/battery12v_avg
+    unique_id: MQTT_summary_TRIPAVG_battery12v_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_battery12v
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/battery12v
+    unique_id: MQTT_summary_TRIPAVG_battery12v
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_soc_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/soc_max
+    unique_id: MQTT_summary_TRIPAVG_soc_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_soc_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/soc_min
+    unique_id: MQTT_summary_TRIPAVG_soc_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_soc_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/soc_avg
+    unique_id: MQTT_summary_TRIPAVG_soc_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_soc
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/soc
+    unique_id: MQTT_summary_TRIPAVG_soc
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_cost
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/cost
+    unique_id: MQTT_summary_TRIPAVG_cost
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_kwh_per_100_distance_unit
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/kwh_per_100_distance_unit
+    unique_id: MQTT_summary_TRIPAVG_kwh_per_100_distance_unit
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_distance_unit_per_kwh
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/distance_unit_per_kwh
+    unique_id: MQTT_summary_TRIPAVG_distance_unit_per_kwh
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_kwh_discharged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/kwh_discharged
+    unique_id: MQTT_summary_TRIPAVG_kwh_discharged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_kwh_charged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/kwh_charged
+    unique_id: MQTT_summary_TRIPAVG_kwh_charged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_delta_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/delta_distance
+    unique_id: MQTT_summary_TRIPAVG_delta_distance
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_odometer
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/odometer
+    unique_id: MQTT_summary_TRIPAVG_odometer
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_info
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/info
+    unique_id: MQTT_summary_TRIPAVG_info
+    value_template: "{{ value }}"
+  - name: MQTT_summary_TRIPAVG_date
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/date
+    unique_id: MQTT_summary_TRIPAVG_date
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_address
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/address
+    unique_id: MQTT_summary_DAYAVG_address
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_range
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/range
+    unique_id: MQTT_summary_DAYAVG_range
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_trip_count
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/trip_count
+    unique_id: MQTT_summary_DAYAVG_trip_count
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_charging_sessions
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/charging_sessions
+    unique_id: MQTT_summary_DAYAVG_charging_sessions
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_battery12v_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/battery12v_max
+    unique_id: MQTT_summary_DAYAVG_battery12v_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_battery12v_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/battery12v_min
+    unique_id: MQTT_summary_DAYAVG_battery12v_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_battery12v_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/battery12v_avg
+    unique_id: MQTT_summary_DAYAVG_battery12v_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_battery12v
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/battery12v
+    unique_id: MQTT_summary_DAYAVG_battery12v
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_soc_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/soc_max
+    unique_id: MQTT_summary_DAYAVG_soc_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_soc_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/soc_min
+    unique_id: MQTT_summary_DAYAVG_soc_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_soc_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/soc_avg
+    unique_id: MQTT_summary_DAYAVG_soc_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_soc
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/soc
+    unique_id: MQTT_summary_DAYAVG_soc
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_cost
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/cost
+    unique_id: MQTT_summary_DAYAVG_cost
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_kwh_per_100_distance_unit
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/kwh_per_100_distance_unit
+    unique_id: MQTT_summary_DAYAVG_kwh_per_100_distance_unit
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_distance_unit_per_kwh
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/distance_unit_per_kwh
+    unique_id: MQTT_summary_DAYAVG_distance_unit_per_kwh
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_kwh_discharged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/kwh_discharged
+    unique_id: MQTT_summary_DAYAVG_kwh_discharged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_kwh_charged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/kwh_charged
+    unique_id: MQTT_summary_DAYAVG_kwh_charged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_delta_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/delta_distance
+    unique_id: MQTT_summary_DAYAVG_delta_distance
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_odometer
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/odometer
+    unique_id: MQTT_summary_DAYAVG_odometer
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_info
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/info
+    unique_id: MQTT_summary_DAYAVG_info
+    value_template: "{{ value }}"
+  - name: MQTT_summary_DAYAVG_date
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/DAYAVG/date
+    unique_id: MQTT_summary_DAYAVG_date
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_address
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/address
+    unique_id: MQTT_summary_WEEKAVG_address
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_range
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/range
+    unique_id: MQTT_summary_WEEKAVG_range
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_trip_count
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/trip_count
+    unique_id: MQTT_summary_WEEKAVG_trip_count
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_charging_sessions
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/charging_sessions
+    unique_id: MQTT_summary_WEEKAVG_charging_sessions
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_battery12v_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/battery12v_max
+    unique_id: MQTT_summary_WEEKAVG_battery12v_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_battery12v_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/battery12v_min
+    unique_id: MQTT_summary_WEEKAVG_battery12v_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_battery12v_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/battery12v_avg
+    unique_id: MQTT_summary_WEEKAVG_battery12v_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_battery12v
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/battery12v
+    unique_id: MQTT_summary_WEEKAVG_battery12v
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_soc_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/soc_max
+    unique_id: MQTT_summary_WEEKAVG_soc_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_soc_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/soc_min
+    unique_id: MQTT_summary_WEEKAVG_soc_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_soc_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/soc_avg
+    unique_id: MQTT_summary_WEEKAVG_soc_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_soc
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/soc
+    unique_id: MQTT_summary_WEEKAVG_soc
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_cost
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/cost
+    unique_id: MQTT_summary_WEEKAVG_cost
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_kwh_per_100_distance_unit
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/kwh_per_100_distance_unit
+    unique_id: MQTT_summary_WEEKAVG_kwh_per_100_distance_unit
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_distance_unit_per_kwh
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/distance_unit_per_kwh
+    unique_id: MQTT_summary_WEEKAVG_distance_unit_per_kwh
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_kwh_discharged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/kwh_discharged
+    unique_id: MQTT_summary_WEEKAVG_kwh_discharged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_kwh_charged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/kwh_charged
+    unique_id: MQTT_summary_WEEKAVG_kwh_charged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_delta_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/delta_distance
+    unique_id: MQTT_summary_WEEKAVG_delta_distance
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_odometer
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/odometer
+    unique_id: MQTT_summary_WEEKAVG_odometer
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_info
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/info
+    unique_id: MQTT_summary_WEEKAVG_info
+    value_template: "{{ value }}"
+  - name: MQTT_summary_WEEKAVG_date
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/date
+    unique_id: MQTT_summary_WEEKAVG_date
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_address
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/address
+    unique_id: MQTT_summary_MONTHAVG_address
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_range
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/range
+    unique_id: MQTT_summary_MONTHAVG_range
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_trip_count
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/trip_count
+    unique_id: MQTT_summary_MONTHAVG_trip_count
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_charging_sessions
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/charging_sessions
+    unique_id: MQTT_summary_MONTHAVG_charging_sessions
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_battery12v_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/battery12v_max
+    unique_id: MQTT_summary_MONTHAVG_battery12v_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_battery12v_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/battery12v_min
+    unique_id: MQTT_summary_MONTHAVG_battery12v_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_battery12v_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/battery12v_avg
+    unique_id: MQTT_summary_MONTHAVG_battery12v_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_battery12v
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/battery12v
+    unique_id: MQTT_summary_MONTHAVG_battery12v
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_soc_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/soc_max
+    unique_id: MQTT_summary_MONTHAVG_soc_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_soc_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/soc_min
+    unique_id: MQTT_summary_MONTHAVG_soc_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_soc_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/soc_avg
+    unique_id: MQTT_summary_MONTHAVG_soc_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_soc
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/soc
+    unique_id: MQTT_summary_MONTHAVG_soc
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_cost
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/cost
+    unique_id: MQTT_summary_MONTHAVG_cost
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_kwh_per_100_distance_unit
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/kwh_per_100_distance_unit
+    unique_id: MQTT_summary_MONTHAVG_kwh_per_100_distance_unit
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_distance_unit_per_kwh
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/distance_unit_per_kwh
+    unique_id: MQTT_summary_MONTHAVG_distance_unit_per_kwh
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_kwh_discharged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/kwh_discharged
+    unique_id: MQTT_summary_MONTHAVG_kwh_discharged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_kwh_charged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/kwh_charged
+    unique_id: MQTT_summary_MONTHAVG_kwh_charged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_delta_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/delta_distance
+    unique_id: MQTT_summary_MONTHAVG_delta_distance
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_odometer
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/odometer
+    unique_id: MQTT_summary_MONTHAVG_odometer
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_info
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/info
+    unique_id: MQTT_summary_MONTHAVG_info
+    value_template: "{{ value }}"
+  - name: MQTT_summary_MONTHAVG_date
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/date
+    unique_id: MQTT_summary_MONTHAVG_date
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_address
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/address
+    unique_id: MQTT_summary_YEARLY_address
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_range
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/range
+    unique_id: MQTT_summary_YEARLY_range
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_trip_count
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/trip_count
+    unique_id: MQTT_summary_YEARLY_trip_count
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_charging_sessions
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/charging_sessions
+    unique_id: MQTT_summary_YEARLY_charging_sessions
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_battery12v_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/battery12v_max
+    unique_id: MQTT_summary_YEARLY_battery12v_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_battery12v_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/battery12v_min
+    unique_id: MQTT_summary_YEARLY_battery12v_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_battery12v_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/battery12v_avg
+    unique_id: MQTT_summary_YEARLY_battery12v_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_battery12v
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/battery12v
+    unique_id: MQTT_summary_YEARLY_battery12v
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_soc_max
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/soc_max
+    unique_id: MQTT_summary_YEARLY_soc_max
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_soc_min
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/soc_min
+    unique_id: MQTT_summary_YEARLY_soc_min
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_soc_avg
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/soc_avg
+    unique_id: MQTT_summary_YEARLY_soc_avg
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_soc
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/soc
+    unique_id: MQTT_summary_YEARLY_soc
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_cost
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/cost
+    unique_id: MQTT_summary_YEARLY_cost
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_kwh_per_100_distance_unit
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/kwh_per_100_distance_unit
+    unique_id: MQTT_summary_YEARLY_kwh_per_100_distance_unit
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_distance_unit_per_kwh
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/distance_unit_per_kwh
+    unique_id: MQTT_summary_YEARLY_distance_unit_per_kwh
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_kwh_discharged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/kwh_discharged
+    unique_id: MQTT_summary_YEARLY_kwh_discharged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_kwh_charged
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/kwh_charged
+    unique_id: MQTT_summary_YEARLY_kwh_charged
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_delta_distance
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/delta_distance
+    unique_id: MQTT_summary_YEARLY_delta_distance
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_odometer
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/odometer
+    unique_id: MQTT_summary_YEARLY_odometer
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_info
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/info
+    unique_id: MQTT_summary_YEARLY_info
+    value_template: "{{ value }}"
+  - name: MQTT_summary_YEARLY_date
+    state_topic: hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/date
+    unique_id: MQTT_summary_YEARLY_date
+    value_template: "{{ value }}"
