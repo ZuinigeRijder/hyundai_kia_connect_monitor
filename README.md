@@ -7,7 +7,6 @@
   - [MQTT-Explorer screenshot after running monitor.py](#mqtt-explorer-screenshot-after-running-monitorpy)
   - [MQTT-Explorer screenshot after running summary.py](#mqtt-explorer-screenshot-after-running-summarypy)
   - [MQTT-Explorer screenshot after running dailystats.py:](#mqtt-explorer-screenshot-after-running-dailystatspy)
-  - [For convenience an example configuration.yaml is provided, replace KMHKR81CPNU012345 with your VIN of the car.](#for-convenience-an-example-configurationyaml-is-provided-replace-kmhkr81cpnu012345-with-your-vin-of-the-car)
 - [monitor.py](#monitorpy)
 - [summary.py](#summarypy)
 - [summary.py sheetupdate](#summarypy-sheetupdate)
@@ -561,7 +560,7 @@ When configured, the data is send to mqtt_main_topic/VIN/subtopic.
 ##  MQTT-Explorer screenshot after running dailystats.py:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MQTTExplorer_dailystats.png)
 
-For convenience an example [configuration.yaml](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/configuration.yaml) is provided, replace KMHKR81CPNU012345 with your VIN of the car.
+For convenience an example [configuration.yaml](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/configuration.yaml) is provided, replace KMHKR81CPNU012345 with your VIN of the car.
 
 ---
 # monitor.py
