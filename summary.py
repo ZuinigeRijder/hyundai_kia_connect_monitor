@@ -97,8 +97,8 @@ if VIN != "":
     LASTRUN_FILENAME = Path(f"monitor.{VIN}.lastrun")
     OUTPUT_SPREADSHEET_NAME = f"monitor.{VIN}"
     CHARGE_CSV_FILENAME = Path(f"summary.charge.{VIN}.csv")
-    TRIP_CSV_FILENAME = Path("summary.trip.{VIN}.csv")
-    DAY_CSV_FILENAME = Path("summary.day.{VIN}.csv")
+    TRIP_CSV_FILENAME = Path(f"summary.trip.{VIN}.csv")
+    DAY_CSV_FILENAME = Path(f"summary.day.{VIN}.csv")
     LENCHECK = 2
 _ = D and dbg(f"INPUT_CSV_FILE: {MONITOR_CSV_FILENAME.name}")
 
