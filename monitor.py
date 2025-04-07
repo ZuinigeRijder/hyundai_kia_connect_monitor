@@ -93,7 +93,7 @@ for kindex in range(1, len(sys.argv)):
 
 if KEYWORD_ERROR or arg_has("help"):
     print("Usage: python monitor.py")
-    exit()
+    sys.exit(-1)
 
 TEST = arg_has("test")
 # == read monitor in monitor.cfg ===========================
@@ -108,6 +108,21 @@ PASSWORD = monitor_settings["password"]
 PIN = monitor_settings["pin"]
 USE_GEOCODE = get_bool(monitor_settings, "use_geocode", False)
 USE_GEOCODE_EMAIL = get_bool(monitor_settings, "use_geocode_email", False)
+GEOCODE_PROVIDER = to_int(
+    get(monitor_settings, "geocode_provider", "1")
+)  # 1=OPENSTREETMAP 2=GOOGLE
+if GEOCODE_PROVIDER < 1 or GEOCODE_PROVIDER > 2:
+    logging.error("Invalid GEOCODE_PROVIDER in monitor.cfg, expected 1 or 2")
+    sys.exit(-1)
+
+GOOGLE_API_KEY = get(monitor_settings, "google_api_key", "")
+if len(GOOGLE_API_KEY) == 0:
+    GOOGLE_API_KEY = None  # default no API key needed for OPENSTREETMAP
+
+if GEOCODE_PROVIDER == 2 and GOOGLE_API_KEY is None:
+    logging.error("Missing GOOGLE_API_KEY in monitor.cfg")
+    sys.exit(-1)
+
 LANGUAGE = monitor_settings["language"]
 ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
 MONITOR_INFINITE = get_bool(monitor_settings, "monitor_infinite", False)
@@ -568,6 +583,8 @@ def handle_vehicles(login: bool) -> bool:
                     pin=PIN,
                     geocode_api_enable=USE_GEOCODE,
                     geocode_api_use_email=USE_GEOCODE_EMAIL,
+                    geocode_provider=GEOCODE_PROVIDER,
+                    geocode_api_key=GOOGLE_API_KEY,
                     language=LANGUAGE,
                 )
 

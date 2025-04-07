@@ -593,6 +593,8 @@ password = your_password
 pin =
 use_geocode = True
 use_geocode_email = True
+geocode_provider = 1
+google_api_key =
 language = en
 odometer_metric = km
 include_regenerate_in_consumption = False
@@ -925,6 +927,8 @@ Explanation of the configuration items:
 - pin: pincode of your bluelink account, required for CANADA, and potentially USA, otherwise pass a blank string
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
 - use_geocode_email: (default: True) use email to avoid abuse of address lookup
+- geocode_provider: (default: 1) use openstreetmap (1) or google (2) for address lookup
+- google_api_key: (default empty) when using "geocode_provider = 2" (google) you need to get a [google API key, see this discussion](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/discussions/76#discussioncomment-12728843)
 - language: (default: en) the Bluelink App is reset to English for users who have set another language in the Bluelink App in Europe when using hyundai_kia_connect_api, you can configure another language as workaround. See Note 3
 - odometer_metric, e.g. km or mi
 - include_regenerate_in_consumption, when set to True the regeneration is taken into account for the consumption calculation in daily stats. However, I think that the next 2 configuration items will better match the boardcomputer values.
