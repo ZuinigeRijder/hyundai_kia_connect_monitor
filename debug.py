@@ -1,11 +1,12 @@
 # == debug.py Author: Zuinige Rijder =========================================
-""" Simple Python3 script to debug hyundai_kia_connect_api values """
+"""Simple Python3 script to debug hyundai_kia_connect_api values"""
+import sys
 import configparser
 from datetime import datetime
 import logging
 import logging.config
 from hyundai_kia_connect_api import VehicleManager, Vehicle
-from monitor_utils import get_filepath
+from monitor_utils import get_filepath, get, get_bool, to_int
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -19,6 +20,24 @@ BRAND = monitor_settings["brand"]
 USERNAME = monitor_settings["username"]
 PASSWORD = monitor_settings["password"]
 PIN = monitor_settings["pin"]
+USE_GEOCODE = get_bool(monitor_settings, "use_geocode", False)
+USE_GEOCODE_EMAIL = get_bool(monitor_settings, "use_geocode_email", False)
+GEOCODE_PROVIDER = to_int(
+    get(monitor_settings, "geocode_provider", "1")
+)  # 1=OPENSTREETMAP 2=GOOGLE
+if GEOCODE_PROVIDER < 1 or GEOCODE_PROVIDER > 2:
+    logging.error("Invalid GEOCODE_PROVIDER in monitor.cfg, expected 1 or 2")
+    sys.exit(-1)
+
+GOOGLE_API_KEY = get(monitor_settings, "google_api_key", "")
+if len(GOOGLE_API_KEY) == 0:
+    GOOGLE_API_KEY = None  # default no API key needed for OPENSTREETMAP
+
+if GEOCODE_PROVIDER == 2 and GOOGLE_API_KEY is None:
+    logging.error("Missing GOOGLE_API_KEY in monitor.cfg")
+    sys.exit(-1)
+
+LANGUAGE = monitor_settings["language"]
 
 
 # == get_child_value =========================================================
@@ -111,7 +130,13 @@ vm = VehicleManager(
     username=USERNAME,
     password=PASSWORD,
     pin=PIN,
+    geocode_api_enable=USE_GEOCODE,
+    geocode_api_use_email=USE_GEOCODE_EMAIL,
+    geocode_provider=GEOCODE_PROVIDER,
+    geocode_api_key=GOOGLE_API_KEY,
+    language=LANGUAGE,
 )
+
 for KEY in vm.vehicles:
     VEHICLE = vm.vehicles[KEY]
     print(f"timezone: {VEHICLE.timezone}")
@@ -120,6 +145,7 @@ for KEY in vm.vehicles:
 vm.check_and_refresh_token()
 # vm.force_refresh_all_vehicles_states()
 vm.update_all_vehicles_with_cached_state()  # needed >= 2.0.0
+vm.update_all_vehicles_with_cached_state()  # do twice to check geocode cache
 
 for KEY in vm.vehicles:
     VEHICLE = vm.vehicles[KEY]
