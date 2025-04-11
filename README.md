@@ -127,22 +127,28 @@ Steps:
 
 Probably some packages needed for Hyundai Connect API are not installed (error messages). [Learn more about installing Python packages](https://packaging.python.org/en/latest/tutorials/installing-packages/)
 I have installed the following packages (e.g. use python -m pip install "package_name"), see [requirements.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements.txt)
-
-    beautifulsoup4==4.11.1
-    python_dateutil==2.8.2
-    pytz==2022.2.1
-    requests==2.28.1
+````
+beautifulsoup4==4.10.0
+geopy==2.2.0
+gspread==5.6.2
+paho_mqtt==1.6.1
+python_dateutil==2.8.2
+pytz==2021.3
+requests==2.28.1
+````
 
 In monitor.py the following package is used:
-
-    paho_mqtt>=1.6.1,<2.0
-
+````
+paho_mqtt>=1.6.1,<2.0
+````
 *Note that paho_mqtt version 2.x is not (yet) supported*
 
-In summary.py and dailystats.py also the following package is used:
-
-    gspread==5.6.2
-
+Examples of package install commands:
+````
+pip install "beautifulsoup4==4.10.0"
+pip install "paho_mqtt>=1.6.1,<2.0"
+pip install "gspread>=5.6.2"
+````
 
 If everything works, it's a matter of regularly collecting the information, for example by running the "python monitor.py" command once an hour or infinite.
 A server is of course best, I use a Raspberry Pi, but it can also regularly be done on a Windows 10 or Mac computer, provided the computer is on.
@@ -928,7 +934,7 @@ Explanation of the configuration items:
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
 - use_geocode_email: (default: True) use email to avoid abuse of address lookup
 - geocode_provider: (default: 1) use openstreetmap (1) or google (2) for address lookup
-- google_api_key: (default empty) when using "geocode_provider = 2" (google) you need to get a [google API key, see this discussion](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/discussions/76#discussioncomment-12728843)
+- google_api_key: (default empty) when using "geocode_provider = 2" (google) you need to get a [google API key, see this discussion](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/discussions/76#discussioncomment-12728843). Do not put quotes around the Google API key!
 - language: (default: en) the Bluelink App is reset to English for users who have set another language in the Bluelink App in Europe when using hyundai_kia_connect_api, you can configure another language as workaround. See Note 3
 - odometer_metric, e.g. km or mi
 - include_regenerate_in_consumption, when set to True the regeneration is taken into account for the consumption calculation in daily stats. However, I think that the next 2 configuration items will better match the boardcomputer values.
@@ -1285,9 +1291,9 @@ Example script [run_monitor_infinite.sh](https://raw.githubusercontent.com/Zuini
 Steps:
 1. create a directory hyundai_kia_connect_monitor in your home directory
 2. copy hyundai_kia_connect_api as subdirectory of directory hyundai_kia_connect_monitor
-3. copy run_monitor_infinite.sh, monitor.py, monitor.cfg, monitor.translations.csv, monitor_utils.py, summary.py, summary.cfg, dailystats.py and logging_config.ini
+3. copy run_monitor_infinite.sh, monitor.py, monitor.cfg, monitor.translations.csv, monitor_utils.py, domoticz_utils.py, mqtt_utils.py, summary.py, summary.cfg, dailystats.py, kml.py, debug.py and logging_config.ini
 4. change inside monitor.cfg the appropriate hyundai_kia_connect settings, e.g. monitor_infinite = True and monitor_execute_commands_when_something_written_or_error = /usr/bin/python -u ~/hyundai_kia_connect_monitor/summary.py sheetupdate > summary.log;/usr/bin/python -u ~/hyundai_kia_connect_monitor/dailystats.py sheetupdate > dailystats.log
-5. chmod +x run_monitor_infinite.sh
+5. chmod +x ~/hyundai_kia_connect_monitor/run_monitor_infinite.sh
 
 Add to your crontab to run once per hour to restart after crashes or reboot (crontab -e)
 ```
