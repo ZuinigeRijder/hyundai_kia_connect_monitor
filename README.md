@@ -609,6 +609,8 @@ consumption_efficiency_factor_summary = 1.0
 monitor_infinite = False
 monitor_infinite_interval_minutes = 60
 monitor_execute_commands_when_something_written_or_error =
+monitor_force_sync_when_odometer_different_location_workaround = False
+monitor_force_sync_max_count = 10
 
 [MQTT]
 send_to_mqtt = False
@@ -944,6 +946,8 @@ Explanation of the configuration items:
 - monitor_infinite_interval_minutes, interval in minutes between getting cached server values
 - monitor_execute_commands_when_something_written_or_error, when new cached server values are retrieved, the specified commands (separated by semicolon ;) are executed. See Note 1.
   * example: monitor_execute_commands_when_something_written_or_error = python -u summary.py sheetupdate > summary.log;python -u dailystats.py sheetupdate > dailystats.log
+- monitor_force_sync_when_odometer_different_location_workaround, when set to True a forced update is done when the odometer has changed, to get the latest location (for some cars the cached location is not updated correctly anymore since May 2025 when turning off the car). Only change to True when you have this problem AND you want up-to-date locations when turning off the car.
+- monitor_force_sync_max_count: (default: 10) Limit the number of forced sync per day when the previous setting is True.
 - For configuration of Domoticz, [see here](#domoticz)
 - For configuration of MQTT Broker, [see here](#mqtt-broker-eg-homeassistant-iobroker)
 
