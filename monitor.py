@@ -438,10 +438,18 @@ def handle_one_vehicle(
     prev_line = get_last_line(Path(filename)).strip()
     list_prev_line = prev_line.split(",")
 
+    location_last_updated_at = get_safe_datetime(
+        vehicle.location_last_updated_at, vehicle.timezone
+    )
+    vehicle_last_updated_at = get_safe_datetime(
+        vehicle.last_updated_at, vehicle.timezone
+    )
+    dates = [vehicle_last_updated_at, location_last_updated_at]
+    last_updated_at = max(dates)
+
     # workaround for location is not updated anymore since may 2025
     # force sync when odometer is different when configured
     odometer_str = get_odometer_str(vehicle)
-    last_updated_at = get_safe_datetime(vehicle.last_updated_at, vehicle.timezone)
     if (
         MONITOR_INFINITE
         and MONITOR_FORCE_SYNC_WHEN_ODOMETER_DIFFERENT_LOCATION_WORKAROUND
@@ -472,9 +480,6 @@ def handle_one_vehicle(
 
     location_longitude = get_safe_float(vehicle.location_longitude)
     location_latitude = get_safe_float(vehicle.location_latitude)
-    location_last_updated_at = get_safe_datetime(
-        vehicle.location_last_updated_at, vehicle.timezone
-    )
 
     ev_driving_range = to_int(f"{vehicle.ev_driving_range}")
 
@@ -524,9 +529,10 @@ def handle_one_vehicle(
                     same = False
                     break  # finished
         if not same:
-            _ = D and dbg("Writing monitor.csv line")
-            _ = D and dbg(f"curr={line}")
+            logging.info("Writing monitor.csv line")
+            logging.info(f"curr={line}")
             _ = D and dbg(f"prev={prev_line}")
+            _ = D and dbg(f"newest: {last_updated_at} from {dates}")
             if TEST:
                 send_monitor_csv_line_to_mqtt(prev_line)
                 send_monitor_csv_line_to_domoticz(prev_line)
@@ -537,7 +543,7 @@ def handle_one_vehicle(
 
     handle_daily_stats(vehicle, number_of_vehicles)
     vehicle_stats = [
-        str(last_updated_at),
+        str(vehicle_last_updated_at),
         str(location_last_updated_at),
         line,
         "",
