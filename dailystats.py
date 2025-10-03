@@ -607,7 +607,7 @@ def compute_total_charge() -> float:
     """compute_total_charge"""
     total_charge = 0.0
     if SUMMARY_CHARGE_CSV_FILE.is_file():
-        with SUMMARY_CHARGE_CSV_FILE.open("r", encoding="utf-8") as inputfile:
+        with SUMMARY_CHARGE_CSV_FILE.open("r", encoding="windows-1252") as inputfile:
             linecount = 0
             for line in inputfile:
                 line = line.strip()
@@ -627,7 +627,7 @@ def compute_total_consumption_per_kwh() -> float:
     total_distance = 0.0
     total_kwh_consumed = 0.0
     if SUMMARY_DAY_CSV_FILE.is_file():
-        with SUMMARY_DAY_CSV_FILE.open("r", encoding="utf-8") as inputfile:
+        with SUMMARY_DAY_CSV_FILE.open("r", encoding="windows-1252") as inputfile:
             linecount = 0
             for line in inputfile:
                 line = line.strip()
@@ -652,7 +652,7 @@ def compute_total_consumption_per_kwh() -> float:
 def summary_tripinfo() -> None:
     """summary_tripinfo"""
     if TRIPINFO_CSV_FILE.is_file():
-        with TRIPINFO_CSV_FILE.open("r", encoding="utf-8") as inputfile:
+        with TRIPINFO_CSV_FILE.open("r", encoding="windows-1252") as inputfile:
             linecount = 0
             for line in inputfile:
                 line = line.strip()

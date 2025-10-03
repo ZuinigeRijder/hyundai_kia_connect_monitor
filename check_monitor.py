@@ -1,5 +1,5 @@
 # == check_monitor.py Author: Zuinige Rijder =========
-""" Simple Python3 script to check monitor.csv """
+"""Simple Python3 script to check monitor.csv"""
 from os import path
 from datetime import datetime
 from io import TextIOWrapper
@@ -30,7 +30,9 @@ EV_RANGE = 10  # EV range (optional field)
 
 MONITOR_CSV_FILENAME = Path("monitor.csv")
 
-MONITOR_CSV_FILE: TextIOWrapper = MONITOR_CSV_FILENAME.open("r", encoding="utf-8")
+MONITOR_CSV_FILE: TextIOWrapper = MONITOR_CSV_FILENAME.open(
+    "r", encoding="windows-1252"
+)
 MONITOR_CSV_FILE_EOL: bool = False
 MONITOR_CSV_READ_AHEAD_LINE: str = ""
 MONITOR_CSV_READ_DONE_ONCE: bool = False

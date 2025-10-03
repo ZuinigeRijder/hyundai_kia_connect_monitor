@@ -161,7 +161,7 @@ def writeln(filename: str, string: str) -> None:
     if not monitor_csv_file.is_file():
         monitor_csv_file.touch()
         write_header = True
-    with monitor_csv_file.open("a", encoding="utf-8") as file:
+    with monitor_csv_file.open("a", encoding="windows-1252") as file:
         if write_header:
             file.write(
                 "datetime, longitude, latitude, engineOn, 12V%, odometer, SOC%, charging, plugged, address, EV range\n"  # noqa
@@ -193,7 +193,7 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
     if not dailystats_file.is_file():
         dailystats_file.touch()
         write_header = True
-    with dailystats_file.open("a", encoding="utf-8") as file:
+    with dailystats_file.open("a", encoding="windows-1252") as file:
         if write_header:
             file.write(
                 "date, distance, distance_unit, total_consumed, regenerated_energy, engine_consumption, climate_consumption, onboard_electronics_consumption, battery_care_consumption\n"  # noqa
@@ -276,7 +276,7 @@ def write_last_run(
     if number_of_vehicles > 1:
         filename = "monitor." + vin + ".lastrun"
     lastrun_file = Path(filename)
-    with lastrun_file.open("w", encoding="utf-8") as file:
+    with lastrun_file.open("w", encoding="windows-1252") as file:
         now_string = datetime.now().strftime("%Y-%m-%d %H:%M %a")
         last_updated_at = vehicle_stats[0].split("+")[0]
         location_last_updated_at = vehicle_stats[1].split("+")[0]
@@ -297,7 +297,7 @@ def append_error_to_last_run(error_string: str) -> None:
     if MANAGER and MANAGER.vehicles and len(MANAGER.vehicles) > 1:
         filename = "monitor." + MANAGER.vehicles[0].VIN + ".lastrun"
     lastrun_file = Path(filename)
-    with lastrun_file.open("a", encoding="utf-8") as file:
+    with lastrun_file.open("a", encoding="windows-1252") as file:
         file.write(f"{error_string}\n")
 
 
@@ -376,7 +376,7 @@ def handle_trip_info(
     last_hhmmss = "000000"
     if len(last_line_splitted) > 6 and "Date," not in last_line:
         last_hhmmss = last_line_splitted[1]
-    with monitor_tripinfo_csv_file.open("a", encoding="utf-8") as file:
+    with monitor_tripinfo_csv_file.open("a", encoding="windows-1252") as file:
         from_month = now  # default only get the current month statistics
         if write_header:
             file.write(
@@ -461,11 +461,11 @@ def handle_one_vehicle(
         logging.info(
             f"Forced sync, new odometer=[{odometer_str}], old_odometer=[{list_prev_line[5].strip()}]"  # noqa
         )
-        _ = D and dbg(f"org={vehicle}")  # noqa
+        logging.info(f"org={vehicle.geocode}")  # noqa
         MANAGER.check_and_force_update_vehicles(0)  # forced sync
         MANAGER.update_all_vehicles_with_cached_state()  # needed >= 2.0.0
         vehicle = MANAGER.vehicles[vehicle_id]
-        _ = D and dbg(f"upd={vehicle}")  # noqa
+        logging.info(f"upd={vehicle.geocode}")  # noqa
         _ = D and dbg(f"prev={prev_line}")
         # newest odometer, keep last_updated_at, because force sync changes the latter
         odometer_str = get_odometer_str(vehicle)
@@ -537,9 +537,9 @@ def handle_one_vehicle(
                 send_monitor_csv_line_to_mqtt(prev_line)
                 send_monitor_csv_line_to_domoticz(prev_line)
             else:
-                writeln(filename, line)
                 send_monitor_csv_line_to_mqtt(line)
                 send_monitor_csv_line_to_domoticz(line)
+            writeln(filename, line)
 
     handle_daily_stats(vehicle, number_of_vehicles)
     vehicle_stats = [
@@ -598,7 +598,9 @@ def run_commands():
             _ = D and dbg(f"output_filename: {output_filename}")
             _ = D and dbg(f"open_mode: {open_mode}")
             try:
-                with open(output_filename, open_mode, encoding="utf-8") as outfile:
+                with open(
+                    output_filename, open_mode, encoding="windows-1252"
+                ) as outfile:
                     process = subprocess.run(
                         command,
                         check=True,

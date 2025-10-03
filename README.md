@@ -1456,39 +1456,23 @@ Dutch screenshot of spreadsheet:
 German screenshot of spreadsheet:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_GoogleSpreadsheet.de.png)
 
-Example output of [summary.charged.csv (larger example)](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.charge.csv)
+Example output of [summary.charged.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.charge.csv)
 ```
-date, odometer, +kWh, end charged SOC%
-2022-09-21, 17383.5, 15.4, 68
-2022-09-23, 17387.1, 6.3, 80
-2022-09-24, 17794.9, 15.4, 7
-2022-09-25, 17810.9, 37.1, 60
-2022-09-30, 17867.2, 12.6, 60
-2022-10-03, 18026.2, 23.8, 60
-2022-10-09, 18115.4, 14.0, 58
-2022-10-13, 18221.0, 13.3, 54
-2022-10-14, 18248.3, 4.2, 60
-2022-10-15, 18252.1, 4.2, 60
-2022-10-17, 18406.7, 21.7, 59
-2022-10-21, 18530.4, 17.5, 58
-2022-10-22, 18564.9, 15.4, 80
-2022-10-23, 18973.0, 51.1, 51
-2022-10-24, 19026.6, 4.2, 57
-2022-10-27, 19083.1, 27.3, 72
-2022-10-31, 19262.4, 28.7, 72
-2022-11-09, 19454.7, 15.4, 62
-2022-11-16, 19555.6, 22.4, 70
-2022-11-26, 20005.7, 13.3, 60
-2022-11-27, 20428.2, 56.0, 30
-2022-11-28, 20443.8, 48.3, 100
-2022-12-04, 20779.8, 42.0, 90
-2022-12-12, 20879.4, 23.1, 74
-2022-12-21, 20994.2, 31.5, 80
-2022-12-23, 21168.1, 42.0, 100
-2022-12-24, 21579.5, 51.1, 70
-2022-12-25, 21706.6, 5.6, 77
-2022-12-31, 21746.9, 15.4, 76
-2023-01-08, 22055.4, 42.7, 80
+date, odometer, +kWh, SOC%, 12V%, address
+2023-01-08, 22132.2, 44.3, 80, 89, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-01-15, 22323.0, 34.8, 83, 95, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-01-21, 22361.9, 18.1, 80, 89, "27; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland"
+2023-01-22, 22780.8, 71.1, 98, 95, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-01-29, 22987.5, 4.4, 30, 87, "6;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-01-30, 22987.5, 21.8, 60, 87, "6;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-02-07, 23063.2, 8, 49, 78, "6;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-02-08, 23068.4, 8, 60, 86, "6;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-02-14, 23157.4, 7.3, 51, 81, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-02-15, 23167.5, 3.6, 50, 85, "7;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-02-16, 23167.5, 21.8, 80, 85, "6;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-02-18, 23575.6, 31.9, 75, 85, "6;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-02-19, 23589.5, 27.6, 60, 84, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
+
 ```
 
 You can use summary.charged.csv also in other tools, e.g. [Excel:](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.charge.xlsx)
@@ -1499,29 +1483,30 @@ Screenshot of Excel example using a larger summary.charged.csv:
 
 Example output of [summary.trip.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.trip.csv)
 ```
-date, odometer, distance, -kWh, +kWh
-2023-01-13 10:15, 22163.4, 1.2, -1.4, 0.0
-2023-01-14 13:58, 22165.5, 2.1, -0.7, 0.0
-2023-01-14 14:27, 22167.5, 2.0, 0.0, 0.0
-2023-01-15 13:41, 22244.9, 77.4, -15.4, 0.0
-2023-01-15 17:30, 22245.5, 0.6, 0.0, 3.5
-2023-01-15 19:17, 22323.0, 77.5, -11.2, 30.1
-2023-01-16 10:49, 22327.1, 4.1, -1.4, 0.0
-2023-01-16 17:50, 22328.6, 1.5, 0.0, 0.0
-2023-01-17 14:54, 22334.4, 5.8, -1.4, 0.0
-2023-01-18 09:50, 22339.5, 5.1, -1.4, 0.0
-2023-01-18 12:19, 22344.6, 5.1, -0.7, 0.0
+date, odometer, distance, -kWh, +kWh, SOC%, 12V%, address
+2023-01-13 10:15, 22163.4, 1.2, -1.5, 0, 58, 85, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-01-14 13:34, 22165.5, 2.1, -0.7, 0, 57, 90, "33; Achterstraat; Drunen; Heusden; Noord-Brabant; Nederland; 5151 BT; Nederland"
+2023-01-14 14:27, 22167.5, 2, 0, 0, 57, 89, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-01-15 13:41, 22244.9, 77.4, -16, 0, 35, 93, "1; Het Dal; Parkhof; Weert; Limburg; Nederland; 6006 KV; Nederland"
+2023-01-15 17:30, 22245.5, 0.6, 0, 3.6, 40, 91, "Keulerstraat; Parkhof; Weert; Limburg; Nederland; 6006 LA; Nederland"
+2023-01-15 19:17, 22323.0, 77.5, -11.6, 31.2, 67, 95, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-01-16 10:49, 22327.1, 4.1, -1.5, 0, 65, 91, "Drunen; Heusden; Noord-Brabant; Nederland; 5151 SM; Nederland"
+2023-01-16 17:50, 22328.6, 1.5, 0, 0, 65, 76, "7;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-01-17 14:54, 22334.4, 5.8, -1.5, 0, 63, 86, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-01-18 09:50, 22339.5, 5.1, -1.5, 0, 59, 89, "Giersbergen; Drunen; Heusden; Noord-Brabant; Nederland; 5151 RG; Nederland"
+2023-01-18 12:19, 22344.6, 5.1, -0.7, 0, 58, 88, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
+
 ```
 
 Example output of [summary.day.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.csv)
 ```
-date, odometer, distance, -kWh, +kWh
-2023-01-13, 22163.4, 1.2, -1.4, 0.0
-2023-01-14, 22167.5, 4.1, -0.7, 0.0
-2023-01-15, 22323.0, 155.5, -26.6, 33.6
-2023-01-16, 22328.6, 5.6, -1.4, 0.0
-2023-01-17, 22334.4, 5.8, -1.4, 0.0
-2023-01-18, 22344.6, 10.2, -2.1, 0.0
+date, odometer, distance, -kWh, +kWh, SOC%, 12V%, address
+2023-01-13, 22163.4, 1.2, -1.5, 0, 58, 89, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-01-14, 22167.5, 4.1, -0.7, 0, 57, 89, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-01-15, 22323.0, 155.5, -27.6, 34.8, 67, 95, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-01-16, 22328.6, 5.6, -1.5, 0, 65, 76, "7;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-01-17, 22334.4, 5.8, -1.5, 0, 63, 86, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
+2023-01-18, 22344.6, 10.2, -2.2, 0, 58, 88, "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
 ```
 
 You can redirect the standard output to a file, e.g. [summary.day.output.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.day.output.csv)

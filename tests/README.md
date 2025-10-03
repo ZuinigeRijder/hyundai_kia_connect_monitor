@@ -26,6 +26,9 @@ Prerequisites for tests:
 - mypy: program that will "type check" your Python code (not mandatory though)
 - Beyond Compare: commandline: C:\Program Files (x86)\Beyond Compare 3\BComp.com
 - sed: tests\unxutils_sed.exe
+- mosquitto: for testing the MQTT output
+  - enable in monitor.cfg "send_to_mqtt = True" and "send_to_domoticz = True"
+  - start in a separate windows command MQTTServer.bat
 
 Test programs:
 - tests\run_tests.bat

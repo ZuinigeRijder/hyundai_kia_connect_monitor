@@ -1,1 +1,1 @@
-date, odometer, distance, -kWh, +kWh
+date, odometer, distance, -kWh, +kWh, SOC%, 12V%, address

@@ -1,1 +1,1 @@
-date, odometer, +kWh, end charged SOC%
+date, odometer, +kWh, SOC%, 12V%, address

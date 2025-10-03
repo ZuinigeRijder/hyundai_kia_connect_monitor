@@ -1,5 +1,5 @@
 # == monitor_utils.py Author: Zuinige Rijder =========
-""" monitor utils """
+"""monitor utils"""
 # pylint:disable=logging-fstring-interpolation
 
 import configparser
@@ -65,7 +65,7 @@ def set_vin(vin: str) -> None:
 def determine_vin(lastrun_filename: Path) -> None:
     """determine_vin"""
     # get vin information from monitor.lastrun
-    with lastrun_filename.open("r", encoding="utf-8") as lastrun_file:
+    with lastrun_filename.open("r", encoding="windows-1252") as lastrun_file:
         lastrun_lines = lastrun_file.readlines()
     vin = get_splitted_list_item(lastrun_lines, 1)[1]
     set_vin(vin)
@@ -338,7 +338,7 @@ def read_reverse_order(file_name: str) -> Generator[str, None, None]:
             # If the read byte is newline character then one line is read
             if new_byte == b"\n":
                 # Fetch the line from buffer and yield it
-                yield buffer.decode()[::-1]
+                yield buffer.decode(encoding="windows-1252")[::-1]
                 # Reinitialize the byte array to save next line
                 buffer = bytearray()
             else:
@@ -463,7 +463,7 @@ def get_translation(translations: dict[str, str], text: str) -> str:
 def execute_request(url: str, data: str, headers: dict) -> str:
     """execute request and handle errors"""
     if data != "":
-        post_data = data.encode("utf-8")
+        post_data = data.encode("windows-1252")
         request = Request(url, data=post_data, headers=headers)
     else:
         request = Request(url)
@@ -471,7 +471,7 @@ def execute_request(url: str, data: str, headers: dict) -> str:
     try:
         with urlopen(request, timeout=30) as response:
             body = response.read()
-            content = body.decode("utf-8")
+            content = body.decode("windows-1252")
             _ = D and dbg(content)
             return content
     except HTTPError as error:

@@ -331,9 +331,9 @@ def print_output_and_update_queue(output: str) -> None:
             text = string.rjust(COLUMN_WIDTHS[i])
         total_line += text
         total_line += ", "
-    print(total_line)
-
     LAST_OUTPUT_QUEUE.append(total_line)
+    total_line = total_line.rstrip(" ,")  # get rid of last comma's
+    print(total_line)
 
 
 def sheet_append_first_rows(row_a: str, row_b: str) -> None:
@@ -461,7 +461,9 @@ if not MONITOR_CSV_FILENAME.is_file():
     logging.error(f"ERROR: file does not exist: {MONITOR_CSV_FILENAME}")
     sys.exit(-1)
 
-MONITOR_CSV_FILE: TextIOWrapper = MONITOR_CSV_FILENAME.open("r", encoding="utf-8")
+MONITOR_CSV_FILE: TextIOWrapper = MONITOR_CSV_FILENAME.open(
+    "r", encoding="windows-1252"
+)
 MONITOR_CSV_FILE_EOL: bool = False
 MONITOR_CSV_READ_AHEAD_LINE: str = ""
 MONITOR_CSV_READ_DONE_ONCE: bool = False
@@ -658,11 +660,11 @@ def print_summary(
         if len(splitted) > 2:
             date = splitted[1]
             write_day_csv(
-                f"{date}, {odo:.1f}, {float_to_string_no_trailing_zero(delta_odo)}, {float_to_string_no_trailing_zero(discharged_kwh)}, {float_to_string_no_trailing_zero(charged_kwh)}"  # noqa
+                f"{date}, {odo:.1f}, {float_to_string_no_trailing_zero(delta_odo)}, {float_to_string_no_trailing_zero(discharged_kwh)}, {float_to_string_no_trailing_zero(charged_kwh)}, {float_to_string_no_trailing_zero(t_soc_cur)}, {t_volt12_cur},{location_str}"  # noqa
             )
             if charged_kwh > 3.0:
                 write_charge_csv(
-                    f"{date}, {odo:.1f}, {float_to_string_no_trailing_zero(charged_kwh)}, {float_to_string_no_trailing_zero(t_soc_charged)}"  # noqa
+                    f"{date}, {odo:.1f}, {float_to_string_no_trailing_zero(charged_kwh)}, {float_to_string_no_trailing_zero(t_soc_charged)}, {t_volt12_cur},{location_str}"  # noqa
                 )
 
     if TRIP and prefix.startswith("TRIP "):
@@ -671,11 +673,11 @@ def print_summary(
             date = splitted[1]
             time_str = splitted[2]
             write_trip_csv(
-                f"{date} {time_str}, {odo:.1f}, {float_to_string_no_trailing_zero(delta_odo)}, {float_to_string_no_trailing_zero(discharged_kwh)}, {float_to_string_no_trailing_zero(charged_kwh)}"  # noqa
+                f"{date} {time_str}, {odo:.1f}, {float_to_string_no_trailing_zero(delta_odo)}, {float_to_string_no_trailing_zero(discharged_kwh)}, {float_to_string_no_trailing_zero(charged_kwh)}, {float_to_string_no_trailing_zero(t_soc_cur)}, {t_volt12_cur},{location_str}"  # noqa
             )
 
     # get information from monitor.lastrun
-    with LASTRUN_FILENAME.open("r", encoding="utf-8") as lastrun_file:
+    with LASTRUN_FILENAME.open("r", encoding="windows-1252") as lastrun_file:
         lastrun_lines = lastrun_file.readlines()
     last_upd_dt = get_splitted_list_item(lastrun_lines, 2)[1]
     location_last_upd_dt = get_splitted_list_item(lastrun_lines, 3)[1]
@@ -1084,16 +1086,16 @@ def send_to_mqtt_domoticz() -> None:
 
 
 # always rewrite charge file, because input might be changed
-CHARGE_CSV_FILE = CHARGE_CSV_FILENAME.open("w", encoding="utf-8")
-write_charge_csv("date, odometer, +kWh, end charged SOC%")
+CHARGE_CSV_FILE = CHARGE_CSV_FILENAME.open("w", encoding="windows-1252")
+write_charge_csv("date, odometer, +kWh, SOC%, 12V%, address")
 
 
 # always rewrite day and tripfile, because input might be changed
-DAY_CSV_FILE = DAY_CSV_FILENAME.open("w", encoding="utf-8")
-write_day_csv("date, odometer, distance, -kWh, +kWh")
+DAY_CSV_FILE = DAY_CSV_FILENAME.open("w", encoding="windows-1252")
+write_day_csv("date, odometer, distance, -kWh, +kWh, SOC%, 12V%, address")
 
-TRIP_CSV_FILE = TRIP_CSV_FILENAME.open("w", encoding="utf-8")
-write_trip_csv("date, odometer, distance, -kWh, +kWh")
+TRIP_CSV_FILE = TRIP_CSV_FILENAME.open("w", encoding="windows-1252")
+write_trip_csv("date, odometer, distance, -kWh, +kWh, SOC%, 12V%, address")
 
 summary()  # do the work
 MONITOR_CSV_FILE.close()
