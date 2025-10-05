@@ -65,7 +65,7 @@ def set_vin(vin: str) -> None:
 def determine_vin(lastrun_filename: Path) -> None:
     """determine_vin"""
     # get vin information from monitor.lastrun
-    with lastrun_filename.open("r", encoding="windows-1252") as lastrun_file:
+    with lastrun_filename.open("r", encoding="utf-8") as lastrun_file:
         lastrun_lines = lastrun_file.readlines()
     vin = get_splitted_list_item(lastrun_lines, 1)[1]
     set_vin(vin)
@@ -317,7 +317,9 @@ def get_last_date(filename: str) -> str:
     return last_date
 
 
-def read_reverse_order(file_name: str) -> Generator[str, None, None]:
+def read_reverse_order(
+    file_name: str, encoding: str = "utf-8"
+) -> Generator[str, None, None]:
     """read in reverse order"""
     # Open file for reading in binary mode
     with open(file_name, "rb") as read_obj:
@@ -338,7 +340,7 @@ def read_reverse_order(file_name: str) -> Generator[str, None, None]:
             # If the read byte is newline character then one line is read
             if new_byte == b"\n":
                 # Fetch the line from buffer and yield it
-                yield buffer.decode(encoding="windows-1252")[::-1]
+                yield buffer.decode(encoding=encoding)[::-1]
                 # Reinitialize the byte array to save next line
                 buffer = bytearray()
             else:
@@ -351,13 +353,13 @@ def read_reverse_order(file_name: str) -> Generator[str, None, None]:
 
 
 def read_reverse_order_init(
-    path: Path,
+    path: Path, encoding: str = "utf-8"
 ) -> tuple[bool, str, Generator[str, None, None]]:
     """ "read_reverse_order_init"""
     eof = False
     last_read_line = ""
     if path.is_file():
-        reverse_order_iterator = read_reverse_order(path.name)
+        reverse_order_iterator = read_reverse_order(path.name, encoding)
         return eof, last_read_line, reverse_order_iterator
     else:
         eof = True
@@ -463,7 +465,7 @@ def get_translation(translations: dict[str, str], text: str) -> str:
 def execute_request(url: str, data: str, headers: dict) -> str:
     """execute request and handle errors"""
     if data != "":
-        post_data = data.encode("windows-1252")
+        post_data = data.encode("utf-8")
         request = Request(url, data=post_data, headers=headers)
     else:
         request = Request(url)
@@ -471,7 +473,7 @@ def execute_request(url: str, data: str, headers: dict) -> str:
     try:
         with urlopen(request, timeout=30) as response:
             body = response.read()
-            content = body.decode("windows-1252")
+            content = body.decode("utf-8")
             _ = D and dbg(content)
             return content
     except HTTPError as error:

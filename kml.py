@@ -157,7 +157,7 @@ def write_kml(
 
 def convert() -> None:
     """convert csv file to kml"""
-    with OUTPUT_KML_FILE.open("w", encoding="windows-1252") as outputfile:
+    with OUTPUT_KML_FILE.open("w", encoding="utf-8") as outputfile:
         count = 0
         writeline(outputfile, '<?xml version="1.0" encoding="UTF-8"?>')
         writeline(outputfile, '<kml xmlns="http://www.opengis.net/kml/2.2">')
@@ -169,7 +169,7 @@ def convert() -> None:
             + "</name>",
         )
 
-        with INPUT_CSV_FILE.open("r", encoding="windows-1252") as inputfile:
+        with INPUT_CSV_FILE.open("r", encoding="utf-8") as inputfile:
             prev_location = ""
             prev_engine_on = ""
             prev_charging = ""

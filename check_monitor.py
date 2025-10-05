@@ -30,9 +30,7 @@ EV_RANGE = 10  # EV range (optional field)
 
 MONITOR_CSV_FILENAME = Path("monitor.csv")
 
-MONITOR_CSV_FILE: TextIOWrapper = MONITOR_CSV_FILENAME.open(
-    "r", encoding="windows-1252"
-)
+MONITOR_CSV_FILE: TextIOWrapper = MONITOR_CSV_FILENAME.open("r", encoding="utf-8")
 MONITOR_CSV_FILE_EOL: bool = False
 MONITOR_CSV_READ_AHEAD_LINE: str = ""
 MONITOR_CSV_READ_DONE_ONCE: bool = False

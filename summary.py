@@ -85,10 +85,10 @@ CURRENT_DAY_STR = datetime.now().strftime("%Y-%m-%d")
 MONITOR_CSV_FILENAME = Path("monitor.csv")
 LASTRUN_FILENAME = Path("monitor.lastrun")
 OUTPUT_SPREADSHEET_NAME = "hyundai-kia-connect-monitor"
-CHARGE_CSV_FILENAME = Path("summary.charge.csv")
-TRIP_CSV_FILENAME = Path("summary.trip.csv")
-DAY_CSV_FILENAME = Path("summary.day.csv")
-CHARGE_CSV_FILE: TextIOWrapper
+SUMMARY_CHARGE_CSV_FILENAME = Path("summary.charge.csv")
+SUMMARY_TRIP_CSV_FILENAME = Path("summary.trip.csv")
+SUMMARY_DAY_CSV_FILENAME = Path("summary.day.csv")
+SUMMARY_CHARGE_CSV_FILE: TextIOWrapper
 
 LENCHECK = 1
 VIN = get_vin_arg()
@@ -96,9 +96,9 @@ if VIN != "":
     MONITOR_CSV_FILENAME = Path(f"monitor.{VIN}.csv")
     LASTRUN_FILENAME = Path(f"monitor.{VIN}.lastrun")
     OUTPUT_SPREADSHEET_NAME = f"monitor.{VIN}"
-    CHARGE_CSV_FILENAME = Path(f"summary.charge.{VIN}.csv")
-    TRIP_CSV_FILENAME = Path(f"summary.trip.{VIN}.csv")
-    DAY_CSV_FILENAME = Path(f"summary.day.{VIN}.csv")
+    SUMMARY_CHARGE_CSV_FILENAME = Path(f"summary.charge.{VIN}.csv")
+    SUMMARY_TRIP_CSV_FILENAME = Path(f"summary.trip.{VIN}.csv")
+    SUMMARY_DAY_CSV_FILENAME = Path(f"summary.day.{VIN}.csv")
     LENCHECK = 2
 _ = D and dbg(f"INPUT_CSV_FILE: {MONITOR_CSV_FILENAME.name}")
 
@@ -461,9 +461,7 @@ if not MONITOR_CSV_FILENAME.is_file():
     logging.error(f"ERROR: file does not exist: {MONITOR_CSV_FILENAME}")
     sys.exit(-1)
 
-MONITOR_CSV_FILE: TextIOWrapper = MONITOR_CSV_FILENAME.open(
-    "r", encoding="windows-1252"
-)
+MONITOR_CSV_FILE: TextIOWrapper = MONITOR_CSV_FILENAME.open("r", encoding="utf-8")
 MONITOR_CSV_FILE_EOL: bool = False
 MONITOR_CSV_READ_AHEAD_LINE: str = ""
 MONITOR_CSV_READ_DONE_ONCE: bool = False
@@ -551,23 +549,23 @@ def get_corrected_next_monitor_csv_line() -> str:
 
 def write_charge_csv(line: str) -> None:
     """write charge csv"""
-    _ = D and dbg(f"{CHARGE_CSV_FILENAME}:[{line}]")
-    CHARGE_CSV_FILE.write(line)
-    CHARGE_CSV_FILE.write("\n")
+    _ = D and dbg(f"{SUMMARY_CHARGE_CSV_FILENAME}:[{line}]")
+    SUMMARY_CHARGE_CSV_FILE.write(line)
+    SUMMARY_CHARGE_CSV_FILE.write("\n")
 
 
 def write_day_csv(line: str) -> None:
     """write day csv"""
-    _ = D and dbg(f"{DAY_CSV_FILENAME}:[{line}]")
-    DAY_CSV_FILE.write(line)
-    DAY_CSV_FILE.write("\n")
+    _ = D and dbg(f"{SUMMARY_DAY_CSV_FILENAME}:[{line}]")
+    SUMMARY_DAY_CSV_FILE.write(line)
+    SUMMARY_DAY_CSV_FILE.write("\n")
 
 
 def write_trip_csv(line: str) -> None:
     """write trip csv"""
-    _ = D and dbg(f"{TRIP_CSV_FILENAME}:[{line}]")
-    TRIP_CSV_FILE.write(line)
-    TRIP_CSV_FILE.write("\n")
+    _ = D and dbg(f"{SUMMARY_TRIP_CSV_FILENAME}:[{line}]")
+    SUMMARY_TRIP_CSV_FILE.write(line)
+    SUMMARY_TRIP_CSV_FILE.write("\n")
 
 
 def show_zero_values_float(value: float) -> str:
@@ -677,7 +675,7 @@ def print_summary(
             )
 
     # get information from monitor.lastrun
-    with LASTRUN_FILENAME.open("r", encoding="windows-1252") as lastrun_file:
+    with LASTRUN_FILENAME.open("r", encoding="utf-8") as lastrun_file:
         lastrun_lines = lastrun_file.readlines()
     last_upd_dt = get_splitted_list_item(lastrun_lines, 2)[1]
     location_last_upd_dt = get_splitted_list_item(lastrun_lines, 3)[1]
@@ -1086,22 +1084,22 @@ def send_to_mqtt_domoticz() -> None:
 
 
 # always rewrite charge file, because input might be changed
-CHARGE_CSV_FILE = CHARGE_CSV_FILENAME.open("w", encoding="windows-1252")
+SUMMARY_CHARGE_CSV_FILE = SUMMARY_CHARGE_CSV_FILENAME.open("w", encoding="windows-1252")
 write_charge_csv("date, odometer, +kWh, SOC%, 12V%, address")
 
 
 # always rewrite day and tripfile, because input might be changed
-DAY_CSV_FILE = DAY_CSV_FILENAME.open("w", encoding="windows-1252")
+SUMMARY_DAY_CSV_FILE = SUMMARY_DAY_CSV_FILENAME.open("w", encoding="windows-1252")
 write_day_csv("date, odometer, distance, -kWh, +kWh, SOC%, 12V%, address")
 
-TRIP_CSV_FILE = TRIP_CSV_FILENAME.open("w", encoding="windows-1252")
+SUMMARY_TRIP_CSV_FILE = SUMMARY_TRIP_CSV_FILENAME.open("w", encoding="windows-1252")
 write_trip_csv("date, odometer, distance, -kWh, +kWh, SOC%, 12V%, address")
 
 summary()  # do the work
 MONITOR_CSV_FILE.close()
-CHARGE_CSV_FILE.close()
-DAY_CSV_FILE.close()
-TRIP_CSV_FILE.close()
+SUMMARY_CHARGE_CSV_FILE.close()
+SUMMARY_DAY_CSV_FILE.close()
+SUMMARY_TRIP_CSV_FILE.close()
 
 RETRIES = -1
 if SHEETUPDATE:

@@ -26,8 +26,8 @@ if VIN != "":
 
 def shrink():
     """shrink csv file"""
-    with INPUT_CSV_FILE.open("r", encoding="windows-1252") as inputfile:
-        with OUTPUT_CSV_FILE.open("w", encoding="windows-1252") as outputfile:
+    with INPUT_CSV_FILE.open("r", encoding="utf-8") as inputfile:
+        with OUTPUT_CSV_FILE.open("w", encoding="utf-8") as outputfile:
             prevline = ""
             previndex = -1
             for line in inputfile:
