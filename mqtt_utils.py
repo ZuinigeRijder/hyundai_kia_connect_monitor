@@ -1,5 +1,5 @@
 # == mqtt_utils.py Author: Zuinige Rijder =========
-""" mqtt utils """
+"""mqtt utils"""
 # pylint:disable=logging-fstring-interpolation, consider-using-enumerate
 
 import configparser
@@ -94,7 +94,7 @@ def connect_mqtt() -> mqtt_client.Client:
         logging.info(f"Reconnect failed after {reconnect_count} attempts. Exiting...")
 
     mqtt_client_id = f"{MQTT_MAIN_TOPIC}-{get_vin()}"
-    client = mqtt_client.Client(mqtt_client_id)
+    client = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION1, mqtt_client_id)
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
     if MQTT_BROKER_USERNAME and MQTT_BROKER_PASSWORD:

@@ -24,8 +24,10 @@ copy /Y monitor.cfg monitor.cfg.backup >NUL
 rem backup original summary.cfg
 copy /Y summary.cfg summary.cfg.backup >NUL
 
-%SED% -e "s?language = .*?language = en?" monitor.cfg > monitor.cfg.en.tmp
+%SED% -e "s?language = .*?language = en?" monitor.cfg | %SED% -e "s?send_to_mqtt = False?send_to_mqtt = True?" | %SED% -e "s?send_to_domoticz = False?send_to_domoticz = True?" > monitor.cfg.en.tmp
 copy /Y monitor.cfg.en.tmp monitor.cfg >NUL
+
+start tests\MQTTServer.bat
 
 call :CLEAN_INPUT
 
@@ -67,6 +69,8 @@ copy /Y monitor.cfg.backup monitor.cfg >NUL
 
 rem restore original summary.cfg
 copy /Y summary.cfg.backup summary.cfg >NUL
+
+taskkill /F /FI "IMAGENAME eq mosquitto.exe" /T
 
 goto :EOF
 
