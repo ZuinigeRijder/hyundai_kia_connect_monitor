@@ -1,4 +1,4 @@
-hyundai_kia_connect_api>=3.43.4
+hyundai_kia_connect_api>=3.48.1
 beautifulsoup4>=4.10.0
 cloudscraper>=1.2.60
 geopy>=2.2.0
