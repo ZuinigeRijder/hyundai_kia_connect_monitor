@@ -1084,15 +1084,15 @@ def send_to_mqtt_domoticz() -> None:
 
 
 # always rewrite charge file, because input might be changed
-SUMMARY_CHARGE_CSV_FILE = SUMMARY_CHARGE_CSV_FILENAME.open("w", encoding="windows-1252")
+SUMMARY_CHARGE_CSV_FILE = SUMMARY_CHARGE_CSV_FILENAME.open("w", encoding="utf-8")
 write_charge_csv("date, odometer, +kWh, SOC%, 12V%, address")
 
 
 # always rewrite day and tripfile, because input might be changed
-SUMMARY_DAY_CSV_FILE = SUMMARY_DAY_CSV_FILENAME.open("w", encoding="windows-1252")
+SUMMARY_DAY_CSV_FILE = SUMMARY_DAY_CSV_FILENAME.open("w", encoding="utf-8")
 write_day_csv("date, odometer, distance, -kWh, +kWh, SOC%, 12V%, address")
 
-SUMMARY_TRIP_CSV_FILE = SUMMARY_TRIP_CSV_FILENAME.open("w", encoding="windows-1252")
+SUMMARY_TRIP_CSV_FILE = SUMMARY_TRIP_CSV_FILENAME.open("w", encoding="utf-8")
 write_trip_csv("date, odometer, distance, -kWh, +kWh, SOC%, 12V%, address")
 
 summary()  # do the work

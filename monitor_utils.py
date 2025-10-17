@@ -317,9 +317,7 @@ def get_last_date(filename: str) -> str:
     return last_date
 
 
-def read_reverse_order(
-    file_name: str, encoding: str = "utf-8"
-) -> Generator[str, None, None]:
+def read_reverse_order(file_name: str) -> Generator[str, None, None]:
     """read in reverse order"""
     # Open file for reading in binary mode
     with open(file_name, "rb") as read_obj:
@@ -340,7 +338,7 @@ def read_reverse_order(
             # If the read byte is newline character then one line is read
             if new_byte == b"\n":
                 # Fetch the line from buffer and yield it
-                yield buffer.decode(encoding=encoding)[::-1]
+                yield buffer[::-1].decode()
                 # Reinitialize the byte array to save next line
                 buffer = bytearray()
             else:
@@ -349,17 +347,15 @@ def read_reverse_order(
         # If there is still data in buffer, then it is first line.
         if len(buffer) > 0:
             # Yield the first line too
-            yield buffer.decode()[::-1]
+            yield buffer[::-1].decode()
 
 
-def read_reverse_order_init(
-    path: Path, encoding: str = "utf-8"
-) -> tuple[bool, str, Generator[str, None, None]]:
+def read_reverse_order_init(path: Path) -> tuple[bool, str, Generator[str, None, None]]:
     """ "read_reverse_order_init"""
     eof = False
     last_read_line = ""
     if path.is_file():
-        reverse_order_iterator = read_reverse_order(path.name, encoding)
+        reverse_order_iterator = read_reverse_order(path.name)
         return eof, last_read_line, reverse_order_iterator
     else:
         eof = True
