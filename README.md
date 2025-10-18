@@ -931,7 +931,7 @@ Explanation of the configuration items:
 - region: 1: REGION_EUROPE, 2: REGION_CANADA, 3: REGION_USA
 - brand: 1: BRAND_KIA, 2: BRAND_HYUNDAI
 - username: your bluelink account email address
-- password: password of your bluelink account
+- password: password of your bluelink account OR the token; the token is needed for Europe, retrieve token once per 180 days [using this README](https://gist.github.com/RustyDust/e2a7be978affd85fb5ef5a345f31f67a) or see [this issue](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/issues/81#issuecomment-3409735930)
 - pin: pincode of your bluelink account, required for CANADA, and potentially USA, otherwise pass a blank string
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
 - use_geocode_email: (default: True) use email to avoid abuse of address lookup
