@@ -8,6 +8,7 @@
   - [MQTT-Explorer screenshot after running summary.py](#mqtt-explorer-screenshot-after-running-summarypy)
   - [MQTT-Explorer screenshot after running dailystats.py:](#mqtt-explorer-screenshot-after-running-dailystatspy)
 - [monitor.py](#monitorpy)
+- [Explanation of the configuration items in monitor.cfg](#explanation-of-the-configuration-items-in-monitorcfg)
 - [summary.py](#summarypy)
 - [summary.py sheetupdate](#summarypy-sheetupdate)
 - [dailystats.py](#dailystatspy)
@@ -927,11 +928,12 @@ dailystats_trip_LAST_DAY_max_speed = 0
 dailystats_trip_LAST_DAY_idle_time = 0
 ```
 
-Explanation of the configuration items:
+---
+# Explanation of the configuration items in monitor.cfg
 - region: 1: REGION_EUROPE, 2: REGION_CANADA, 3: REGION_USA
 - brand: 1: BRAND_KIA, 2: BRAND_HYUNDAI
 - username: your bluelink account email address
-- password: password of your bluelink account OR the token; the token is needed for Europe, retrieve token once per 180 days [using this README](https://gist.github.com/RustyDust/e2a7be978affd85fb5ef5a345f31f67a) or see [this issue](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/issues/81#issuecomment-3409735930)
+- password: password of your bluelink account OR the token; the token is needed for Europe, retrieve token once per 180 days [using this README](https://gist.github.com/RustyDust/e2a7be978affd85fb5ef5a345f31f67a) or see [this issue](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/issues/81#issuecomment-3409735930) or for [Hyundai with a terminal without GUI](https://gist.github.com/stefan-home/808d8774a461f22f2ae1d9519f067b71)
 - pin: pincode of your bluelink account, required for CANADA, and potentially USA, otherwise pass a blank string
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
 - use_geocode_email: (default: True) use email to avoid abuse of address lookup
