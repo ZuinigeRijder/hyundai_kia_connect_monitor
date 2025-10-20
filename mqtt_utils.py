@@ -4,14 +4,19 @@
 
 import configparser
 import logging
-import logging.config
 import traceback
 import time
 
-from paho.mqtt import client as mqtt_client
+try:  # make paho.mqtt optional
+    from paho.mqtt import client as mqtt_client
+
+    MQTT_AVAILABLE = True
+except ImportError:
+    MQTT_AVAILABLE = False
 
 from monitor_utils import (
     dbg,
+    die,  #
     get,
     d,
     get_bool,
@@ -59,8 +64,14 @@ if SEND_TO_MQTT:
 
 
 # == connect MQTT ========================================================
-def connect_mqtt() -> mqtt_client.Client:
+def connect_mqtt():
     """connect_mqtt"""
+
+    if not MQTT_AVAILABLE:
+        die(
+            "MQTT support not available, please install paho_mqtt, e.g."
+            'pip install "paho_mqtt>=2.0"'
+        )
 
     mqtt_first_reconnect_delay = 1
     mqtt_reconnect_rate = 2

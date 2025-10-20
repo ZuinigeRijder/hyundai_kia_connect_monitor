@@ -43,11 +43,12 @@ import logging.config
 from pathlib import Path
 from datetime import datetime, timedelta
 import typing
-from dateutil.relativedelta import relativedelta
 from hyundai_kia_connect_api import VehicleManager, Vehicle, exceptions
 from monitor_utils import (
+    add_months,
     arg_has,
     dbg,
+    die,
     float_to_string_no_trailing_zero,
     get,
     get_bool,
@@ -92,8 +93,7 @@ for kindex in range(1, len(sys.argv)):
         KEYWORD_ERROR = True
 
 if KEYWORD_ERROR or arg_has("help"):
-    print("Usage: python monitor.py")
-    sys.exit(-1)
+    die("Usage: python monitor.py")
 
 TEST = arg_has("test")
 # == read monitor in monitor.cfg ===========================
@@ -112,16 +112,14 @@ GEOCODE_PROVIDER = to_int(
     get(monitor_settings, "geocode_provider", "1")
 )  # 1=OPENSTREETMAP 2=GOOGLE
 if GEOCODE_PROVIDER < 1 or GEOCODE_PROVIDER > 2:
-    logging.error("Invalid GEOCODE_PROVIDER in monitor.cfg, expected 1 or 2")
-    sys.exit(-1)
+    die("Invalid GEOCODE_PROVIDER in monitor.cfg, expected 1 or 2")
 
 GOOGLE_API_KEY = get(monitor_settings, "google_api_key", "")
 if len(GOOGLE_API_KEY) == 0:
     GOOGLE_API_KEY = None  # default no API key needed for OPENSTREETMAP
 
 if GEOCODE_PROVIDER == 2 and GOOGLE_API_KEY is None:
-    logging.error("Missing GOOGLE_API_KEY in monitor.cfg")
-    sys.exit(-1)
+    die("Missing GOOGLE_API_KEY in monitor.cfg")
 
 LANGUAGE = monitor_settings["language"]
 ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
@@ -385,14 +383,14 @@ def handle_trip_info(
             # only last 4 months can be retrieved
             # only fill when header is written
             # because for each day with trips an API call will be made
-            from_month = now - relativedelta(months=3)
+            from_month = add_months(now, -3)
         else:
             if now.day == 1:  # first day of month also retrieve previous month
-                from_month = now - relativedelta(months=1)
+                from_month = add_months(now, -1)
 
         while from_month <= now:
             yyyymm = from_month.strftime("%Y%m")
-            from_month = from_month + relativedelta(months=1)
+            from_month = add_months(from_month, 1)
             _ = D and dbg(f"update_month_trip_info: {yyyymm}")
             manager.update_month_trip_info(vehicle.id, yyyymm)
             month_trip_info = vehicle.month_trip_info
@@ -738,8 +736,7 @@ def monitor():
                 sleep_seconds(total_seconds)
 
         if error_count > 96:  # more than 24 hours subsequnt errors
-            logging.error("Too many subsequent errors occurred, exiting monitor.py")
-            sys.exit(-1)
+            die("Too many subsequent errors occurred, exiting monitor.py")
 
     stop_mqtt()
     sys.exit(0)

@@ -1,12 +1,10 @@
 # == debug.py Author: Zuinige Rijder =========================================
 """Simple Python3 script to debug hyundai_kia_connect_api values"""
-import sys
 import configparser
 from datetime import datetime
 import logging
-import logging.config
 from hyundai_kia_connect_api import VehicleManager, Vehicle
-from monitor_utils import get_filepath, get, get_bool, to_int
+from monitor_utils import die, get_filepath, get, get_bool, to_int
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -26,16 +24,14 @@ GEOCODE_PROVIDER = to_int(
     get(monitor_settings, "geocode_provider", "1")
 )  # 1=OPENSTREETMAP 2=GOOGLE
 if GEOCODE_PROVIDER < 1 or GEOCODE_PROVIDER > 2:
-    logging.error("Invalid GEOCODE_PROVIDER in monitor.cfg, expected 1 or 2")
-    sys.exit(-1)
+    die("Invalid GEOCODE_PROVIDER in monitor.cfg, expected 1 or 2")
 
 GOOGLE_API_KEY = get(monitor_settings, "google_api_key", "")
 if len(GOOGLE_API_KEY) == 0:
     GOOGLE_API_KEY = None  # default no API key needed for OPENSTREETMAP
 
 if GEOCODE_PROVIDER == 2 and GOOGLE_API_KEY is None:
-    logging.error("Missing GOOGLE_API_KEY in monitor.cfg")
-    sys.exit(-1)
+    die("Missing GOOGLE_API_KEY in monitor.cfg")
 
 LANGUAGE = monitor_settings["language"]
 

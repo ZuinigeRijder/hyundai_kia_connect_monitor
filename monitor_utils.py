@@ -15,6 +15,7 @@ import time
 from typing import Generator
 
 from datetime import datetime, timezone
+from calendar import monthrange
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen, Request
 
@@ -44,6 +45,12 @@ def set_dbg() -> None:
     global D  # pylint:disable=global-statement
     D = True
     logging.getLogger().setLevel(logging.DEBUG)
+
+
+def die(msg: str):
+    """die with an error string"""
+    logging.error(msg)
+    sys.exit(-1)
 
 
 def get_splitted_list_item(the_list: list[str], index: int) -> list[str]:
@@ -306,6 +313,18 @@ def get_safe_datetime(date: datetime, tzinfo: timezone) -> datetime:
     if date is None:
         return datetime(2000, 1, 1, tzinfo=tzinfo)
     return date
+
+
+def add_months(dt: datetime, months: int) -> datetime:
+    """add months to datetime"""
+    month = dt.month - 1 + months
+    year = dt.year + month // 12
+    month = month % 12 + 1
+
+    # Clamp the day to the last valid day of the target month
+    day = min(dt.day, monthrange(year, month)[1])
+
+    return dt.replace(year=year, month=month, day=day)
 
 
 def get_last_date(filename: str) -> str:

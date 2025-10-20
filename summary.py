@@ -16,12 +16,17 @@ from datetime import datetime
 from pathlib import Path
 from collections import deque
 import typing
-import gspread
-from dateutil import parser
+
+try:  # make gspread optional
+    import gspread
+except ImportError:
+    gspread = None
+
 from domoticz_utils import SEND_TO_DOMOTICZ, send_summary_line_to_domoticz
 from monitor_utils import (
     dbg,
     determine_vin,
+    die,
     get_filepath,
     arg_has,
     get,
@@ -75,10 +80,9 @@ for kindex in range(1, len(sys.argv)):
             KEYWORD_ERROR = True
 
 if KEYWORD_ERROR or arg_has("help"):
-    print(
+    die(
         "Usage: python summary.py [trip] [day] [week] [month] [year] [sheetupdate] [vin=VIN]"  # noqa
     )
-    exit()
 
 
 CURRENT_DAY_STR = datetime.now().strftime("%Y-%m-%d")
@@ -458,8 +462,7 @@ def get_address(split: list[str]) -> str:
 
 
 if not MONITOR_CSV_FILENAME.is_file():
-    logging.error(f"ERROR: file does not exist: {MONITOR_CSV_FILENAME}")
-    sys.exit(-1)
+    die(f"ERROR: file does not exist: {MONITOR_CSV_FILENAME}")
 
 MONITOR_CSV_FILE: TextIOWrapper = MONITOR_CSV_FILENAME.open("r", encoding="utf-8")
 MONITOR_CSV_FILE_EOL: bool = False
@@ -860,8 +863,8 @@ def keep_track_of_totals(
         )
 
     # keep track of elapsed minutes
-    current_day = parser.parse(split[DT])
-    prev_day = parser.parse(prev_split[DT])
+    current_day = datetime.strptime(split[DT], "%Y-%m-%d %H:%M:%S%z")
+    prev_day = datetime.strptime(prev_split[DT], "%Y-%m-%d %H:%M:%S%z")
     elapsed_minutes = round((current_day - prev_day).total_seconds() / 60)
     t_elapsed_minutes += elapsed_minutes
 
@@ -964,7 +967,7 @@ def handle_line(
     else:
         HIGHEST_ODO = odo
 
-    current_day = parser.parse(split[DT])
+    current_day = datetime.strptime(split[DT], "%Y-%m-%d %H:%M:%S%z")
     current_day_values = init(current_day, odo, to_int(split[SOC]), to_int(split[V12]))
     t_day = totals.day
     if not t_day:
@@ -1042,7 +1045,8 @@ def summary():
         _ = D and dbg(str(MONITOR_CSV_LINECOUNT) + ": LINE=[" + line + "]")
         split = MONITOR_CSV_CURR_SPLIT
         if totals.day and not same_day(
-            parser.parse(split[DT]), parser.parse(prev_split[DT])
+            datetime.strptime(split[DT], "%Y-%m-%d %H:%M:%S%z"),
+            datetime.strptime(prev_split[DT], "%Y-%m-%d %H:%M:%S%z"),
         ):
             # handle end of day previous day
             eod_line = line[0:11] + "00:00:00" + prev_line[19:]
@@ -1103,6 +1107,12 @@ SUMMARY_TRIP_CSV_FILE.close()
 
 RETRIES = -1
 if SHEETUPDATE:
+    if gspread is None:
+        die(
+            "Google spreadsheet support not available, please install gspread, e.g."
+            'pip install "gspread>=5.6.2"'
+        )
+
     RETRIES = 2
     while RETRIES > 0:
         try:

@@ -10,7 +10,7 @@ echo mypy monitor_utils.py
 mypy monitor_utils.py | egrep -v "Success: no issues found in 1 source file"
 
 echo mypy mqtt_utils.py
-mypy mqtt_utils.py | egrep -v "^Found|paho.mqtt|: note:"
+mypy mqtt_utils.py | egrep -v "^Found|paho.mqtt|: note:|Success: no issues found in 1 source file"
 
 echo mypy domoticz_utils.py
 mypy domoticz_utils.py | egrep -v "Success: no issues found in 1 source file"

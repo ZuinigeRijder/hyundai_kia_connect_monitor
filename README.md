@@ -1,14 +1,13 @@
 - [Introduction hyundai\_kia\_connect\_monitor](#introduction-hyundai_kia_connect_monitor)
-- [How to install python, packages and hyundai\_connect\_monitor](#how-to-install-python-packages-and-hyundai_connect_monitor)
-- [configuration of gspread for "python summary.py sheetupdate" and "python dailystats.py sheetupdate"](#configuration-of-gspread-for-python-summarypy-sheetupdate-and-python-dailystatspy-sheetupdate)
-- [Translations](#translations)
-- [Domoticz](#domoticz)
+- [How to install Python, packages and hyundai\_connect\_monitor](#how-to-install-python-packages-and-hyundai_connect_monitor)
+- [monitor.py](#monitorpy)
+- [Explanation of the configuration items in monitor.cfg](#explanation-of-the-configuration-items-in-monitorcfg)
 - [MQTT Broker (e.g. HomeAssistant, ioBroker)](#mqtt-broker-eg-homeassistant-iobroker)
   - [MQTT-Explorer screenshot after running monitor.py](#mqtt-explorer-screenshot-after-running-monitorpy)
   - [MQTT-Explorer screenshot after running summary.py](#mqtt-explorer-screenshot-after-running-summarypy)
   - [MQTT-Explorer screenshot after running dailystats.py:](#mqtt-explorer-screenshot-after-running-dailystatspy)
-- [monitor.py](#monitorpy)
-- [Explanation of the configuration items in monitor.cfg](#explanation-of-the-configuration-items-in-monitorcfg)
+- [Domoticz](#domoticz)
+- [Configuration of gspread for "python summary.py sheetupdate" and "python dailystats.py sheetupdate"](#configuration-of-gspread-for-python-summarypy-sheetupdate-and-python-dailystatspy-sheetupdate)
 - [summary.py](#summarypy)
 - [summary.py sheetupdate](#summarypy-sheetupdate)
 - [dailystats.py](#dailystatspy)
@@ -20,16 +19,18 @@
 - [domoticz\_utils.py](#domoticz_utilspy)
 - [mqtt\_utils.py](#mqtt_utilspy)
 - [logging\_config.ini](#logging_configini)
-- [Raspberry pi configuration](#raspberry-pi-configuration)
+- [Raspberry Pi configuration](#raspberry-pi-configuration)
   - [Running monitor.py infinitely and only running summary.py and dailystats.py when there is new cached server data received](#running-monitorpy-infinitely-and-only-running-summarypy-and-dailystatspy-when-there-is-new-cached-server-data-received)
   - [Running monitor.py once](#running-monitorpy-once)
-  - [follow the last content of monitor.csv or run\_monitor\_infinite.log](#follow-the-last-content-of-monitorcsv-or-run_monitor_infinitelog)
+  - [follow the latest content of monitor.csv or run\_monitor\_infinite.log](#follow-the-latest-content-of-monitorcsv-or-run_monitor_infinitelog)
 - [Examples](#examples)
   - [monitor.csv](#monitorcsv)
   - [python summary.py](#python-summarypy)
   - [python dailystats.py](#python-dailystatspy)
   - [python kml.py](#python-kmlpy)
   - [python shrink.py](#python-shrinkpy)
+- [Avoid waking up your car (forced updates or sending commands with Apps or Tools)](#avoid-waking-up-your-car-forced-updates-or-sending-commands-with-apps-or-tools)
+- [Translations](#translations)
 - [Development Environment](#development-environment)
 - [FAQ](#faq)
 
@@ -37,13 +38,13 @@
 # Introduction hyundai_kia_connect_monitor
 Automatic trip administration tools for Hyundai Bluelink or Kia UVO Connect users.
 Determining afterwards your private and/or business trips and information about those trips and usage of the car. Support for Domoticz and/or MQTT Broker (e.g. HomeAssistant, ioBroker).
-Best of all is the fact that it does NOT drain your 12 volt battery of the car, because it only uses the cached server information!
+Best of all is the fact that it does NOT drain your 12-volt battery of the car, because it only uses the cached server information!
 
 Examples of supported cars (including cars with newer [ccNC Infotainment](https://ifdesign.com/en/winner-ranking/project/hyundai-ccnc-infotainment-system-seon/568244)):
 - Hyundai (Bluelink): Ioniq, IONIQ 5, IONIQ 6, Kona
 - Kia (Connect): EV6, EV9, Niro, Soul
 
-[Here a video](http://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U) with some nice diagrams in Google Spreadsheet, showing:
+[Here a video](http://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U) with some nice diagrams in a Google Sheet, showing:
 
 Daily Statistics:
 - Total
@@ -64,17 +65,9 @@ Trip information:
 - Maximum speed
 - Idle minutes
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U" target="_blank"><img src="http://img.youtube.com/vi/W5syq4uqo7U/0.jpg" alt="monitor.dailystats Google Spreadsheet" width="240" height="180" border="10" /></a>
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U" target="_blank"><img src="http://img.youtube.com/vi/W5syq4uqo7U/0.jpg" alt="monitor.dailystats Google Sheet" width="240" height="180" border="10" /></a>
 
-[This video shows why it is important to avoid awakening the car for actual values.](https://youtu.be/rpLWEe-2aUU?t=121)
-
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=rpLWEe-2aUU" target="_blank"><img src="http://img.youtube.com/vi/rpLWEe-2aUU/0.jpg" alt="IONIQ 5 Quicklynks BM2 battery monitor 12 volt battery 3 days" width="240" height="180" border="10" /></a>
-
-30 nov 6:10 a refresh via the Bluelink App has been done and you see a dip from 12.92 Volt to 12.42 Volt for a moment and then back to 12.83 Volt.
-
-*Note the tool asks only for server cache updates and the car decides when to send push notifications with actual values to the server.*
-
-Example screenshots showing the results in a Google Spreadsheet:
+Example screenshots showing the results in a Google Sheet:
 - DailyStats
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.png)
 
@@ -84,24 +77,24 @@ Example screenshots showing the results in a Google Spreadsheet:
 - Summary
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_GoogleSpreadsheet.png)
 
-Run monitor.py e.g. once per hour or infinite (I use it on a Raspberry Pi and on Windows 10 with pure Python, but it will also run on Mac or a linux Operating System) and you can always check afterwards:
+Run monitor.py e.g. once per hour or infinite (I use it on a Raspberry Pi and on Windows 11 with pure Python, but it will also run on MacOS or a Linux operating system) and you can always check afterwards:
 - captured locations
 - odometer at specific day/hour
 - how much driven at a specific day
 - how much battery% used at a specific day (for BEV or HEV users)
 - where you have been at a specific day/hour
 - when you have charged and how much
-- see your 12 volt battery percentage fluctuation
+- see your 12-volt battery percentage fluctuation
 - EV range
 - daily statistics from the car (Europe only)
 - trip info information from the car (Europe only)
 
 You can analyze the information over time with other scripts or e.g. with Excel:
 - summaries (see summary.py script)
-- daily statistics (see dailstats.py script)
+- daily statistics (see dailystats.py script)
 - odometer trend over the lifetime
 - SOC trend and charging trend
-- 12V battery fluctuations
+- 12-volt battery fluctuations
 
 The following tools are available as pure Python3 scripts:
 - monitor.py: Simple Python3 script to monitor values using [hyundai_kia_connect_api](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api)
@@ -109,14 +102,17 @@ The following tools are available as pure Python3 scripts:
 - dailystats.py: represent the gathered daily statistics and trip info in a nice formatted text, including computed totals.
 - kml.py: transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations
 - shrink.py: Simple Python3 script to shrink monitor.csv, identical lines removed (first date/time column excluded)
-- debug.py: same sort of python script as monitor.py, but debug logging enabled and all the (internal) data is just printed to standard output in pretty print
-- Raspberry pi configuration: example script to run the scripts on a linux based system
+- debug.py: same sort of Python script as monitor.py, but debug logging enabled and all the (internal) data is just printed to standard output in pretty print
+- Raspberry Pi configuration: example script to run the scripts on a Linux based system
 
 ---
-# How to install python, packages and hyundai_connect_monitor
-Explanation for someone with no knowledge of python. I don't know what computer you have.
+# How to install Python, packages and hyundai_connect_monitor
+Explanation for someone with no knowledge of Python. It will run on many computers.
 Part of the tools is the regular retrieval of the data with the Python script monitor.py.
 For this you need to install Python 3.9 or higher. I have installed Python 3.9.13.
+
+*Note: hyundai_kia_connect_api has the minimum requirement of Python 3.10, for now it also works with Python 3.9, but it might break in the future*
+
 [Here is more information about installing Python](https://realpython.com/installing-python/)
 
 Steps:
@@ -127,447 +123,41 @@ Steps:
 - Then run: python monitor.py
 
 Probably some packages needed for Hyundai Connect API are not installed (error messages). [Learn more about installing Python packages](https://packaging.python.org/en/latest/tutorials/installing-packages/)
-I have installed the following packages (e.g. use python -m pip install "package_name"), see [requirements.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements.txt)
 ````
-beautifulsoup4==4.10.0
-geopy==2.2.0
-gspread==5.6.2
-paho_mqtt==1.6.1
-python_dateutil==2.8.2
-pytz==2021.3
-requests==2.28.1
+ pip install "package_name"
+````
+or
+````
+python -m pip install "package_name"
 ````
 
-In monitor.py the following package is used:
+The following packages are mandatory, see [requirements.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements.txt) and [requirements.txt from hyundai_kia_connect_api](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/blob/master/requirements.txt).
+
+Examples of content of requirements.txt:
 ````
-paho_mqtt>=1.6.1,<2.0
+beautifulsoup4>=4.10.0
+requests>=2.28.1
 ````
-*Note that paho_mqtt version 2.x is not (yet) supported*
 
 Examples of package install commands:
 ````
-pip install "beautifulsoup4==4.10.0"
-pip install "paho_mqtt>=1.6.1,<2.0"
-pip install "gspread>=5.6.2"
+pip install "requests>=2.28.1"
+pip install "beautifulsoup4>=4.10.0"
 ````
 
-If everything works, it's a matter of regularly collecting the information, for example by running the "python monitor.py" command once an hour or infinite.
-A server is of course best, I use a Raspberry Pi, but it can also regularly be done on a Windows 10 or Mac computer, provided the computer is on.
+The following packages are optional:
+- gspread is mandatory when Google Sheets option is used
+- paho_mqtt is mandatory when MQTT option is used (send_to_mqtt = True)
+- geopy is mandatory when Google address lookup is used (geocode_provider = 2)
+````
+geopy>=2.2.0
+gspread>=5.6.2
+paho_mqtt>=2.0
+````
 
-*Note: each time you run monitor.py it makes a snapshot of the latest server cache values. How more often you run it, the better charges and trips can be detected by summary.py. The easiest way is to run monitor.py infinite.*
+If everything works, it's a matter of regularly collecting the information, for example by running the "python monitor.py" command once an hour or infinite. A server is of course best, I use a Raspberry Pi, but it can also regularly be done on a Windows or MacOS computer, provided the computer is on.
 
----
-# configuration of gspread for "python summary.py sheetupdate" and "python dailystats.py sheetupdate"
-For updating a Google Spreadsheet, summary.py and dailystats.py are using the package gspread.
-For Authentication with Google Spreadsheet you have to configure authentication for gspread.
-This [authentication configuration is described here](https://docs.gspread.org/en/latest/oauth2.html)
-
-The summary.py and dailystats.py script uses access to the Google spreadsheets on behalf of a bot account using Service Account.
-
-Follow the steps in this link above, here is the summary of these steps:
-1. Enable API Access for a Project
-  - Head to [Google Developers Console](https://console.developers.google.com/) and create a new project (or select the one you already have).
-  - In the box labeled "Search for APIs and Services", search for "Google Drive API" and enable it.
-  - In the box labeled "Search for APIs and Services", search for "Google Sheets API" and enable it
-2. For Bots: Using Service Account
-  - Go to "APIs & Services > Credentials" and choose "Create credentials > Service account key".
-  - Fill out the form
-  - Click "Create" and "Done".
-  - Press "Manage service accounts" above Service Accounts.
-  - Press on : near recently created service account and select "Manage keys" and then click on "ADD KEY > Create new key".
-  - Select JSON key type and press "Create".
-  - You will automatically download a JSON file with credentials
-  - Remember the path to the downloaded credentials json file. Also, in the next step you will need the value of client_email from this file.
-  - Move the downloaded json file to ~/.config/gspread/service_account.json. Windows users should put this file to %APPDATA%\gspread\service_account.json.
-3. Setup a Google Spreasheet to be updated by sheetupdate
-  - In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai-kia-connect-monitor or monitor.VIN (latter if vin=VIN is given as parameter)
-  - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json)
-  - In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google spreadsheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and change e.g. diagram titles into your own language.
-  - Go to your spreadsheet and share it with the client_email from the step above (inside service_account.json).
-  - How to share a Google Spreadsheet:
-    1. Open the Sheet you want to share (that you own or have edit access to).
-    2. Click Share.
-    3. Enter the client_email address as mentioned inside service_account.json.
-    4. Choose kind of access: Editor.
-    5. Click Send.
-4. run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor or monitor.VIN spreadheet will be updated with a summary and the last 122 lines of standard output
-5. run "python dailystats.py sheetupdate" and if everything is correct, the monitor.dailystats or monitor.dailystats.VIN spreadheet will be updated with the last 122 lines of standard output
-6. configure to run "python summary.py sheetupdate" regularly, after having run "python monitor.py"
-7. configure to run "python dailystats.py sheetupdate" regularly, after having run "python summary.py sheetupdate"
-
----
-# Translations
-There are translations available for the following tools (only the standard output and sheetupdate, not the other generated csv files):
-- dailystats.py
-- summary.py
-
-Remarks:
-- The configured language in monitor.cfg is used for the translations, see monitor.cfg in [monitor.py](#monitorpy).
-- Translations are inside monitor.translations.xlsx for easier Unicode editing and are saved in monitor.translations.csv as comma separated csv file in UTF-8 format, so unicode characters are preserved.
-- All the supported languages have been translated with Google Translate and German is checked/corrected by a goingelectric.de user (thanks)
-- Polish, Czech, Slovak, Hungarian are not translated, feel free to provide translations for those languages
-- If (some) translations are not correct, please submit an issue with the proposed corrections, but be careful to provide them as unicode text, preferably using monitor.translations.xlsx
-
----
-# Domoticz
-[Domoticz](https://www.domoticz.com/) is a very light weight home automation system that lets you monitor and configure miscellaneous devices, including lights, switches, various sensors/meters like temperature, rainfall, wind, ultraviolet (UV) radiation, electricity usage/production, gas consumption, water consumption and many more. Notifications/alerts can be sent to any mobile device.
-
-In the file "monitor.cfg" there is a configuration section for domoticz:
-```
-[Domoticz]
-send_to_domoticz = False
-domot_url = http://192.168.0.222:8081
-
-monitor_monitor_datetime = 0
-monitor_monitor_longitude = 0
-monitor_monitor_latitude = 0
-monitor_monitor_engineon = 0
-monitor_monitor_battery12v = 0
-monitor_monitor_odometer = 0
-monitor_monitor_soc = 0
-monitor_monitor_charging = 0
-monitor_monitor_plugged = 0
-monitor_monitor_address = 0
-monitor_monitor_evrange = 0
-
-monitor_tripinfo_date = 0
-monitor_tripinfo_starttime = 0
-monitor_tripinfo_drivetime = 0
-monitor_tripinfo_idletime = 0
-monitor_tripinfo_distance = 0
-monitor_tripinfo_avgspeed = 0
-monitor_tripinfo_maxspeed = 0
-
-monitor_dailystats_date = 0
-monitor_dailystats_distance = 0
-monitor_dailystats_distance_unit = 0
-monitor_dailystats_total_consumed = 0
-monitor_dailystats_regenerated_energy = 0
-monitor_dailystats_engine_consumption = 0
-monitor_dailystats_climate_consumption = 0
-monitor_dailystats_onboard_electronics_consumption = 0
-monitor_dailystats_battery_care_consumption = 0
-
-summary_TRIP_date = 0
-summary_TRIP_info = 0
-summary_TRIP_odometer = 0
-summary_TRIP_delta_distance = 0
-summary_TRIP_kwh_charged = 0
-summary_TRIP_kwh_discharged = 0
-summary_TRIP_distance_unit_per_kwh = 0
-summary_TRIP_kwh_per_100_distance_unit = 0
-summary_TRIP_cost = 0
-summary_TRIP_soc = 0
-summary_TRIP_soc_avg = 0
-summary_TRIP_soc_min = 0
-summary_TRIP_soc_max = 0
-summary_TRIP_battery12v = 0
-summary_TRIP_battery12v_avg = 0
-summary_TRIP_battery12v_min = 0
-summary_TRIP_battery12v_max = 0
-summary_TRIP_charging_sessions = 0
-summary_TRIP_trip_count = 0
-summary_TRIP_range = 0
-summary_TRIP_address = 0
-
-summary_DAY_date = 0
-summary_DAY_info = 0
-summary_DAY_odometer = 0
-summary_DAY_delta_distance = 0
-summary_DAY_kwh_charged = 0
-summary_DAY_kwh_discharged = 0
-summary_DAY_distance_unit_per_kwh = 0
-summary_DAY_kwh_per_100_distance_unit = 0
-summary_DAY_cost = 0
-summary_DAY_soc = 0
-summary_DAY_soc_avg = 0
-summary_DAY_soc_min = 0
-summary_DAY_soc_max = 0
-summary_DAY_battery12v = 0
-summary_DAY_battery12v_avg = 0
-summary_DAY_battery12v_min = 0
-summary_DAY_battery12v_max = 0
-summary_DAY_charging_sessions = 0
-summary_DAY_trip_count = 0
-summary_DAY_range = 0
-summary_DAY_address = 0
-
-summary_WEEK_date = 0
-summary_WEEK_info = 0
-summary_WEEK_odometer = 0
-summary_WEEK_delta_distance = 0
-summary_WEEK_kwh_charged = 0
-summary_WEEK_kwh_discharged = 0
-summary_WEEK_distance_unit_per_kwh = 0
-summary_WEEK_kwh_per_100_distance_unit = 0
-summary_WEEK_cost = 0
-summary_WEEK_soc = 0
-summary_WEEK_soc_avg = 0
-summary_WEEK_soc_min = 0
-summary_WEEK_soc_max = 0
-summary_WEEK_battery12v = 0
-summary_WEEK_battery12v_avg = 0
-summary_WEEK_battery12v_min = 0
-summary_WEEK_battery12v_max = 0
-summary_WEEK_charging_sessions = 0
-summary_WEEK_trip_count = 0
-summary_WEEK_range = 0
-summary_WEEK_address = 0
-
-summary_MONTH_date = 0
-summary_MONTH_info = 0
-summary_MONTH_odometer = 0
-summary_MONTH_delta_distance = 0
-summary_MONTH_kwh_charged = 0
-summary_MONTH_kwh_discharged = 0
-summary_MONTH_distance_unit_per_kwh = 0
-summary_MONTH_kwh_per_100_distance_unit = 0
-summary_MONTH_cost = 0
-summary_MONTH_soc = 0
-summary_MONTH_soc_avg = 0
-summary_MONTH_soc_min = 0
-summary_MONTH_soc_max = 0
-summary_MONTH_battery12v = 0
-summary_MONTH_battery12v_avg = 0
-summary_MONTH_battery12v_min = 0
-summary_MONTH_battery12v_max = 0
-summary_MONTH_charging_sessions = 0
-summary_MONTH_trip_count = 0
-summary_MONTH_range = 0
-summary_MONTH_address = 0
-
-summary_YEAR_date = 0
-summary_YEAR_info = 0
-summary_YEAR_odometer = 0
-summary_YEAR_delta_distance = 0
-summary_YEAR_kwh_charged = 0
-summary_YEAR_kwh_discharged = 0
-summary_YEAR_distance_unit_per_kwh = 0
-summary_YEAR_kwh_per_100_distance_unit = 0
-summary_YEAR_cost = 0
-summary_YEAR_soc = 0
-summary_YEAR_soc_avg = 0
-summary_YEAR_soc_min = 0
-summary_YEAR_soc_max = 0
-summary_YEAR_battery12v = 0
-summary_YEAR_battery12v_avg = 0
-summary_YEAR_battery12v_min = 0
-summary_YEAR_battery12v_max = 0
-summary_YEAR_charging_sessions = 0
-summary_YEAR_trip_count = 0
-summary_YEAR_range = 0
-summary_YEAR_address = 0
-
-summary_TRIPAVG_date = 0
-summary_TRIPAVG_info = 0
-summary_TRIPAVG_odometer = 0
-summary_TRIPAVG_delta_distance = 0
-summary_TRIPAVG_kwh_charged = 0
-summary_TRIPAVG_kwh_discharged = 0
-summary_TRIPAVG_distance_unit_per_kwh = 0
-summary_TRIPAVG_kwh_per_100_distance_unit = 0
-summary_TRIPAVG_cost = 0
-summary_TRIPAVG_soc = 0
-summary_TRIPAVG_soc_avg = 0
-summary_TRIPAVG_soc_min = 0
-summary_TRIPAVG_soc_max = 0
-summary_TRIPAVG_battery12v = 0
-summary_TRIPAVG_battery12v_avg = 0
-summary_TRIPAVG_battery12v_min = 0
-summary_TRIPAVG_battery12v_max = 0
-summary_TRIPAVG_charging_sessions = 0
-summary_TRIPAVG_trip_count = 0
-summary_TRIPAVG_range = 0
-summary_TRIPAVG_address = 0
-
-summary_DAYAVG_date = 0
-summary_DAYAVG_info = 0
-summary_DAYAVG_odometer = 0
-summary_DAYAVG_delta_distance = 0
-summary_DAYAVG_kwh_charged = 0
-summary_DAYAVG_kwh_discharged = 0
-summary_DAYAVG_distance_unit_per_kwh = 0
-summary_DAYAVG_kwh_per_100_distance_unit = 0
-summary_DAYAVG_cost = 0
-summary_DAYAVG_soc = 0
-summary_DAYAVG_soc_avg = 0
-summary_DAYAVG_soc_min = 0
-summary_DAYAVG_soc_max = 0
-summary_DAYAVG_battery12v = 0
-summary_DAYAVG_battery12v_avg = 0
-summary_DAYAVG_battery12v_min = 0
-summary_DAYAVG_battery12v_max = 0
-summary_DAYAVG_charging_sessions = 0
-summary_DAYAVG_trip_count = 0
-summary_DAYAVG_range = 0
-summary_DAYAVG_address = 0
-
-summary_WEEKAVG_date = 0
-summary_WEEKAVG_info = 0
-summary_WEEKAVG_odometer = 0
-summary_WEEKAVG_delta_distance = 0
-summary_WEEKAVG_kwh_charged = 0
-summary_WEEKAVG_kwh_discharged = 0
-summary_WEEKAVG_distance_unit_per_kwh = 0
-summary_WEEKAVG_kwh_per_100_distance_unit = 0
-summary_WEEKAVG_cost = 0
-summary_WEEKAVG_soc = 0
-summary_WEEKAVG_soc_avg = 0
-summary_WEEKAVG_soc_min = 0
-summary_WEEKAVG_soc_max = 0
-summary_WEEKAVG_battery12v = 0
-summary_WEEKAVG_battery12v_avg = 0
-summary_WEEKAVG_battery12v_min = 0
-summary_WEEKAVG_battery12v_max = 0
-summary_WEEKAVG_charging_sessions = 0
-summary_WEEKAVG_trip_count = 0
-summary_WEEKAVG_range = 0
-summary_WEEKAVG_address = 0
-
-summary_MONTHAVG_date = 0
-summary_MONTHAVG_info = 0
-summary_MONTHAVG_odometer = 0
-summary_MONTHAVG_delta_distance = 0
-summary_MONTHAVG_kwh_charged = 0
-summary_MONTHAVG_kwh_discharged = 0
-summary_MONTHAVG_distance_unit_per_kwh = 0
-summary_MONTHAVG_kwh_per_100_distance_unit = 0
-summary_MONTHAVG_cost = 0
-summary_MONTHAVG_soc = 0
-summary_MONTHAVG_soc_avg = 0
-summary_MONTHAVG_soc_min = 0
-summary_MONTHAVG_soc_max = 0
-summary_MONTHAVG_battery12v = 0
-summary_MONTHAVG_battery12v_avg = 0
-summary_MONTHAVG_battery12v_min = 0
-summary_MONTHAVG_battery12v_max = 0
-summary_MONTHAVG_charging_sessions = 0
-summary_MONTHAVG_trip_count = 0
-summary_MONTHAVG_range = 0
-summary_MONTHAVG_address = 0
-
-summary_YEARLY_date = 0
-summary_YEARLY_info = 0
-summary_YEARLY_odometer = 0
-summary_YEARLY_delta_distance = 0
-summary_YEARLY_kwh_charged = 0
-summary_YEARLY_kwh_discharged = 0
-summary_YEARLY_distance_unit_per_kwh = 0
-summary_YEARLY_kwh_per_100_distance_unit = 0
-summary_YEARLY_cost = 0
-summary_YEARLY_soc = 0
-summary_YEARLY_soc_avg = 0
-summary_YEARLY_soc_min = 0
-summary_YEARLY_soc_max = 0
-summary_YEARLY_battery12v = 0
-summary_YEARLY_battery12v_avg = 0
-summary_YEARLY_battery12v_min = 0
-summary_YEARLY_battery12v_max = 0
-summary_YEARLY_charging_sessions = 0
-summary_YEARLY_trip_count = 0
-summary_YEARLY_range = 0
-summary_YEARLY_address = 0
-
-dailystats_day_TOTALS_date = 0
-dailystats_day_TOTALS_total_consumption = 0
-dailystats_day_TOTALS_regenerated_energy = 0
-dailystats_day_TOTALS_average_consumption = 0
-dailystats_day_TOTALS_engine_consumption = 0
-dailystats_day_TOTALS_climate_consumption = 0
-dailystats_day_TOTALS_onboard_electronics_consumption = 0
-dailystats_day_TOTALS_battery_care_consumption = 0
-dailystats_day_TOTALS_driven = 0
-dailystats_day_TOTALS_regenerated_energy_percentage = 0
-dailystats_day_TOTALS_average_consumption_per_100 = 0
-dailystats_day_TOTALS_engine_consumption_percentage = 0
-dailystats_day_TOTALS_climate_consumption_percentage = 0
-dailystats_day_TOTALS_onboard_electronics_consumption_percentage = 0
-dailystats_day_TOTALS_battery_care_consumption_percentage = 0
-
-dailystats_day_LAST_DAY_date = 0
-dailystats_day_LAST_DAY_total_consumption = 0
-dailystats_day_LAST_DAY_regenerated_energy = 0
-dailystats_day_LAST_DAY_average_consumption = 0
-dailystats_day_LAST_DAY_engine_consumption = 0
-dailystats_day_LAST_DAY_climate_consumption = 0
-dailystats_day_LAST_DAY_onboard_electronics_consumption = 0
-dailystats_day_LAST_DAY_battery_care_consumption = 0
-dailystats_day_LAST_DAY_driven = 0
-dailystats_day_LAST_DAY_regenerated_energy_percentage = 0
-dailystats_day_LAST_DAY_average_consumption_per_100 = 0
-dailystats_day_LAST_DAY_engine_consumption_percentage = 0
-dailystats_day_LAST_DAY_climate_consumption_percentage = 0
-dailystats_day_LAST_DAY_onboard_electronics_consumption_percentage = 0
-dailystats_day_LAST_DAY_battery_care_consumption_percentage = 0
-
-dailystats_trip_TOTALS_computed_kwh_charged = 0
-dailystats_trip_TOTALS_computed_day_consumption = 0
-dailystats_trip_TOTALS_computed_kwh_used = 0
-dailystats_trip_TOTALS_trip_time = 0
-dailystats_trip_TOTALS_computed_consumption_or_distance = 0
-dailystats_trip_TOTALS_distance = 0
-dailystats_trip_TOTALS_avg_speed = 0
-dailystats_trip_TOTALS_max_speed = 0
-dailystats_trip_TOTALS_idle_time = 0
-
-dailystats_trip_LAST_DAY_computed_kwh_charged = 0
-dailystats_trip_LAST_DAY_computed_day_consumption = 0
-dailystats_trip_LAST_DAY_computed_kwh_used = 0
-dailystats_trip_LAST_DAY_trip_time = 0
-dailystats_trip_LAST_DAY_computed_consumption_or_distance = 0
-dailystats_trip_LAST_DAY_distance = 0
-dailystats_trip_LAST_DAY_avg_speed = 0
-dailystats_trip_LAST_DAY_max_speed = 0
-dailystats_trip_LAST_DAY_idle_time = 0
-```
-
-- set send_to_domoticz to True if you want to send updates to *.csv also to Domoticz
-- domot_url is the URL where to send the updates to
-- the next items (e.g. monitor_monitor_odometer) you can configure the ID/IDX of each item, If the ID/IDX is 0, that item will NOT be send to Domoticz.
-- the Domoticz configuration lines starting with monitor_ are the configuration items for monitor.py
-- the Domoticz configuration lines starting with summary_ are the configuration items for summary.py
-- the Domoticz configuration lines starting with dailystats_ are the configuration items for dailystats.py
-
-*Note: only when there is something added when running monitor.py (in monitor.csv, monitor.tripinfo.csv and/or monitor.dailystats.csv) the corresponding line is splitted and send to Domoticz. You can trigger this for testing by e.g. removing the last line of monitor.csv , monitor.tripinfo.csv and/or monitor.dailystats.csv. However, summary.py and dailystats.py will always send the latest values to Domoticz.*
-
----
-# MQTT Broker (e.g. HomeAssistant, ioBroker)
-An MQTT broker is a server that receives all messages from the clients and then routes the messages to the appropriate destination clients. Information is organized in a hierarchy of topics. When hyundai_kia_connect_monitor has a new item of data to distribute, it sends a control message with the data to the connected broker. The broker then distributes the information to any clients that have subscribed to that topic. The hyundai_kia_connect_monitor does not need to have any data on the number or locations of subscribers, and subscribers, in turn, do not have to be configured with any data about the publishers.
-
-In the file "monitor.cfg" there is a configuration section for MQTT:
-
-```
-[MQTT]
-send_to_mqtt = False
-mqtt_broker_hostname = localhost
-mqtt_broker_port = 1883
-mqtt_broker_username =
-mqtt_broker_password =
-mqtt_main_topic = hyundai_kia_connect_monitor
-```
-
-- set send_to_mqtt to True if you want to send information also to MQTT
-- mqtt_broker_hostname is the URL where to send the updates to
-- mqtt_broker_port is the port where to send the updates to
-- mqtt_broker_username is an optional username
-- mqtt_broker_password is an optional password
-- mqtt_main_topic is the main topic
-
-When configured, the data is send to mqtt_main_topic/VIN/subtopic.
-
-*Note: only when there is something added when running monitor.py (in monitor.csv, monitor.tripinfo.csv and/or monitor.dailystats.csv) the corresponding line is splitted and send to MQTT. You can trigger this for testing by e.g. removing the last line of monitor.csv , monitor.tripinfo.csv and/or monitor.dailystats.csv. However, summary.py and dailystats.py will always send the latest values to MQTT.*
-
-
-## MQTT-Explorer screenshot after running monitor.py
-![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MQTTExplorer_monitor.png)
-
-## MQTT-Explorer screenshot after running summary.py
-![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MQTTExplorer_summary.png)
-
-##  MQTT-Explorer screenshot after running dailystats.py:
-![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MQTTExplorer_dailystats.png)
-
-For convenience an example [configuration.yaml](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/configuration.yaml) is provided, replace KMHKR81CPNU012345 with your VIN of the car.
+*Note: each time you run monitor.py it makes a snapshot of the latest server cache values. The more often you run it, the better charges and trips can be detected by summary.py. The easiest way is to run monitor.py infinite.*
 
 ---
 # monitor.py
@@ -588,7 +178,7 @@ OUTPUTFILES:
 
 *Note 1: dailystats and tripinfo are only available in Europe.*
 
-*Note 2: Changes to the output csv files are also send to [Domoticz](#domoticz) and/or [MQTT Broker](#mqtt-broker-eg-homeassistant-iobroker) (e.g. HomeAssistant, ioBroker) when configured.*
+*Note 2: Changes to the output csv files are also sent to [Domoticz](#domoticz) and/or [MQTT Broker](#mqtt-broker-eg-homeassistant-iobroker) (e.g. HomeAssistant, ioBroker) when configured.*
 
 Make sure to configure monitor.cfg once:
 ```
@@ -932,36 +522,36 @@ dailystats_trip_LAST_DAY_idle_time = 0
 # Explanation of the configuration items in monitor.cfg
 - region: 1: REGION_EUROPE, 2: REGION_CANADA, 3: REGION_USA
 - brand: 1: BRAND_KIA, 2: BRAND_HYUNDAI
-- username: your bluelink account email address
-- password: password of your bluelink account OR the token; the token is needed for Europe, retrieve token once per 180 days [using this README](https://gist.github.com/RustyDust/e2a7be978affd85fb5ef5a345f31f67a) or see [this issue](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/issues/81#issuecomment-3409735930) or for [Hyundai with a terminal without GUI](https://gist.github.com/stefan-home/808d8774a461f22f2ae1d9519f067b71)
-- pin: pincode of your bluelink account, required for CANADA, and potentially USA, otherwise pass a blank string
+- username: your Bluelink or Connect account email address
+- password: password of your Bluelink or Connect account OR the token; the token is needed for Europe, retrieve token once per 180 days [using this README](https://gist.github.com/RustyDust/e2a7be978affd85fb5ef5a345f31f67a) or see [this issue](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/issues/81#issuecomment-3409735930) or for [Hyundai with a terminal without GUI](https://gist.github.com/stefan-home/808d8774a461f22f2ae1d9519f067b71)
+- pin: pincode of your Bluelink or Connect account, required for CANADA, and potentially USA, otherwise pass a blank string
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
 - use_geocode_email: (default: True) use email to avoid abuse of address lookup
 - geocode_provider: (default: 1) use openstreetmap (1) or google (2) for address lookup
 - google_api_key: (default empty) when using "geocode_provider = 2" (google) you need to get a [google API key, see this discussion](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/discussions/76#discussioncomment-12728843). Do not put quotes around the Google API key!
-- language: (default: en) the Bluelink App is reset to English for users who have set another language in the Bluelink App in Europe when using hyundai_kia_connect_api, you can configure another language as workaround. See Note 3
+- language: (default: en) the Bluelink or Connect App is reset to English for users who have set another language in the Bluelink or Connect App in Europe when using hyundai_kia_connect_api, you can configure another language as workaround. See Note 3
 - odometer_metric, e.g. km or mi
-- include_regenerate_in_consumption, when set to True the regeneration is taken into account for the consumption calculation in daily stats. However, I think that the next 2 configuration items will better match the boardcomputer values.
+- include_regenerate_in_consumption, when set to True the regeneration is taken into account for the consumption calculation in daily stats. However, I think that the next 2 configuration items will better match the trip computer values.
 - consumption_efficiency_factor_dailystats, see Note 2
 - consumption_efficiency_factor_summary, see Note 2
 - monitor_infinite, if set to True monitor.py keeps running using monitor_infinite_interval_minutes between getting cached server values
 - monitor_infinite_interval_minutes, interval in minutes between getting cached server values
 - monitor_execute_commands_when_something_written_or_error, when new cached server values are retrieved, the specified commands (separated by semicolon ;) are executed. See Note 1.
   * example: monitor_execute_commands_when_something_written_or_error = python -u summary.py sheetupdate > summary.log;python -u dailystats.py sheetupdate > dailystats.log
-- monitor_force_sync_when_odometer_different_location_workaround, when set to True a forced update is done when the odometer has changed, to get the latest location (for some cars the cached location is not updated correctly anymore since May 2025 when turning off the car). Only change to True when you have this problem AND you want up-to-date locations when turning off the car.
+- monitor_force_sync_when_odometer_different_location_workaround, when set to True a forced update is done when the odometer has changed, to get the latest location (for some cars the cached location is not updated correctly anymore since May 2025 when turning off the car). Only change to True when you have this problem AND you want up-to-date locations when turning off the car, because this will wake up your car.
 - monitor_force_sync_max_count: (default: 10) Limit the number of forced sync per day when the previous setting is True.
 - For configuration of Domoticz, [see here](#domoticz)
 - For configuration of MQTT Broker, [see here](#mqtt-broker-eg-homeassistant-iobroker)
 
 *Note 1: in combination with infinite (monitor_infinite = True) summary.py and dailystats.py are only run when something is changed or error occurred (or once a day). You do not need to run summary.py and dailystats.py separately and it is only run when it is needed.*
 
-*Note 2: I think that the consumption values ​​of the on-board computer are corrected with an efficiency number, e.g. 1 kWh of energy results in 0.9 kWh of real energy (losses when converting battery kWh by the car). So therefor I introduced an efficiency configuration factor in monitor.cfg, consumption_efficiency_factor_dailystats and consumption_efficiency_factor_summary. For example, when setting this to 0.9, 10% of the energy is lost during the conversion and is used in the consumption calculation. Default the values are 1.0, so no correction.*
+*Note 2: I think that the consumption values ​​of the on-board computer are corrected with an efficiency number, e.g. 1 kWh of energy results in 0.9 kWh of real energy (losses when converting battery kWh by the car). Therefore, I introduced an efficiency configuration factor in monitor.cfg, consumption_efficiency_factor_dailystats and consumption_efficiency_factor_summary. For example, when setting this to 0.9, 10% of the energy is lost during the conversion and is used in the consumption calculation. By default, the values are 1.0, so no correction.*
 
-*Note 3: The last TRIP, DAY, WEEK, MONTH, YEAR, TRIPAVG, DAYAVG, WEEKAVG, MONTHAVG, YEARLY lines are also send to [Domoticz](#domoticz) and/or [MQTT Broker](#mqtt-broker-eg-homeassistant-iobroker) (e.g. HomeAssistant, ioBroker) when configured.*
+*Note 3: The last TRIP, DAY, WEEK, MONTH, YEAR, TRIPAVG, DAYAVG, WEEKAVG, MONTHAVG, YEARLY lines are also sent to [Domoticz](#domoticz) and/or [MQTT Broker](#mqtt-broker-eg-homeassistant-iobroker) (e.g. HomeAssistant, ioBroker) when configured.*
 
 *Note 4: language is only implemented for Europe currently.*
 
-[For a list of language codes, see here.](https://www.science.co.il/language/Codes.php). Currently in Europe the Bluelink App shows the following languages:
+[For a list of language codes, see here.](https://www.science.co.il/language/Codes.php). Currently in Europe the Bluelink or Connect App shows the following languages:
 - "en" English
 - "de" German
 - "fr" French
@@ -1017,18 +607,6 @@ This information is used by the other tools:
 - kml.py
 - shrink.py
 
-The monitor.py tool will by never do a forced update and only asks for cached server values, so the 12 volt battery is NOT drained by the tool.
-Note that if you do a lot of refresh calls by Hyundai Bluelink or Kia Connect App, than definitely the car 12 volt battery can be drained.
-See [here some results of someone with an IONIQ 5 using refresh](https://community.home-assistant.io/t/hyundai-bluelink-integration/319129/132), so use refresh carefully:
-```
-With 15-minute refreshed:
-95% to 80% in 8 hours, approx. 1.8%/hour
-
-With 60-minute refreshed:
-93% to 82% in 14 hours, approx. 0.78%/hour
-```
-Therefor it is chosen to make it not possible to do a forcerefresh via the monitor tools (earlier versions of monitor had this non-default possibility).
-
 Note that the number of API calls is restricted for Hyundai Bluelink or Kia UVO Connect users, see [this page for API Rate Limits](https://github.com/Hacksore/bluelinky/wiki/API-Rate-Limits)
 ```
 Region Daily Limits    Per Action  Comments
@@ -1040,20 +618,112 @@ Region Daily Limits    Per Action  Comments
 
 *Note that a Bluelink USA user has detected that there is a limit in the number of logins, not for the subsequent calls, therefore the option to run monitor.py infinite is a good choice. The monitor.py infinite does only login once per day and then the subsequent calls are done with the retrieved information. Unfortunately for Europe the total is restricted to about 200, so the number of logins does not matter. For the other regions I do not know the limit and behavior.*
 
-So maybe you can capture more than once per hour, but you might run into the problem that you use too much API calls, especially when you also regularly use the Hyndai Bluelink or Kia UVO Connect app.
+So maybe you can capture more than once per hour, but you might run into the problem that you use too much API calls, especially when you also regularly use the Hyundai Bluelink or Kia UVO Connect app.
 You also can consider only to monitor between e.g. 6:00 and 22:00 (saves 1/3 of the calls). Dependent on your regular driving habit, choose the best option for you. Examples:
 - run monitor.py infinite (monitor_infinite = True) with monitor_infinite_interval_minutes = 15 (means 96 requests per day and 1 login per day)
 - twice a day, e.g. 6.00 and 21:00, when you normally do not drive that late in the evening and charge in the night after 21:00
-- each hour means 24 requests per day
-- each hour between 6:00 and 19:00 means 13 requests per day
-- each hour between 6:00 and 22:00 means 16 requests per day
-- each half hour means 48 requests per day
-- each half hour between 6:00 and 19:00 means 26 requests per day
-- each half hour between 6:00 and 22:00 means 32 requests per day
-- each quarter hour means 96 requests per day
-- each quarter hour between 6:00 and 19:00 means 52 requests per day
-- each quarter hour between 6:00 and 22:00 means 64 requests per day
+- every hour means 24 requests per day
+- every hour between 6:00 and 19:00 means 13 requests per day
+- every hour between 6:00 and 22:00 means 16 requests per day
+- every half-hour means 48 requests per day
+- every half-hour between 6:00 and 19:00 means 26 requests per day
+- every half-hour between 6:00 and 22:00 means 32 requests per day
+- every quarter-hour means 96 requests per day
+- every quarter-hour between 6:00 and 19:00 means 52 requests per day
+- every quarter-hour between 6:00 and 22:00 means 64 requests per day
 
+---
+# MQTT Broker (e.g. HomeAssistant, ioBroker)
+An MQTT broker is a server that receives all messages from the clients and then routes the messages to the appropriate destination clients. Information is organized in a hierarchy of topics. When hyundai_kia_connect_monitor has a new item of data to distribute, it sends a control message with the data to the connected broker. The broker then distributes the information to any clients that have subscribed to that topic. The hyundai_kia_connect_monitor does not need to have any data on the number or locations of subscribers, and subscribers, in turn, do not have to be configured with any data about the publishers.
+
+In the file "monitor.cfg" there is a configuration section for MQTT.
+
+```
+[MQTT]
+send_to_mqtt = False
+mqtt_broker_hostname = localhost
+mqtt_broker_port = 1883
+mqtt_broker_username =
+mqtt_broker_password =
+mqtt_main_topic = hyundai_kia_connect_monitor
+```
+
+- set send_to_mqtt to True if you want to send information also to MQTT
+- mqtt_broker_hostname is the URL where to send the updates to
+- mqtt_broker_port is the port where to send the updates to
+- mqtt_broker_username is an optional username
+- mqtt_broker_password is an optional password
+- mqtt_main_topic is the main topic
+
+When configured, the data is sent to mqtt_main_topic/VIN/subtopic.
+
+*Note: only when there is something added when running monitor.py (in monitor.csv, monitor.tripinfo.csv and/or monitor.dailystats.csv) the corresponding line is split and sent to MQTT. You can trigger this for testing by e.g. removing the last line of monitor.csv , monitor.tripinfo.csv and/or monitor.dailystats.csv. However, summary.py and dailystats.py will always send the latest values to MQTT.*
+
+## MQTT-Explorer screenshot after running monitor.py
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MQTTExplorer_monitor.png)
+
+## MQTT-Explorer screenshot after running summary.py
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MQTTExplorer_summary.png)
+
+##  MQTT-Explorer screenshot after running dailystats.py:
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/MQTTExplorer_dailystats.png)
+
+For convenience an example [configuration.yaml](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/configuration.yaml) is provided, replace KMHKR81CPNU012345 with your VIN of the car.
+
+---
+# Domoticz
+[Domoticz](https://www.domoticz.com/) is a very light weight home automation system that lets you monitor and configure miscellaneous devices, including lights, switches, various sensors/meters like temperature, rainfall, wind, ultraviolet (UV) radiation, electricity usage/production, gas consumption, water consumption and many more. Notifications/alerts can be sent to any mobile device.
+
+In the file "monitor.cfg" there is a configuration section for domoticz. [See configuration items here.](#configuration-of-gspread-for-python-summarypy-sheetupdate-and-python-dailystatspy-sheetupdate)
+
+- set send_to_domoticz to True if you want to send updates to *.csv also to Domoticz
+- domot_url is the URL where to send the updates to
+- the next items (e.g. monitor_monitor_odometer) you can configure the ID/IDX of each item, If the ID/IDX is 0, that item will NOT be sent to Domoticz.
+- the Domoticz configuration lines starting with monitor_ are the configuration items for monitor.py
+- the Domoticz configuration lines starting with summary_ are the configuration items for summary.py
+- the Domoticz configuration lines starting with dailystats_ are the configuration items for dailystats.py
+
+*Note: only when there is something added when running monitor.py (in monitor.csv, monitor.tripinfo.csv and/or monitor.dailystats.csv) the corresponding line is split and sent to Domoticz. You can trigger this for testing by e.g. removing the last line of monitor.csv , monitor.tripinfo.csv and/or monitor.dailystats.csv. However, summary.py and dailystats.py will always send the latest values to Domoticz.*
+
+---
+# Configuration of gspread for "python summary.py sheetupdate" and "python dailystats.py sheetupdate"
+For updating Google Sheets, summary.py and dailystats.py are using the package gspread.
+For Authentication with Google Sheets you have to configure authentication for gspread.
+This [authentication configuration is described here](https://docs.gspread.org/en/latest/oauth2.html)
+
+The summary.py and dailystats.py script uses access to the Google Sheet on behalf of a bot account using Service Account.
+
+Follow the steps in this link above, here is the summary of these steps:
+1. Enable API Access for a Project
+  - Head to [Google Developers Console](https://console.developers.google.com/) and create a new project (or select the one you already have).
+  - In the box labeled "Search for APIs and Services", search for "Google Drive API" and enable it.
+  - In the box labeled "Search for APIs and Services", search for "Google Sheets API" and enable it
+2. For Bots: Using Service Account
+  - Go to "APIs & Services > Credentials" and choose "Create credentials > Service account key".
+  - Fill out the form
+  - Click "Create" and "Done".
+  - Press "Manage service accounts" above Service Accounts.
+  - Click the: near recently created service account and select "Manage keys" and then click on "ADD KEY > Create new key".
+  - Select JSON key type and press "Create".
+  - You will automatically download a JSON file with credentials
+  - Remember the path to the downloaded credentials json file. Also, in the next step you will need the value of client_email from this file.
+  - Move the downloaded json file to ~/.config/gspread/service_account.json. Windows users should put this file to %APPDATA%\gspread\service_account.json.
+3. Setup a Google Spreasheet to be updated by sheetupdate
+  - In Google Sheets, create an empty Google Sheet with the name: hyundai-kia-connect-monitor or monitor.VIN (latter if vin=VIN is given as parameter)
+  - Go to your Google Sheet and share it with the client_email from the step above (inside service_account.json)
+  - In Google Sheets, create an empty Google Sheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google Sheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and change e.g. diagram titles into your own language.
+  - Go to your Google Sheet and share it with the client_email from the step above (inside service_account.json).
+  - How to share a Google Sheet:
+    1. Open the Sheet you want to share (that you own or have edit access to).
+    2. Click Share.
+    3. Enter the client_email address as mentioned inside service_account.json.
+    4. Choose kind of access: Editor.
+    5. Click Send.
+4. run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor or monitor.VIN spreadheet will be updated with a summary and the last 122 lines of standard output
+5. run "python dailystats.py sheetupdate" and if everything is correct, the monitor.dailystats or monitor.dailystats.VIN spreadheet will be updated with the last 122 lines of standard output
+6. configure to run "python summary.py sheetupdate" regularly, after having run "python monitor.py"
+7. configure to run "python dailystats.py sheetupdate" regularly, after having run "python summary.py sheetupdate"
+8.
 ---
 # summary.py
 make summary per TRIP, DAY, WEEK, MONTH, YEAR or a combination with monitor.csv as input or monitor.VIN.csv (latter if vin=VIN is given as parameter). Support for Domoticz and/or MQTT Broker (e.g. HomeAssistant, ioBroker).
@@ -1113,13 +783,13 @@ Explanation of configuration items:
 - min_consumption_discharge_kwh, do not show consumption figures when the discharge in kWh is below this number
 - ignore_small_positive_delta_soc, do not see this as charge% when not charging/moved, because with temperature changes the percentage can increase
 - ignore_small_negative_delta_soc, do not see this as discharge% when not moved, because with temperature changes the percentage can decrease
-- show_zero_values = True shows also zero values in the standard output, can be easier for spreadsheets, but more difficult to read
+- show_zero_values = True shows also zero values in the standard output, can be easier for Google Sheets, but more difficult to read
 
-*Note: The dailystats DAY totals, TRIP Totals and last DAY and TRIP lines are also send to [Domoticz](#domoticz) and/or [MQTT Broker](#mqtt-broker-eg-homeassistant-iobroker) (e.g. HomeAssistant, ioBroker) when configured.*
+*Note: The dailystats DAY totals, TRIP Totals and last DAY and TRIP lines are also sent to [Domoticz](#domoticz) and/or [MQTT Broker](#mqtt-broker-eg-homeassistant-iobroker) (e.g. HomeAssistant, ioBroker) when configured.*
 
 ---
 # summary.py sheetupdate
-make summary per TRIP, DAY, WEEK, MONTH, YEAR with monitor.csv as input and write summary to Google Spreadsheet
+make summary per TRIP, DAY, WEEK, MONTH, YEAR with monitor.csv as input and write summary to Google Sheet
 
 Usage:
 ```
@@ -1130,22 +800,22 @@ or
 python summary.py sheetupdate vin=VIN
 ```
 
-For sheetupdate configure once gspread and a specific Google Spreadsheet:
+For sheetupdate configure once gspread and a specific Google Sheet:
 - [See configuration of gspread here](#configuration-of-gspread-for-python-summarypy-sheetupdate-and-python-dailystatspy-sheetupdate)
-- In Google Spreadsheet, create an empty Google Spreadsheet with the name: hyundai_kia_connect_monitor or monitor.VIN (latter if vin=VIN is given as parameter)
-- Go to your spreadsheet and share it with the client_email inside service_account.json created above
+- In Google Sheets, create an empty Google Sheet with the name: hyundai_kia_connect_monitor or monitor.VIN (latter if vin=VIN is given as parameter)
+- Go to your Sheet and share it with the client_email inside service_account.json created above
 
 INPUT:
 - summary.cfg (see above)
-- monitor.csv or or monitor.VIN.csv (latter if vin=VIN is given as parameter)
+- monitor.csv or monitor.VIN.csv (latter if vin=VIN is given as parameter)
 
 OUTPUT:
 - standard output: summary per TRIP, DAY, WEEK, MONTH, YEAR in csv format
-- summary.charged.csv or summary.charged.VIN.csv, showing detected sharges per day "date, odometer, +kWh, end of charge SOC%", can be used by other tools. Is also used by dailystats.py
+- summary.charged.csv or summary.charged.VIN.csv, showing detected charges per day "date, odometer, +kWh, end of charge SOC%", can be used by other tools. Is also used by dailystats.py
 - summary.trip.csv or summary.trip.VIN.csv, showing per detected trip "date, odometer, distance, -kWh, +kWh", can be used by other tools. Is also used by dailystats.py
-- Google spreadsheet update with name: hyundai-kia-connect-monitor or monitor.VIN or (latter if vin=VIN is given as parameter)
+- Google Sheet update with name: hyundai-kia-connect-monitor or monitor.VIN or (latter if vin=VIN is given as parameter)
 
-For easier use on a mobile phone, the spreadsheet will contain first the overall information in the first number of rows:
+For easier use on a mobile phone, the Google Sheet will contain first the overall information in the first number of rows:
 - Last run
 - last update at datetime
 - location last updated at datetime
@@ -1183,10 +853,10 @@ Read the daily stats, trip info and charge files and represent these in a nice f
 
 *Note summary input information is represented using round brackets, examples: (+33.6kWh) or (11.2kWh) or (4.1km/kWh), because the other information is probably more accurate*
 
-For sheetupdate configure once gspread and a specific Google Spreadsheet:
+For sheetupdate configure once gspread and a specific Google Sheet:
 - [See configuration of gspread here](#configuration-of-gspread-for-python-summarypy-sheetupdate-and-python-dailystatspy-sheetupdate)
-- In Google Spreadsheet, create an empty Google Spreadsheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google spreadsheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and e.g. change diagram titles into your own language.
-- Go to your spreadsheet and share it with the client_email inside service_account.json created above
+- In Google Sheets, create an empty Google Sheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google Sheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and e.g. change diagram titles into your own language.
+- Go to your Google Sheet and share it with the client_email inside service_account.json created above
 
 Usage:
 ```
@@ -1208,7 +878,7 @@ INPUT:
 
 OUTPUT:
 - standard output: totals, daily and tripinfo statistics in a nice formatted text, including charge information using summary.charge.csv
-- Google spreadsheet update with name: monitor.dailystats or monitor.dailystats.VIN or (latter if vin=VIN is given as parameter)
+- Google Sheet update with name: monitor.dailystats or monitor.dailystats.VIN (latter if vin=VIN is given as parameter)
 
 ---
 # kml.py
@@ -1255,7 +925,7 @@ python shrink.py vin=VIN
 
 ---
 # debug.py
-Same sort of python script as monitor.py, but debug logging enabled and all the (internal) data is just printed to standard output in pretty print.
+Same sort of Python script as monitor.py, but debug logging enabled and all the (internal) data is just printed to standard output in pretty print.
 It uses the configuration from monitor.cfg.
 
 Usage:
@@ -1271,23 +941,23 @@ Python script for testing: print when the odometer between two monitor.csv entri
 
 ---
 # monitor_utils.py
-Generic utility methods, used by the other python scripts.
+Generic utility methods, used by the other Python scripts.
 
 ---
 # domoticz_utils.py
-Domoticz utility methods, used by the other python scripts.
+Domoticz utility methods, used by the other Python scripts.
 
 ---
 # mqtt_utils.py
-MQTT utility methods, used by the other python scripts.
+MQTT utility methods, used by the other Python scripts.
 
 ---
 # logging_config.ini
 Configuration of default logging and formatting of logging.
 
 ---
-# Raspberry pi configuration
-Examples of running on Raspberry Pi or a linux based system.
+# Raspberry Pi configuration
+Examples of running on Raspberry Pi or a Linux-based system.
 
 There are 2 different options to run monitor.py. Run infinitely or only once. The first one is more efficient, because then only summary.py and dailystats.py are run when there is new cached server data received. Also running infinitely does a login once per day, which is also more efficient and for Bluelink USA the rate limit is not restricted.
 
@@ -1307,10 +977,10 @@ Add to your crontab to run once per hour to restart after crashes or reboot (cro
 @reboot sleep 125 && ~/hyundai_kia_connect_monitor/run_monitor_infinite.sh >> ~/hyundai_kia_connect_monitor/crontab_run_monitor_infinite.log 2>&1
 ```
 
-*Note: there is a limit in the number of request per country, but 1 request per hour should not hamper using the Bluelink or UVO Connect App at the same time*
+*Note: there is a limit in the number of requests per country, but 1 request per hour should not hamper using the Bluelink or UVO Connect App at the same time*
 
 ## Running monitor.py once
-Example script [run_monitor_once.sh](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/run_monitor_once.sh) to run monitor.py once on a linux based system.
+Example script [run_monitor_once.sh](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/run_monitor_once.sh) to run monitor.py once on a Linux-based system.
 
 Steps:
 1. create a directory hyundai_kia_connect_monitor in your home directory
@@ -1332,9 +1002,9 @@ Add the following line in your crontab -e to run it every 15 minutes between 6 a
 *Note: there is a limit in the number of request per country, but 1 request per hour should not hamper using the Bluelink or UVO Connect App at the same time*
 
 
-## follow the last content of monitor.csv or run_monitor_infinite.log
+## follow the latest content of monitor.csv or run_monitor_infinite.log
 
-There is another python tool to follow the content of a file on a server and send it to a Google Sheet with the same filename. [See tail2GoogleSheet](https://github.com/ZuinigeRijder/tail2GoogleSheet?tab=readme-ov-file#example-crontab-to-run-on-raspberry-pi-or-another-linux-system).
+There is another Python tool to follow the content of a file on a server and send it to a Google Sheet with the same filename. [See tail2GoogleSheet](https://github.com/ZuinigeRijder/tail2GoogleSheet?tab=readme-ov-file#example-crontab-to-run-on-raspberry-pi-or-another-linux-system).
 
 Another example is [tail_run_monitor_infinite.log.sh](https://raw.githubusercontent.com/ZuinigeRijder/tail2GoogleSheet/main/examples/tail_run_monitor_infinite.log.sh) which is following ~/hyundai_kia_connect_monitor/run_monitor_infinite.log
 
@@ -1444,18 +1114,18 @@ YEARLY  , 2023-01-18,   6d ,  22344.6,  11096.0,  1831.1,  -1916.2,    5.8,     
 ```
 
 
-Also the 12 Volt battery is shown. Here the mapping of percentage to volt for a typical Lead Acid Battery:
+Also the 12-volt battery is shown. Here the mapping of percentage to volt for a typical Lead Acid Battery:
 
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/Lead-Acid-Battery-Voltage-Charts.jpg)
 
 
-Screenshot of spreadsheet:
+Screenshot of Google Sheet:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_GoogleSpreadsheet.png)
 
-Dutch screenshot of spreadsheet:
+Dutch screenshot of Google Sheet:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_GoogleSpreadsheet.nl.png)
 
-German screenshot of spreadsheet:
+German screenshot of Google Sheet:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_GoogleSpreadsheet.de.png)
 
 Example output of [summary.charged.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.charge.csv)
@@ -1580,19 +1250,19 @@ C:\Users\Rick\git\monitor>python dailystats.py sheetupdate
    (0.7kWh)  13:24-13:31   (3.0km/kWh)       2km   23km/h   48km/h      1min
 ```
 
-Video of spreadsheet:
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U" target="_blank"><img src="http://img.youtube.com/vi/W5syq4uqo7U/0.jpg" alt="monitor.dailystats Google Spreadsheet" width="240" height="180" border="10" /></a>
+Video of Google Sheet:
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U" target="_blank"><img src="http://img.youtube.com/vi/W5syq4uqo7U/0.jpg" alt="monitor.dailystats Google Sheet" width="240" height="180" border="10" /></a>
 
 Screenshot in browser with nice diagrams:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.Browser.jpg)
 
-Screenshot of spreadsheet:
+Screenshot of Google Sheet:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.png)
 
-Dutch screenshot of spreadsheet:
+Dutch screenshot of Google Sheet:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.nl.png)
 
-German screenshot of spreadsheet:
+German screenshot of Google Sheet:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.de.png)
 
 **Example translations of standard output (only first line is not the finally translated one, your browser might not display the unicode characters correct):**
@@ -1675,7 +1345,7 @@ I changed the style to "sequence numbering" so you see the order of locations in
 ----
 ## python shrink.py
 
-Example (based on earlier monitor.csv) outputfile [shrinked_monitor.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/shrinked_monitor.csv)
+Example (based on earlier monitor.csv) output file [shrinked_monitor.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/shrinked_monitor.csv)
 ```
 datetime, longitude, latitude, engineOn, 12V%, odometer, SOC%, charging, plugged, address, EV range
 2023-01-13 09:04:04+01:00, 6.401608, 51.934742, False, 85, 22162.2, 60, False, 0, 7;Kwakstraat; Duckstad; Nederland; 7054; AN, 221
@@ -1706,9 +1376,47 @@ datetime, longitude, latitude, engineOn, 12V%, odometer, SOC%, charging, plugged
 Because monitor.py is now only adding lines when they are different, the difference is in this example only one line.
 
 ----
+# Avoid waking up your car (forced updates or sending commands with Apps or Tools)
+
+The monitor.py tool will never do a forced update (with one configurable exception, see Note 2) and only asks for cached server values, so the 12-volt battery is NOT drained by the tool.
+
+Note that if you do a lot of refresh calls by Hyundai Bluelink or Kia Connect App, than definitely the car's 12-volt battery can be drained.
+See [here some results of someone with an IONIQ 5 using refresh](https://community.home-assistant.io/t/hyundai-bluelink-integration/319129/132), so use the refresh carefully:
+```
+With 15-minute refreshed:
+95% to 80% in 8 hours, approx. 1.8%/hour
+
+With 60-minute refreshed:
+93% to 82% in 14 hours, approx. 0.78%/hour
+```
+
+[This video shows also why it is important to avoid awakening the car for actual values or sending commands.](https://youtu.be/rpLWEe-2aUU?t=121)
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=rpLWEe-2aUU" target="_blank"><img src="http://img.youtube.com/vi/rpLWEe-2aUU/0.jpg" alt="IONIQ 5 Quicklynks BM2 battery monitor 12 volt battery 3 days" width="240" height="180" border="10" /></a>
+
+30 nov 6:10 a refresh via the Bluelink App has been done and you see a dip from 12.92 Volt to 12.42 Volt for a moment and then back to 12.83 Volt.
+
+*Note 1: the tool asks only for server cache updates and the car decides when to send push notifications with actual values to the server.*
+
+*Note 2: When configured in monitor.cfg: monitor_force_sync_when_odometer_different_location_workaround = True, a forced update is done when the odometer has changed, to get the latest location (for some cars the cached location is not updated correctly anymore since May 2025 when turning off the car). Only change to True when you have this problem AND you want up-to-date locations when turning off the car. Although this will only wake up your car once per trip, it can have the dip-effect of the 12-volt battery as described above.*
+
+----
+# Translations
+There are translations available for the following tools (only the standard output and sheetupdate, not the other generated csv files):
+- dailystats.py
+- summary.py
+
+Remarks:
+- The configured language in monitor.cfg is used for the translations, see monitor.cfg in [monitor.py](#monitorpy).
+- Translations are inside monitor.translations.xlsx for easier Unicode editing and are saved in monitor.translations.csv as comma separated csv file in UTF-8 format, so unicode characters are preserved.
+- All the supported languages have been translated with Google Translate and German is checked/corrected by a goingelectric.de user (thanks)
+- Polish, Czech, Slovak, Hungarian are not translated, feel free to provide translations for those languages
+- If (some) translations are not correct, please submit an issue with the proposed corrections, but be careful to provide them as unicode text, preferably using monitor.translations.xlsx
+-
+----
 # Development Environment
-- I develop on Windows 10 and the tools are run on my Raspberry Pi, with python 3.9.*
-- on Windows 10 I use the free Visual Studio Code version with python plugins.
+- I develop on Windows 11 and the tools are run on my Raspberry Pi, with Python 3.9.*
+- on Windows 11 I use the free Visual Studio Code version with Python plugins.
 - configured pylint and flake8 for static checking
 - files are saved with Black with the default linelength of 88
 - flake8 linelength is set to value of 88, same as Black
@@ -1730,7 +1438,7 @@ How often should I run the tools:
 - this depends on your usage pattern
 - if you are only interested in daily statistics and trip info from the car, you only need to run monitor.py once a day, because it will retrieve the daily stats and trip stats from the server
 - if you want to capture charging sessions, then you need to run monitor.py before the charging session and after the charging session. If you only charge in the night, then twice is sufficient (in the evening once before charging and in the morning once before leaving with the car)
-- If you want the latest information of the car (e.g. battery percentage) to be send to the bluelink server, do a refresh status in the bluelink App and thereafter run monitor.py
+- If you want the latest information of the car (e.g. battery percentage) to be send to the Bluelink or Connect server, do a refresh status in the Bluelink or Connect App and thereafter run monitor.py
 - if you also want to catch trip consumption figures and charging sessions during the day with summary.py, you need to run monitor.py as often as is allowed with the API call limit, e.g. I run monitor.py once per 15 minutes between 6:00 and 22:00
 
 Why are regularly exceptions thrown when running monitor.py?
