@@ -41,6 +41,7 @@ MQTT_BROKER_HOSTNAME = get(mqtt_settings, "mqtt_broker_hostname", "localhost")
 MQTT_BROKER_PORT = int(get(mqtt_settings, "mqtt_broker_port", "1883"))
 MQTT_BROKER_USERNAME = get(mqtt_settings, "mqtt_broker_username", "")
 MQTT_BROKER_PASSWORD = get(mqtt_settings, "mqtt_broker_password", "")
+MQTT_BROKER_CABUNDLE = get(mqtt_settings, "mqtt_broker_cabundle", "")
 MQTT_MAIN_TOPIC = get(mqtt_settings, "mqtt_main_topic", "hyundai_kia_connect_monitor")
 
 MQTT_CLIENT = None  # will be filled at MQTT connect if configured
@@ -110,6 +111,8 @@ def connect_mqtt():
     client.on_disconnect = on_disconnect
     if MQTT_BROKER_USERNAME and MQTT_BROKER_PASSWORD:
         client.username_pw_set(MQTT_BROKER_USERNAME, MQTT_BROKER_PASSWORD)
+    if MQTT_BROKER_CABUNDLE:
+        client.tls_set(MQTT_BROKER_CABUNDLE)
     client.connect(MQTT_BROKER_HOSTNAME, MQTT_BROKER_PORT)
     return client
 
