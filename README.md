@@ -209,6 +209,7 @@ mqtt_broker_hostname = localhost
 mqtt_broker_port = 1883
 mqtt_broker_username =
 mqtt_broker_password =
+mqtt_broker_cabundle =
 mqtt_main_topic = hyundai_kia_connect_monitor
 
 [Domoticz]
@@ -645,6 +646,7 @@ mqtt_broker_hostname = localhost
 mqtt_broker_port = 1883
 mqtt_broker_username =
 mqtt_broker_password =
+mqtt_broker_cabundle =
 mqtt_main_topic = hyundai_kia_connect_monitor
 ```
 
@@ -653,6 +655,7 @@ mqtt_main_topic = hyundai_kia_connect_monitor
 - mqtt_broker_port is the port where to send the updates to
 - mqtt_broker_username is an optional username
 - mqtt_broker_password is an optional password
+- mqtt_broker_cabundle is an optional path to a CA bundle in PEM format if your MQTT broker uses a self-signed TLS certificate
 - mqtt_main_topic is the main topic
 
 When configured, the data is sent to mqtt_main_topic/VIN/subtopic.
