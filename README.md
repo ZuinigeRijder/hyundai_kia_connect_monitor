@@ -527,8 +527,9 @@ dailystats_trip_LAST_DAY_idle_time = 0
 - password: password of your Bluelink or Connect account OR the token; the token is needed for Europe, retrieve token once per 180 days [using this README](https://gist.github.com/RustyDust/e2a7be978affd85fb5ef5a345f31f67a) or see [this issue](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/issues/81#issuecomment-3409735930) or for [Hyundai with a terminal without GUI](https://gist.github.com/stefan-home/808d8774a461f22f2ae1d9519f067b71)
 - pin: pincode of your Bluelink or Connect account, required for CANADA, and potentially USA, otherwise pass a blank string
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
-- use_geocode_email: (default: True) use email to avoid abuse of address lookup
-- geocode_provider: (default: 1) use openstreetmap (1) or google (2) for address lookup
+- use_geocode_email: (default: True) use email to avoid abuse of address looku
+- geocode_provider: (default: 1) use openstreetmap (1) or google (2) for address lookup<br/>
+  *Note: google variant requires additional python package(s) installation not being installed by default*
 - google_api_key: (default empty) when using "geocode_provider = 2" (google) you need to get a [google API key, see this discussion](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/discussions/76#discussioncomment-12728843). Do not put quotes around the Google API key!
 - language: (default: en) the Bluelink or Connect App is reset to English for users who have set another language in the Bluelink or Connect App in Europe when using hyundai_kia_connect_api, you can configure another language as workaround. See Note 3
 - odometer_metric, e.g. km or mi
@@ -636,6 +637,8 @@ You also can consider only to monitor between e.g. 6:00 and 22:00 (saves 1/3 of 
 ---
 # MQTT Broker (e.g. HomeAssistant, ioBroker)
 An MQTT broker is a server that receives all messages from the clients and then routes the messages to the appropriate destination clients. Information is organized in a hierarchy of topics. When hyundai_kia_connect_monitor has a new item of data to distribute, it sends a control message with the data to the connected broker. The broker then distributes the information to any clients that have subscribed to that topic. The hyundai_kia_connect_monitor does not need to have any data on the number or locations of subscribers, and subscribers, in turn, do not have to be configured with any data about the publishers.
+
+*Note: additional python package(s) installation required that are not installed by default*
 
 In the file "monitor.cfg" there is a configuration section for MQTT.
 
@@ -793,6 +796,8 @@ Explanation of configuration items:
 ---
 # summary.py sheetupdate
 make summary per TRIP, DAY, WEEK, MONTH, YEAR with monitor.csv as input and write summary to Google Sheet
+
+*Note: additional python package(s) installation required that are not installed by default*
 
 Usage:
 ```
