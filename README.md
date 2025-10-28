@@ -44,7 +44,7 @@ Examples of supported cars (including cars with newer [ccNC Infotainment](https:
 - Hyundai (Bluelink): Ioniq, IONIQ 5, IONIQ 6, Kona
 - Kia (Connect): EV6, EV9, Niro, Soul
 
-[Here a video](http://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U) with some nice diagrams in a Google Sheet, showing:
+[Here a video](https://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U) with some nice diagrams in a Google Sheet, showing:
 
 Daily Statistics:
 - Total
@@ -65,7 +65,7 @@ Trip information:
 - Maximum speed
 - Idle minutes
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U" target="_blank"><img src="http://img.youtube.com/vi/W5syq4uqo7U/0.jpg" alt="monitor.dailystats Google Sheet" width="240" height="180" border="10" /></a>
+<a href="https://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U" target="_blank"><img src="https://img.youtube.com/vi/W5syq4uqo7U/0.jpg" alt="monitor.dailystats Google Sheet" width="240" height="180" border="10" /></a>
 
 Example screenshots showing the results in a Google Sheet:
 - DailyStats
@@ -146,9 +146,9 @@ pip install "beautifulsoup4>=4.10.0"
 ````
 
 The following packages are optional:
-- gspread is mandatory when Google Sheets option is used
-- paho_mqtt is mandatory when MQTT option is used (send_to_mqtt = True)
-- geopy is mandatory when Google address lookup is used (geocode_provider = 2)
+- gspread is mandatory when Google Sheets option is used, see [requirements-gspread.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements-gspread.txt)
+- paho_mqtt is mandatory when MQTT option is used (send_to_mqtt = True), see [requirements-mqtt.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements-mqtt.txt)
+- geopy is mandatory when Google address lookup is used (geocode_provider = 2), see [requirements-google-geo-lookup.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements-google-geo-lookup.txt)
 ````
 geopy>=2.2.0
 gspread>=5.6.2
@@ -529,7 +529,7 @@ dailystats_trip_LAST_DAY_idle_time = 0
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
 - use_geocode_email: (default: True) use email to avoid abuse of address looku
 - geocode_provider: (default: 1) use openstreetmap (1) or google (2) for address lookup<br/>
-  *Note: google variant requires additional python package(s) installation not being installed by default*
+  *Note: google variant requires additional python package(s) installation not being installed by default, geopy is mandatory when Google address lookup is used (geocode_provider = 2), see [requirements-google-geo-lookup.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements-google-geo-lookup.txt)*
 - google_api_key: (default empty) when using "geocode_provider = 2" (google) you need to get a [google API key, see this discussion](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/discussions/76#discussioncomment-12728843). Do not put quotes around the Google API key!
 - language: (default: en) the Bluelink or Connect App is reset to English for users who have set another language in the Bluelink or Connect App in Europe when using hyundai_kia_connect_api, you can configure another language as workaround. See Note 3
 - odometer_metric, e.g. km or mi
@@ -547,7 +547,7 @@ dailystats_trip_LAST_DAY_idle_time = 0
 
 *Note 1: in combination with infinite (monitor_infinite = True) summary.py and dailystats.py are only run when something is changed or error occurred (or once a day). You do not need to run summary.py and dailystats.py separately and it is only run when it is needed.*
 
-*Note 2: I think that the consumption values ​​of the on-board computer are corrected with an efficiency number, e.g. 1 kWh of energy results in 0.9 kWh of real energy (losses when converting battery kWh by the car). Therefore, I introduced an efficiency configuration factor in monitor.cfg, consumption_efficiency_factor_dailystats and consumption_efficiency_factor_summary. For example, when setting this to 0.9, 10% of the energy is lost during the conversion and is used in the consumption calculation. By default, the values are 1.0, so no correction.*
+*Note 2: Assumed is that the consumption values ​​of the on-board computer are corrected with an efficiency number, e.g. 1 kWh of energy results in 0.9 kWh of real energy (losses when converting battery kWh by the car). Therefore, I introduced an efficiency configuration factor in monitor.cfg, consumption_efficiency_factor_dailystats and consumption_efficiency_factor_summary. For example, when setting this to 0.9, 10% of the energy is lost during the conversion and is used in the consumption calculation. By default, the values are 1.0, so no correction.*
 
 *Note 3: The last TRIP, DAY, WEEK, MONTH, YEAR, TRIPAVG, DAYAVG, WEEKAVG, MONTHAVG, YEARLY lines are also sent to [Domoticz](#domoticz) and/or [MQTT Broker](#mqtt-broker-eg-homeassistant-iobroker) (e.g. HomeAssistant, ioBroker) when configured.*
 
@@ -638,7 +638,7 @@ You also can consider only to monitor between e.g. 6:00 and 22:00 (saves 1/3 of 
 # MQTT Broker (e.g. HomeAssistant, ioBroker)
 An MQTT broker is a server that receives all messages from the clients and then routes the messages to the appropriate destination clients. Information is organized in a hierarchy of topics. When hyundai_kia_connect_monitor has a new item of data to distribute, it sends a control message with the data to the connected broker. The broker then distributes the information to any clients that have subscribed to that topic. The hyundai_kia_connect_monitor does not need to have any data on the number or locations of subscribers, and subscribers, in turn, do not have to be configured with any data about the publishers.
 
-*Note: additional python package(s) installation required that are not installed by default*
+*Note: additional python package(s) installation are required that are not installed by default, paho_mqtt is mandatory, see [requirements-mqtt.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements-mqtt.txt)*
 
 In the file "monitor.cfg" there is a configuration section for MQTT.
 
@@ -680,7 +680,7 @@ For convenience an example [configuration.yaml](https://raw.githubusercontent.co
 # Domoticz
 [Domoticz](https://www.domoticz.com/) is a very light weight home automation system that lets you monitor and configure miscellaneous devices, including lights, switches, various sensors/meters like temperature, rainfall, wind, ultraviolet (UV) radiation, electricity usage/production, gas consumption, water consumption and many more. Notifications/alerts can be sent to any mobile device.
 
-In the file "monitor.cfg" there is a configuration section for domoticz. [See configuration items here.](#configuration-of-gspread-for-python-summarypy-sheetupdate-and-python-dailystatspy-sheetupdate)
+In the file "monitor.cfg" there is a configuration section for domoticz. [See configuration items here.](#domoticz)
 
 - set send_to_domoticz to True if you want to send updates to *.csv also to Domoticz
 - domot_url is the URL where to send the updates to
@@ -693,7 +693,10 @@ In the file "monitor.cfg" there is a configuration section for domoticz. [See co
 
 ---
 # Configuration of gspread for "python summary.py sheetupdate" and "python dailystats.py sheetupdate"
-For updating Google Sheets, summary.py and dailystats.py are using the package gspread.
+
+:
+*Note: For updating Google Sheets by summary.py and dailystats.py, additional python package(s) installation are required that are not installed by default, using the package gspread, see [requirements-gspread.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements-gspread.txt)*
+
 For Authentication with Google Sheets you have to configure authentication for gspread.
 This [authentication configuration is described here](https://docs.gspread.org/en/latest/oauth2.html)
 
@@ -797,7 +800,7 @@ Explanation of configuration items:
 # summary.py sheetupdate
 make summary per TRIP, DAY, WEEK, MONTH, YEAR with monitor.csv as input and write summary to Google Sheet
 
-*Note: additional python package(s) installation required that are not installed by default*
+*Note: additional python package(s) installation are required that are not installed by default, gspread is mandatory, see [requirements-gspread.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements-gspread.txt)*
 
 Usage:
 ```
@@ -858,7 +861,7 @@ And thereafter the last 122 lines of the summary in reverse order, so you do not
 Read the daily stats, trip info and charge files and represent these in a nice formatted text, including computed totals. Support for Domoticz and/or MQTT Broker (e.g. HomeAssistant, ioBroker).
 
 *Note dailystats and tripinfo from hyundai_kia_connect_api is currently only available for Europe*
-
+additiona
 *Note summary input information is represented using round brackets, examples: (+33.6kWh) or (11.2kWh) or (4.1km/kWh), because the other information is probably more accurate*
 
 For sheetupdate configure once gspread and a specific Google Sheet:
@@ -1259,7 +1262,7 @@ C:\Users\Rick\git\monitor>python dailystats.py sheetupdate
 ```
 
 Video of Google Sheet:
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U" target="_blank"><img src="http://img.youtube.com/vi/W5syq4uqo7U/0.jpg" alt="monitor.dailystats Google Sheet" width="240" height="180" border="10" /></a>
+<a href="https://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U" target="_blank"><img src="https://img.youtube.com/vi/W5syq4uqo7U/0.jpg" alt="monitor.dailystats Google Sheet" width="240" height="180" border="10" /></a>
 
 Screenshot in browser with nice diagrams:
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/dailystats.py_GoogleSpreadsheet.Browser.jpg)
@@ -1400,7 +1403,7 @@ With 60-minute refreshed:
 
 [This video shows also why it is important to avoid awakening the car for actual values or sending commands.](https://youtu.be/rpLWEe-2aUU?t=121)
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=rpLWEe-2aUU" target="_blank"><img src="http://img.youtube.com/vi/rpLWEe-2aUU/0.jpg" alt="IONIQ 5 Quicklynks BM2 battery monitor 12 volt battery 3 days" width="240" height="180" border="10" /></a>
+<a href="https://www.youtube.com/watch?feature=player_embedded&v=rpLWEe-2aUU" target="_blank"><img src="https://img.youtube.com/vi/rpLWEe-2aUU/0.jpg" alt="IONIQ 5 Quicklynks BM2 battery monitor 12 volt battery 3 days" width="240" height="180" border="10" /></a>
 
 30 nov 6:10 a refresh via the Bluelink App has been done and you see a dip from 12.92 Volt to 12.42 Volt for a moment and then back to 12.83 Volt.
 

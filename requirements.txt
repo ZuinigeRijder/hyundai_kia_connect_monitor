@@ -1,3 +1,5 @@
 hyundai_kia_connect_api>=3.49.0
 beautifulsoup4>=4.10.0
 requests>=2.28.1
+certifi>=2024.6.2
+tzdata>=2025.2
