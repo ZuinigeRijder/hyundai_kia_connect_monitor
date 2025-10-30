@@ -16,7 +16,7 @@ except ImportError:
 
 from monitor_utils import (
     dbg,
-    die,  #
+    die,
     get,
     d,
     get_bool,

@@ -50,7 +50,9 @@ def set_dbg() -> None:
 def die(msg: str):
     """die with an error string"""
     logging.error(msg)
-    sys.exit(-1)
+    logging.error("Fail fast with error code: 112")
+    traceback.print_exc()
+    os._exit(112)
 
 
 def get_splitted_list_item(the_list: list[str], index: int) -> list[str]:
@@ -185,7 +187,7 @@ def sleep_a_minute(retries: int) -> int:
         retries -= 1
         if retries > 0:
             logging.info("Sleeping a minute")
-            time.sleep(60)
+            sleep_seconds(60)
     return retries
 
 

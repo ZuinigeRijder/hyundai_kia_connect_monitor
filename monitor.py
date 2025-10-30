@@ -460,7 +460,7 @@ def handle_one_vehicle(
             f"Forced sync, new odometer=[{odometer_str}], old_odometer=[{list_prev_line[5].strip()}]"  # noqa
         )
         logging.info(f"org={vehicle.geocode}")  # noqa
-        MANAGER.check_and_force_update_vehicles(0)  # forced sync
+        MANAGER.force_refresh_all_vehicles_states()  # forced sync always
         MANAGER.update_all_vehicles_with_cached_state()  # needed >= 2.0.0
         vehicle = MANAGER.vehicles[vehicle_id]
         logging.info(f"upd={vehicle.geocode}")  # noqa
@@ -595,6 +595,7 @@ def run_commands():
             _ = D and dbg(f"command: {command}")
             _ = D and dbg(f"output_filename: {output_filename}")
             _ = D and dbg(f"open_mode: {open_mode}")
+            returncode = 0
             try:
                 with open(output_filename, open_mode, encoding="utf-8") as outfile:
                     process = subprocess.run(
@@ -604,13 +605,19 @@ def run_commands():
                         stderr=subprocess.STDOUT,
                         stdout=outfile,
                     )
-                if process.returncode != 0:
+                returncode = process.returncode
+                if returncode != 0:
                     logging.error(
-                        f"Error in running {command}: returncode {process.returncode}"
+                        f"Error in running {command}: returncode {returncode}"
                     )
+
             except Exception as ex:  # pylint: disable=broad-except
+                returncode = 112
                 (_, error_string) = handle_exception(ex, 1, True)
                 logging.error(f"Error in running {command}: {error_string}")
+
+            if returncode == 112:
+                die("Unexpected end of subprocess")
 
 
 # get MANAGER only once
@@ -650,7 +657,13 @@ def handle_vehicles(login: bool) -> bool:
                         set_vin("KMHKR81CPNU012345")
                     else:
                         set_vin(vehicle.VIN)
-                    error = handle_one_vehicle(MANAGER, vehicle_id, number_of_vehicles)
+                    try:
+                        error = handle_one_vehicle(
+                            MANAGER, vehicle_id, number_of_vehicles
+                        )
+                    except Exception as ex_one_vehicle:  # pylint: disable=broad-except
+                        logging.error(f"handle_one_vehicle exception: {ex_one_vehicle}")
+                        error = True
                     if error:  # something gone wrong, exit vehicles loop
                         error_string = "Error occurred in handle_one_vehicle()"
                         break
@@ -710,6 +723,8 @@ def monitor():
         if error:
             logging.error(f"error count: {error_count}")
             error_count += 1
+            logging.info("Sleeping a minute")
+            sleep_seconds(60)
         else:
             error_count = 1
         if (len(MONITOR_EXECUTE_COMMANDS_WHEN_SOMETHING_WRITTEN_OR_ERROR) > 0) and (
