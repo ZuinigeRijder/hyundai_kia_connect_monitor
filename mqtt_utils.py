@@ -29,6 +29,7 @@ from monitor_utils import (
     get_items_summary,
     get_summary_headers,
     get_vin,
+    sleep_seconds,
 )
 
 PARSER = configparser.ConfigParser()
@@ -99,6 +100,7 @@ def connect_mqtt():
                 return
             except Exception as reconnect_ex:  # pylint: disable=broad-except
                 logging.error(f"{reconnect_ex}. Reconnect failed. Retrying...")
+                sleep_seconds(60)
 
             reconnect_delay *= mqtt_reconnect_rate
             reconnect_delay = min(reconnect_delay, mqtt_max_reconnect_delay)
