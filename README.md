@@ -109,9 +109,9 @@ The following tools are available as pure Python3 scripts:
 # How to install Python, packages and hyundai_connect_monitor
 Explanation for someone with no knowledge of Python. It will run on many computers.
 Part of the tools is the regular retrieval of the data with the Python script monitor.py.
-For this you need to install Python 3.9 or higher. I have installed Python 3.9.13.
+For this you need to install Python 3.12 or higher.
 
-*Note: hyundai_kia_connect_api has the minimum requirement of Python 3.10, for now it also works with Python 3.9, but it might break in the future*
+*Note: hyundai_kia_connect_api has the minimum requirement of Python 3.12*
 
 [Here is more information about installing Python](https://realpython.com/installing-python/)
 
@@ -524,7 +524,7 @@ dailystats_trip_LAST_DAY_idle_time = 0
 - region: 1: REGION_EUROPE, 2: REGION_CANADA, 3: REGION_USA
 - brand: 1: BRAND_KIA, 2: BRAND_HYUNDAI
 - username: your Bluelink or Connect account email address
-- password: password of your Bluelink or Connect account OR the token; the token is needed for Europe, retrieve token once per 180 days [using this README](https://gist.github.com/RustyDust/e2a7be978affd85fb5ef5a345f31f67a) or see [this issue](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/issues/81#issuecomment-3409735930) or for [Hyundai with a terminal without GUI](https://gist.github.com/stefan-home/808d8774a461f22f2ae1d9519f067b71)
+- password: password of your Bluelink or Connect account. Europe Hyundai and Kia login logic is internally based on the bluelink-refresh-token project. Username/password login is supported directly for Kia, Hyundai, and Genesis (EU) — no longer browser or manual token extraction needed. The pycryptodome package (see requirements.txt) is used for RSA password encryption during the EU login flow.
 - pin: pincode of your Bluelink or Connect account, required for CANADA, and potentially USA, otherwise pass a blank string
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
 - use_geocode_email: (default: True) use email to avoid abuse of address looku
@@ -1426,7 +1426,7 @@ Remarks:
 -
 ----
 # Development Environment
-- I develop on Windows 11 and the tools are run on my Raspberry Pi, with Python 3.9.*
+- I develop on Windows 11 and the tools are run on my Raspberry Pi, with Python 3.12.*
 - on Windows 11 I use the free Visual Studio Code version with Python plugins.
 - configured pylint and flake8 for static checking
 - files are saved with Black with the default linelength of 88
