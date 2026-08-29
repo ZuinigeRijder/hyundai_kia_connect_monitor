@@ -130,6 +130,10 @@ or
 ````
 python -m pip install "package_name"
 ````
+or
+````
+sudo apt install package_name
+````
 
 The following packages are mandatory, see [requirements.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements.txt) and [requirements.txt from hyundai_kia_connect_api](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/blob/master/requirements.txt).
 
@@ -153,6 +157,16 @@ The following packages are optional:
 geopy>=2.2.0
 gspread>=5.6.2
 paho_mqtt>=2.0
+````
+
+*Note: When using Debian 13 or above, it is possible the package names are somewhat different. Examples for using with sudo apt install:
+````
+beautifulsoup4 → python3-bs4
+paho-mqtt → python3-paho-mqtt
+gspread → python3-gspread
+geopy → python3-geopy
+python-dateutil → python3-dateutil
+requests → python3-requests
 ````
 
 If everything works, it's a matter of regularly collecting the information, for example by running the "python monitor.py" command once an hour or infinite. A server is of course best, I use a Raspberry Pi, but it can also regularly be done on a Windows or MacOS computer, provided the computer is on.
