@@ -1,0 +1,12 @@
+services:
+  hyundai:
+    build: .
+    volumes:
+      - ./monitor.cfg:/usr/src/hyundai_kia_connect_monitor/monitor.cfg
+      - ./monitor.csv:/usr/src/hyundai_kia_connect_monitor/monitor.csv
+      - ./monitor.dailystats.csv:/usr/src/hyundai_kia_connect_monitor/monitor.dailystats.csv
+      - ./monitor.tripinfo.csv:/usr/src/hyundai_kia_connect_monitor/monitor.tripinfo.csv
+      - ./summary.cfg:/usr/src/hyundai_kia_connect_monitor/summary.cfg
+      - ./summary.charge.csv:/usr/src/hyundai_kia_connect_monitor/summary.charge.csv
+      - ./summary.trip.csv:/usr/src/hyundai_kia_connect_monitor/summary.trip.csv
+
