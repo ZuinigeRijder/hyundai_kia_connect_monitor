@@ -1,4 +1,4 @@
-hyundai_kia_connect_api>=4.27.1
+hyundai_kia_connect_api>=4.35.3
 beautifulsoup4>=4.10.0
 requests>=2.28.1
 certifi>=2024.6.2
