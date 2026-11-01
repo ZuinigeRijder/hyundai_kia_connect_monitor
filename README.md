@@ -109,9 +109,9 @@ The following tools are available as pure Python3 scripts:
 # How to install Python, packages and hyundai_connect_monitor
 Explanation for someone with no knowledge of Python. It will run on many computers.
 Part of the tools is the regular retrieval of the data with the Python script monitor.py.
-For this you need to install Python 3.9 or higher. I have installed Python 3.9.13.
+For this you need to install Python 3.12 or higher.
 
-*Note: hyundai_kia_connect_api has the minimum requirement of Python 3.10, for now it also works with Python 3.9, but it might break in the future*
+*Note: hyundai_kia_connect_api has the minimum requirement of Python 3.12*
 
 [Here is more information about installing Python](https://realpython.com/installing-python/)
 
@@ -129,6 +129,10 @@ Probably some packages needed for Hyundai Connect API are not installed (error m
 or
 ````
 python -m pip install "package_name"
+````
+or
+````
+sudo apt install package_name
 ````
 
 The following packages are mandatory, see [requirements.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements.txt) and [requirements.txt from hyundai_kia_connect_api](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api/blob/master/requirements.txt).
@@ -153,6 +157,16 @@ The following packages are optional:
 geopy>=2.2.0
 gspread>=5.6.2
 paho_mqtt>=2.0
+````
+
+*Note: When using Debian 13 or above, it is possible the package names are somewhat different. Examples for using with sudo apt install:
+````
+beautifulsoup4 → python3-bs4
+paho-mqtt → python3-paho-mqtt
+gspread → python3-gspread
+geopy → python3-geopy
+python-dateutil → python3-dateutil
+requests → python3-requests
 ````
 
 If everything works, it's a matter of regularly collecting the information, for example by running the "python monitor.py" command once an hour or infinite. A server is of course best, I use a Raspberry Pi, but it can also regularly be done on a Windows or MacOS computer, provided the computer is on.
@@ -524,7 +538,7 @@ dailystats_trip_LAST_DAY_idle_time = 0
 - region: 1: REGION_EUROPE, 2: REGION_CANADA, 3: REGION_USA
 - brand: 1: BRAND_KIA, 2: BRAND_HYUNDAI
 - username: your Bluelink or Connect account email address
-- password: password of your Bluelink or Connect account OR the token; the token is needed for Europe, retrieve token once per 180 days [using this README](https://gist.github.com/RustyDust/e2a7be978affd85fb5ef5a345f31f67a) or see [this issue](https://github.com/ZuinigeRijder/hyundai_kia_connect_monitor/issues/81#issuecomment-3409735930) or for [Hyundai with a terminal without GUI](https://gist.github.com/stefan-home/808d8774a461f22f2ae1d9519f067b71)
+- password: password of your Bluelink or Connect account. Europe Hyundai and Kia login logic is internally based on the bluelink-refresh-token project. Username/password login is supported directly for Kia, Hyundai, and Genesis (EU) — no longer browser or manual token extraction needed. The pycryptodome package (see requirements.txt) is used for RSA password encryption during the EU login flow.
 - pin: pincode of your Bluelink or Connect account, required for CANADA, and potentially USA, otherwise pass a blank string
 - use_geocode: (default: True) find address with the longitude/latitude for each entry
 - use_geocode_email: (default: True) use email to avoid abuse of address looku
@@ -1426,7 +1440,7 @@ Remarks:
 -
 ----
 # Development Environment
-- I develop on Windows 11 and the tools are run on my Raspberry Pi, with Python 3.9.*
+- I develop on Windows 11 and the tools are run on my Raspberry Pi, with Python 3.12.*
 - on Windows 11 I use the free Visual Studio Code version with Python plugins.
 - configured pylint and flake8 for static checking
 - files are saved with Black with the default linelength of 88
