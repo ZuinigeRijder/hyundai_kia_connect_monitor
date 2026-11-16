@@ -1,5 +1,6 @@
 # == monitor_utils.py Author: Zuinige Rijder =========
 """monitor utils"""
+
 # pylint:disable=logging-fstring-interpolation
 
 import configparser
@@ -8,7 +9,6 @@ import logging
 import logging.config
 import sys
 import os
-import socket
 import traceback
 from pathlib import Path
 import time
@@ -18,7 +18,6 @@ from datetime import datetime, timezone
 from calendar import monthrange
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen, Request
-
 
 VIN = ""  # filled by set_vin() or determine_vin() method
 
@@ -83,6 +82,14 @@ def determine_vin(lastrun_filename: Path) -> None:
 def get_vin() -> str:
     """get_vin"""
     return VIN
+
+
+def get_csv_path(filename: str, vin: str) -> Path:
+    """get_csv_path"""
+    path = Path(filename)
+    if not vin:
+        return path
+    return path.with_name(f"{path.stem}.{vin}{path.suffix}")
 
 
 def get_items_monitor_csv() -> list:
@@ -218,7 +225,7 @@ def to_float(string: str) -> float:
     return float(string.strip())
 
 
-def get_safe_float(number: float) -> float:
+def get_safe_float(number: float | None) -> float:
     """get safe float"""
     if number is None:
         return 0.0
@@ -230,7 +237,7 @@ def float_to_string_no_trailing_zero(input_value: float) -> str:
     return (f"{input_value:.1f}").rstrip("0").rstrip(".")
 
 
-def get_safe_bool(value: bool) -> bool:
+def get_safe_bool(value: bool | None) -> bool:
     """get safe bool"""
     if value is None:
         return False
@@ -310,7 +317,7 @@ def get_last_line(filename: Path) -> str:
     return last_line
 
 
-def get_safe_datetime(date: datetime, tzinfo: timezone) -> datetime:
+def get_safe_datetime(date: datetime | None, tzinfo: timezone) -> datetime:
     """get safe datetime"""
     if date is None:
         return datetime(2000, 1, 1, tzinfo=tzinfo)
@@ -499,8 +506,6 @@ def execute_request(url: str, data: str, headers: dict) -> str:
         errorstring = str(error.reason)
     except TimeoutError:
         errorstring = "Request timed out"
-    except socket.timeout:
-        errorstring = "Socket timed out"
     except Exception as ex:  # pylint: disable=broad-except
         errorstring = "urlopen exception: " + str(ex)
         traceback.print_exc()

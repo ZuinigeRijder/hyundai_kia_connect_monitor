@@ -1,7 +1,9 @@
 # == mqtt_utils.py Author: Zuinige Rijder =========
 """mqtt utils"""
+
 # pylint:disable=logging-fstring-interpolation, consider-using-enumerate
 
+from typing import Final
 import configparser
 import logging
 import traceback
@@ -32,18 +34,20 @@ from monitor_utils import (
     sleep_seconds,
 )
 
-PARSER = configparser.ConfigParser()
+PARSER: Final = configparser.ConfigParser()
 PARSER.read(get_filepath("monitor.cfg"))
 
 # == read [MQTT] settings in monitor.cfg ===========================
 mqtt_settings = dict(PARSER.items("MQTT"))
-SEND_TO_MQTT = get_bool(mqtt_settings, "send_to_mqtt", False)
-MQTT_BROKER_HOSTNAME = get(mqtt_settings, "mqtt_broker_hostname", "localhost")
-MQTT_BROKER_PORT = int(get(mqtt_settings, "mqtt_broker_port", "1883"))
-MQTT_BROKER_USERNAME = get(mqtt_settings, "mqtt_broker_username", "")
-MQTT_BROKER_PASSWORD = get(mqtt_settings, "mqtt_broker_password", "")
-MQTT_BROKER_CABUNDLE = get(mqtt_settings, "mqtt_broker_cabundle", "")
-MQTT_MAIN_TOPIC = get(mqtt_settings, "mqtt_main_topic", "hyundai_kia_connect_monitor")
+SEND_TO_MQTT: Final = get_bool(mqtt_settings, "send_to_mqtt", False)
+MQTT_BROKER_HOSTNAME: Final = get(mqtt_settings, "mqtt_broker_hostname", "localhost")
+MQTT_BROKER_PORT: Final = int(get(mqtt_settings, "mqtt_broker_port", "1883"))
+MQTT_BROKER_USERNAME: Final = get(mqtt_settings, "mqtt_broker_username", "")
+MQTT_BROKER_PASSWORD: Final = get(mqtt_settings, "mqtt_broker_password", "")
+MQTT_BROKER_CABUNDLE: Final = get(mqtt_settings, "mqtt_broker_cabundle", "")
+MQTT_MAIN_TOPIC: Final = get(
+    mqtt_settings, "mqtt_main_topic", "hyundai_kia_connect_monitor"
+)
 
 MQTT_CLIENT = None  # will be filled at MQTT connect if configured
 

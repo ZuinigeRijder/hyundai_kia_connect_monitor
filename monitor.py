@@ -30,6 +30,7 @@ e.g. with Excel:
 - charging pattern over time
 - visited places
 """
+
 # pylint:disable=logging-fstring-interpolation,logging-not-lazy
 from os import path
 import re
@@ -42,6 +43,7 @@ import logging
 import logging.config
 from pathlib import Path
 from datetime import datetime, timedelta
+from typing import Any, Final
 import typing
 from hyundai_kia_connect_api import VehicleManager, Vehicle, exceptions
 from monitor_utils import (
@@ -78,65 +80,63 @@ from domoticz_utils import (
     send_tripinfo_csv_line_to_domoticz,
 )
 
-SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
+SCRIPT_DIRNAME: Final = path.abspath(path.dirname(__file__))
 logging.config.fileConfig(f"{SCRIPT_DIRNAME}/logging_config.ini")
-D = arg_has("debug")
+D: Final = arg_has("debug")
 if D:
     set_dbg()
 
 # keep forceupdate and cacheupdate as keyword, but do nothing with them
-KEYWORD_LIST = ["forceupdate", "cacheupdate", "debug", "test"]
-KEYWORD_ERROR = False
+KEYWORD_LIST: Final = ["forceupdate", "cacheupdate", "debug", "test"]
+keyword_error = False
 for kindex in range(1, len(sys.argv)):
     if sys.argv[kindex].lower() not in KEYWORD_LIST:
         print("Unknown keyword: " + sys.argv[kindex])
-        KEYWORD_ERROR = True
+        keyword_error = True
 
-if KEYWORD_ERROR or arg_has("help"):
+if keyword_error or arg_has("help"):
     die("Usage: python monitor.py")
 
-TEST = arg_has("test")
+TEST: Final = arg_has("test")
 # == read monitor in monitor.cfg ===========================
 parser = configparser.ConfigParser()
 parser.read(get_filepath("monitor.cfg"))
 monitor_settings = dict(parser.items("monitor", raw=True))
 
-REGION = monitor_settings["region"]
-BRAND = monitor_settings["brand"]
-USERNAME = monitor_settings["username"]
-PASSWORD = monitor_settings["password"]
-PIN = monitor_settings["pin"]
-USE_GEOCODE = get_bool(monitor_settings, "use_geocode", False)
-USE_GEOCODE_EMAIL = get_bool(monitor_settings, "use_geocode_email", False)
-GEOCODE_PROVIDER = to_int(
+REGION: Final = monitor_settings["region"]
+BRAND: Final = monitor_settings["brand"]
+USERNAME: Final = monitor_settings["username"]
+PASSWORD: Final = monitor_settings["password"]
+PIN: Final = monitor_settings["pin"]
+USE_GEOCODE: Final = get_bool(monitor_settings, "use_geocode", False)
+USE_GEOCODE_EMAIL: Final = get_bool(monitor_settings, "use_geocode_email", False)
+GEOCODE_PROVIDER: Final = to_int(
     get(monitor_settings, "geocode_provider", "1")
 )  # 1=OPENSTREETMAP 2=GOOGLE
 if GEOCODE_PROVIDER < 1 or GEOCODE_PROVIDER > 2:
     die("Invalid GEOCODE_PROVIDER in monitor.cfg, expected 1 or 2")
 
-GOOGLE_API_KEY = get(monitor_settings, "google_api_key", "")
-if len(GOOGLE_API_KEY) == 0:
-    GOOGLE_API_KEY = None  # default no API key needed for OPENSTREETMAP
+GOOGLE_API_KEY: Final[str | None] = get(monitor_settings, "google_api_key", "") or None
 
 if GEOCODE_PROVIDER == 2 and GOOGLE_API_KEY is None:
     die("Missing GOOGLE_API_KEY in monitor.cfg")
 
-LANGUAGE = monitor_settings["language"]
-ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
-MONITOR_INFINITE = get_bool(monitor_settings, "monitor_infinite", False)
-MONITOR_INFINITE_INTERVAL_MINUTES = to_int(
+LANGUAGE: Final = monitor_settings["language"]
+ODO_METRIC: Final = get(monitor_settings, "odometer_metric", "km").lower()
+MONITOR_INFINITE: Final = get_bool(monitor_settings, "monitor_infinite", False)
+MONITOR_INFINITE_INTERVAL_MINUTES: Final = to_int(
     get(monitor_settings, "monitor_infinite_interval_minutes", "60")
 )
-MONITOR_EXECUTE_COMMANDS_WHEN_SOMETHING_WRITTEN_OR_ERROR = get(
+MONITOR_EXECUTE_COMMANDS_WHEN_SOMETHING_WRITTEN_OR_ERROR: Final = get(
     monitor_settings, "monitor_execute_commands_when_something_written_or_error", ""
 )
 
-MONITOR_FORCE_SYNC_WHEN_ODOMETER_DIFFERENT_LOCATION_WORKAROUND = get_bool(
+MONITOR_FORCE_SYNC_WHEN_ODOMETER_DIFFERENT_LOCATION_WORKAROUND: Final = get_bool(
     monitor_settings,
     "monitor_force_sync_when_odometer_different_location_workaround",
     False,
 )
-MONITOR_FORCE_SYNC_MAX_COUNT = to_int(
+MONITOR_FORCE_SYNC_MAX_COUNT: Final = to_int(
     get(
         monitor_settings,
         "monitor_force_sync_max_count",
@@ -186,6 +186,7 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
 
     filename = "monitor.dailystats.csv"
     if number_of_vehicles > 1:
+        assert vehicle.VIN is not None
         filename = "monitor.dailystats." + vehicle.VIN + ".csv"
     dailystats_file = Path(filename)
     write_header = False
@@ -212,6 +213,7 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
         while i > 0:
             i = i - 1
             stat = daily_stats[i]
+            assert stat.date is not None
             if usa:
                 # write new (non-cumulative) data from today
                 dailystats_date = stat.date.strftime("%Y%m%d %H:%M")
@@ -224,6 +226,7 @@ def handle_daily_stats(vehicle: Vehicle, number_of_vehicles: int) -> None:
                 )
             if dailystats_date >= last_date:
                 # only append not already written daily stats
+                assert stat.distance is not None
                 distance = float(stat.distance)
                 distance_unit = vehicle.odometer_unit
                 if to_miles_needed(vehicle):
@@ -274,6 +277,7 @@ def write_last_run(
     filename = "monitor.lastrun"
     vin = vehicle.VIN
     if number_of_vehicles > 1:
+        assert vin is not None
         filename = "monitor." + vin + ".lastrun"
     lastrun_file = Path(filename)
     with lastrun_file.open("w", encoding="utf-8") as file:
@@ -326,7 +330,11 @@ def handle_day_trip_info(
                             f"{yyyymmdd},{trip.hhmmss},{trip.drive_time},{trip.idle_time},{trip.distance},{trip.avg_speed},{trip.max_speed}"  # noqa
                         )
                     hhmmss = trip.hhmmss
+                    assert hhmmss is not None
                     if yyyymmdd > last_date or hhmmss > last_hhmmss:
+                        assert trip.distance is not None
+                        assert trip.avg_speed is not None
+                        assert trip.max_speed is not None
                         distance = float(trip.distance)
                         avg_speed = float(trip.avg_speed)
                         max_speed = float(trip.max_speed)
@@ -364,6 +372,7 @@ def handle_trip_info(
     now = datetime.now()
     filename = "monitor.tripinfo.csv"
     if number_of_vehicles > 1:
+        assert vehicle.VIN is not None
         filename = "monitor.tripinfo." + vehicle.VIN + ".csv"
     write_header = False  # create header if file does not exists
     monitor_tripinfo_csv_file = Path(filename)
@@ -390,6 +399,9 @@ def handle_trip_info(
             if now.day == 1:  # first day of month also retrieve previous month
                 from_month = add_months(now, -1)
 
+        if len(last_line_splitted) > 6 and "Date," in last_line:
+            last_date = from_month.strftime("%Y%m01")  # assume data is first of month
+            _ = D and dbg(f"last_date: {last_date}")
         while from_month <= now:
             yyyymm = from_month.strftime("%Y%m")
             from_month = add_months(from_month, 1)
@@ -437,6 +449,7 @@ def handle_one_vehicle(
 ) -> bool:
     """handle one vehicle and return if error occurred"""
     global MONITOR_FORCE_SYNC_COUNT  # pylint:disable=global-statement
+    assert MANAGER is not None
     vehicle: Vehicle = MANAGER.vehicles[vehicle_id]
     try:
         handle_trip_info(manager, vehicle, number_of_vehicles)
@@ -446,6 +459,7 @@ def handle_one_vehicle(
 
     filename = "monitor.csv"
     if number_of_vehicles > 1:
+        assert vehicle.VIN is not None
         filename = "monitor." + vehicle.VIN + ".csv"
     prev_line = get_last_line(Path(filename)).strip()
     list_prev_line = prev_line.split(",")
@@ -473,18 +487,19 @@ def handle_one_vehicle(
         logging.info(
             f"Forced sync, new odometer=[{odometer_str}], old_odometer=[{list_prev_line[5].strip()}]"  # noqa
         )
-        _ = D and dbg(f"org={vehicle.geocode}")
+        logging.info(f"org={vehicle.geocode}")  # noqa
         MANAGER.force_refresh_all_vehicles_states()  # forced sync always
         MANAGER.update_all_vehicles_with_cached_state()  # needed >= 2.0.0
         vehicle = MANAGER.vehicles[vehicle_id]
-        _ = D and dbg(f"upd={vehicle.geocode}")
+        logging.info(f"upd={vehicle.geocode}")  # noqa
         _ = D and dbg(f"prev={prev_line}")
         # Workaround: remember correct location,
         # subsequent updates may be wrong, when same odometer
-        geocode_name = ""
-        geocode_address = ""
+        geocode_name: Any | str | None = ""
+        geocode_address: Any | str | None = ""
         if USE_GEOCODE:
             geocode = vehicle.geocode
+            assert geocode is not None
             geocode_name = geocode[0]
             geocode_address = geocode[1]
         PREV_WORKAROUND_LOCATION[vehicle.id] = {
@@ -495,7 +510,7 @@ def handle_one_vehicle(
             "geocode_name": geocode_name,
             "geocode_address": geocode_address,
         }
-        _ = D and dbg(f"Remember location: {PREV_WORKAROUND_LOCATION[vehicle.id]}")
+        logging.info(f"Remember location: {PREV_WORKAROUND_LOCATION[vehicle.id]}")
         # newest odometer, keep last_updated_at, because force sync changes the latter
         odometer_str = get_odometer_str(vehicle)
 
@@ -515,7 +530,7 @@ def handle_one_vehicle(
                 or vehicle.location_latitude != latitude
                 or vehicle.location_longitude != longitude
             ):
-                _ = D and dbg(
+                logging.info(
                     f"Overruling location: {prev_workaround_location} iso {vehicle.odometer} {vehicle.location}"  # noqa
                 )
                 vehicle.location = (
@@ -528,7 +543,7 @@ def handle_one_vehicle(
                     geocode_address = prev_workaround_location["geocode_address"]
                     vehicle.geocode = (geocode_name, geocode_address)
 
-    geocode = get_geocode(vehicle)
+    geocode_str = get_geocode(vehicle)
     location_latitude = get_safe_float(vehicle.location_latitude)
     location_longitude = get_safe_float(vehicle.location_longitude)
 
@@ -562,7 +577,7 @@ def handle_one_vehicle(
     ev_battery_is_charging = get_safe_bool(vehicle.ev_battery_is_charging)
     ev_battery_is_plugged_in = get_safe_bool(vehicle.ev_battery_is_plugged_in)
 
-    line = f"{last_updated_at}, {location_longitude}, {location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {odometer_str}, {ev_battery_percentage}, {ev_battery_is_charging}, {ev_battery_is_plugged_in}, {geocode}, {ev_driving_range}"  # noqa
+    line = f"{last_updated_at}, {location_longitude}, {location_latitude}, {vehicle.engine_is_running}, {vehicle.car_battery_percentage}, {odometer_str}, {ev_battery_percentage}, {ev_battery_is_charging}, {ev_battery_is_plugged_in}, {geocode_str}, {ev_driving_range}"  # noqa
     if "None, None" in line:  # something gone wrong, retry
         logging.warning(f"Skipping Unexpected line: {line}")
         return True  # exit subroutine with error
@@ -666,7 +681,7 @@ def run_commands():
 
             except Exception as ex:  # pylint: disable=broad-except
                 returncode = 112
-                (_, error_string) = handle_exception(ex, 1, True)
+                _, error_string = handle_exception(ex, 1, True)
                 logging.error(f"Error in running {command}: {error_string}")
 
             if returncode == 112:
@@ -727,26 +742,26 @@ def handle_vehicles(login: bool) -> bool:
             else:
                 retries = -1  # successfully end while loop without error
         except exceptions.AuthenticationError as ex:
-            (retries, error_string) = handle_exception(ex, retries)
+            retries, error_string = handle_exception(ex, retries)
         except exceptions.RateLimitingError as ex:
-            (retries, error_string) = handle_exception(ex, retries)
+            retries, error_string = handle_exception(ex, retries)
         except exceptions.NoDataFound as ex:
-            (retries, error_string) = handle_exception(ex, retries)
+            retries, error_string = handle_exception(ex, retries)
         except exceptions.DuplicateRequestError as ex:
-            (retries, error_string) = handle_exception(ex, retries)
+            retries, error_string = handle_exception(ex, retries)
         except exceptions.RequestTimeoutError as ex:
-            (retries, error_string) = handle_exception(ex, retries)
+            retries, error_string = handle_exception(ex, retries)
         # Not yet available, so workaround for now in handle_exception
         # except exceptions.ServiceTemporaryUnavailable as ex:
         #    retries = handle_exception(ex, retries)
         except exceptions.InvalidAPIResponseError as ex:
-            (retries, error_string) = handle_exception(ex, retries, True)
+            retries, error_string = handle_exception(ex, retries, True)
         except exceptions.APIError as ex:
-            (retries, error_string) = handle_exception(ex, retries, True)
+            retries, error_string = handle_exception(ex, retries, True)
         except exceptions.HyundaiKiaException as ex:
-            (retries, error_string) = handle_exception(ex, retries, True)
+            retries, error_string = handle_exception(ex, retries, True)
         except Exception as ex:  # pylint: disable=broad-except
-            (retries, error_string) = handle_exception(ex, retries, True)
+            retries, error_string = handle_exception(ex, retries, True)
 
     error = retries != -1
     if error:
@@ -755,7 +770,7 @@ def handle_vehicles(login: bool) -> bool:
         try:
             append_error_to_last_run(error_string)
         except Exception as ex:  # pylint: disable=broad-except
-            (retries, error_string) = handle_exception(ex, retries, True)
+            retries, error_string = handle_exception(ex, retries, True)
 
     return error
 

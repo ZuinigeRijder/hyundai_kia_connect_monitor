@@ -27,30 +27,28 @@ Note:
 How to import kml in Google Maps:
 https://www.spotzi.com/en/about/help-center/how-to-import-a-kml-into-google-maps/
 """
+
 from io import TextIOWrapper
 from datetime import datetime, timezone
 from pathlib import Path
-from monitor_utils import get_vin_arg, to_float
-
+from typing import Final
+from monitor_utils import get_csv_path, get_vin_arg, to_float
 
 # indexes to splitted monitor.csv items
-DT = 0  # datetime
-LON = 1  # longitude
-LAT = 2  # latitude
-ENGINEON = 3  # engineOn
-V12 = 4  # 12V%
-ODO = 5  # odometer
-SOC = 6  # SOC%
-CHARGING = 7  # charging
-PLUGGED = 8  # plugged
-LOCATION = 9  # location address (optional field)
+DT: Final = 0  # datetime
+LON: Final = 1  # longitude
+LAT: Final = 2  # latitude
+ENGINEON: Final = 3  # engineOn
+V12: Final = 4  # 12V%
+ODO: Final = 5  # odometer
+SOC: Final = 6  # SOC%
+CHARGING: Final = 7  # charging
+PLUGGED: Final = 8  # plugged
+LOCATION: Final = 9  # location address (optional field)
 
-INPUT_CSV_FILE = Path("monitor.csv")
-OUTPUT_KML_FILE = Path("monitor.kml")
-VIN = get_vin_arg()
-if VIN != "":
-    INPUT_CSV_FILE = Path(f"monitor.{VIN}.csv")
-    OUTPUT_KML_FILE = Path(f"monitor.{VIN}.kml")
+VIN: Final = get_vin_arg()
+INPUT_CSV_FILE: Final[Path] = get_csv_path("monitor.csv", VIN)
+OUTPUT_KML_FILE: Final[Path] = get_csv_path("monitor.kml", VIN)
 
 
 def write(outputfile: TextIOWrapper, line: str) -> None:

@@ -2,6 +2,7 @@
 """
 Simple Python3 script to make a dailystats overview
 """
+
 # pylint:disable=logging-fstring-interpolation,logging-not-lazy
 import configparser
 from dataclasses import dataclass
@@ -14,12 +15,15 @@ import traceback
 from datetime import datetime, timedelta
 from pathlib import Path
 from collections import deque
+from typing import Final
 import typing
 
 try:  # make gspread optional
     import gspread
+
+    HAS_GSPREAD = True
 except ImportError:
-    gspread = None
+    HAS_GSPREAD = False
 
 from domoticz_utils import (
     SEND_TO_DOMOTICZ,
@@ -32,6 +36,7 @@ from monitor_utils import (
     die,
     float_to_string_no_trailing_zero,
     get,
+    get_csv_path,
     get_filepath,
     arg_has,
     get_vin_arg,
@@ -56,18 +61,18 @@ from mqtt_utils import (
     stop_mqtt,
 )
 
-SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
+SCRIPT_DIRNAME: Final = path.abspath(path.dirname(__file__))
 logging.config.fileConfig(f"{SCRIPT_DIRNAME}/logging_config.ini")
-D = arg_has("debug")
+D: Final = arg_has("debug")
 if D:
     set_dbg()
 
 # Initializing a queue for about 30 days
-MAX_QUEUE_LEN = 122
-PRINTED_OUTPUT_QUEUE: deque[str] = deque(maxlen=MAX_QUEUE_LEN)
+MAX_QUEUE_LEN: Final = 122
+PRINTED_OUTPUT_QUEUE: Final[deque[str]] = deque(maxlen=MAX_QUEUE_LEN)
 
-KEYWORD_LIST = ["help", "sheetupdate", "debug"]
-KEYWORD_ERROR = False
+KEYWORD_LIST: Final = ["help", "sheetupdate", "debug"]
+keyword_error = False
 for kindex in range(1, len(sys.argv)):
     if sys.argv[kindex].lower() not in KEYWORD_LIST:
         arg = sys.argv[kindex]
@@ -75,62 +80,57 @@ for kindex in range(1, len(sys.argv)):
             _ = D and dbg("vin parameter: " + arg)
         else:
             print("Unknown keyword: " + arg)
-            KEYWORD_ERROR = True
+            keyword_error = True
 
-if KEYWORD_ERROR or arg_has("help"):
+if keyword_error or arg_has("help"):
     die("Usage: python dailystats.py [sheetupdate] [vin=VIN]")
 
-SHEETUPDATE = arg_has("sheetupdate")
-OUTPUT_SPREADSHEET_NAME = "monitor.dailystats"
-SHEET: typing.Any = None
+SHEETUPDATE: Final = arg_has("sheetupdate")
+SHEET: typing.Any = None  # pylint: disable=invalid-name
 
-LASTRUN_FILENAME = Path("monitor.lastrun")
-DAILYSTATS_CSV_FILE = Path("monitor.dailystats.csv")
-TRIPINFO_CSV_FILE = Path("monitor.tripinfo.csv")
-SUMMARY_CHARGE_CSV_FILE = Path("summary.charge.csv")
-SUMMARY_TRIP_CSV_FILE = Path("summary.trip.csv")
-SUMMARY_DAY_CSV_FILE = Path("summary.day.csv")
-LENCHECK = 1
-VIN = get_vin_arg()
-if VIN != "":
-    LASTRUN_FILENAME = Path(f"monitor.{VIN}.lastrun")
-    DAILYSTATS_CSV_FILE = Path(f"monitor.dailystats.{VIN}.csv")
-    TRIPINFO_CSV_FILE = Path(f"monitor.tripinfo.{VIN}.csv")
-    SUMMARY_CHARGE_CSV_FILE = Path(f"summary.charge.{VIN}.csv")
-    SUMMARY_TRIP_CSV_FILE = Path(f"summary.trip.{VIN}.csv")
-    SUMMARY_DAY_CSV_FILE = Path(f"summary.day.{VIN}.csv")
-    OUTPUT_SPREADSHEET_NAME = f"monitor.dailystats.{VIN}"
-    LENCHECK = 2
+VIN: Final[str] = get_vin_arg()
+
+LASTRUN_FILENAME: Final[Path] = get_csv_path("monitor.lastrun", VIN)
+DAILYSTATS_CSV_FILE: Final[Path] = get_csv_path("monitor.dailystats.csv", VIN)
+TRIPINFO_CSV_FILE: Final[Path] = get_csv_path("monitor.tripinfo.csv", VIN)
+SUMMARY_CHARGE_CSV_FILE: Final[Path] = get_csv_path("summary.charge.csv", VIN)
+SUMMARY_TRIP_CSV_FILE: Final[Path] = get_csv_path("summary.trip.csv", VIN)
+SUMMARY_DAY_CSV_FILE: Final[Path] = get_csv_path("summary.day.csv", VIN)
+
+OUTPUT_SPREADSHEET_NAME: Final[str] = (
+    f"monitor.dailystats.{VIN}" if VIN else "monitor.dailystats"
+)
+
 _ = D and dbg(f"DAILYSTATS_CSV_FILE: {DAILYSTATS_CSV_FILE.name}")
 
 parser = configparser.ConfigParser()
 parser.read(get_filepath("monitor.cfg"))
 monitor_settings = dict(parser.items("monitor", raw=True))
-ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
-REGION = get(monitor_settings, "region", "1")
-INCLUDE_REGENERATE_IN_CONSUMPTION = (
+ODO_METRIC: Final = get(monitor_settings, "odometer_metric", "km").lower()
+REGION: Final = get(monitor_settings, "region", "1")
+INCLUDE_REGENERATE_IN_CONSUMPTION: Final = (
     get(monitor_settings, "include_regenerate_in_consumption", "False").lower()
     == "true"
 )
-CONSUMPTION_EFFICIENCY_FACTOR_DAILYSTATS = to_float(
+CONSUMPTION_EFFICIENCY_FACTOR_DAILYSTATS: Final = to_float(
     get(monitor_settings, "consumption_efficiency_factor_dailystats", "1.0")
 )
 
 
 # indexes to splitted monitor.dailystats.csv items
-DATE = 0
-DISTANCE = 1
-DISTANCE_UNIT = 2
-CONSUMED = 3
-REGENERATED = 4
-ENGINE = 5
-CLIMATE = 6
-ELECTRONICS = 7
-BATTERY_CARE = 8
+DATE: Final = 0
+DISTANCE: Final = 1
+DISTANCE_UNIT: Final = 2
+CONSUMED: Final = 3
+REGENERATED: Final = 4
+ENGINE: Final = 5
+CLIMATE: Final = 6
+ELECTRONICS: Final = 7
+BATTERY_CARE: Final = 8
 
-TR_HELPER: dict[str, str] = read_translations()
-COLUMN_WIDTHS = [11, 12, 14, 10, 9, 9, 8]
-EMPTY_ROW = ",,,,,,"
+TR_HELPER: Final[dict[str, str]] = read_translations()
+COLUMN_WIDTHS: Final = [11, 12, 14, 10, 9, 9, 8]
+EMPTY_ROW: Final = ",,,,,,"
 
 
 def update_width(text: str, index_column_widths: int) -> None:
@@ -196,7 +196,7 @@ def fill_translations() -> Translations:
     return translations
 
 
-TR = fill_translations()  # TR contains translations dataclass
+TR: Final = fill_translations()  # TR contains translations dataclass
 
 
 def get_weekday_translation(weekday_string: str) -> str:
@@ -920,7 +920,7 @@ def send_to_mqtt_domoticz() -> None:
 # main program
 RETRIES = -1
 if SHEETUPDATE:
-    if gspread is None:
+    if not HAS_GSPREAD:
         die(
             "Google spreadsheet support not available, please install gspread, e.g."
             'pip install "gspread>=5.6.2"'
@@ -931,7 +931,7 @@ if SHEETUPDATE:
         try:
             gc = gspread.service_account()
             spreadsheet = gc.open(OUTPUT_SPREADSHEET_NAME)
-            SHEET = spreadsheet.sheet1
+            SHEET = spreadsheet.sheet1  # pylint: disable=invalid-name
             SHEET.batch_clear(["A:G", "N:V"])
             RETRIES = -1
         except Exception as ex:  # pylint: disable=broad-except

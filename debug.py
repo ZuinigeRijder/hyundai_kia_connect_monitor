@@ -1,7 +1,9 @@
 # == debug.py Author: Zuinige Rijder =========================================
 """Simple Python3 script to debug hyundai_kia_connect_api values"""
+
 import configparser
 from datetime import datetime
+from typing import Any, Final
 import logging
 from hyundai_kia_connect_api import VehicleManager, Vehicle
 from monitor_utils import die, get_filepath, get, get_bool, to_int
@@ -13,33 +15,31 @@ parser = configparser.ConfigParser()
 parser.read(get_filepath("monitor.cfg"))
 monitor_settings = dict(parser.items("monitor", raw=True))
 
-REGION = monitor_settings["region"]
-BRAND = monitor_settings["brand"]
-USERNAME = monitor_settings["username"]
-PASSWORD = monitor_settings["password"]
-PIN = monitor_settings["pin"]
-USE_GEOCODE = get_bool(monitor_settings, "use_geocode", False)
-USE_GEOCODE_EMAIL = get_bool(monitor_settings, "use_geocode_email", False)
-GEOCODE_PROVIDER = to_int(
+REGION: Final = monitor_settings["region"]
+BRAND: Final = monitor_settings["brand"]
+USERNAME: Final = monitor_settings["username"]
+PASSWORD: Final = monitor_settings["password"]
+PIN: Final = monitor_settings["pin"]
+USE_GEOCODE: Final = get_bool(monitor_settings, "use_geocode", False)
+USE_GEOCODE_EMAIL: Final = get_bool(monitor_settings, "use_geocode_email", False)
+GEOCODE_PROVIDER: Final = to_int(
     get(monitor_settings, "geocode_provider", "1")
 )  # 1=OPENSTREETMAP 2=GOOGLE
 if GEOCODE_PROVIDER < 1 or GEOCODE_PROVIDER > 2:
     die("Invalid GEOCODE_PROVIDER in monitor.cfg, expected 1 or 2")
 
-GOOGLE_API_KEY = get(monitor_settings, "google_api_key", "")
-if len(GOOGLE_API_KEY) == 0:
-    GOOGLE_API_KEY = None  # default no API key needed for OPENSTREETMAP
+GOOGLE_API_KEY: Final[str | None] = get(monitor_settings, "google_api_key", "") or None
 
 if GEOCODE_PROVIDER == 2 and GOOGLE_API_KEY is None:
     die("Missing GOOGLE_API_KEY in monitor.cfg")
 
-LANGUAGE = monitor_settings["language"]
+LANGUAGE: Final = monitor_settings["language"]
 
 
 # == get_child_value =========================================================
-def get_child_value(data: dict, key: str) -> dict:
+def get_child_value(data: dict[str, Any] | None, key: str) -> dict:
     """get child value"""
-    value = data
+    value: Any = data
     for k in key.split("."):
         try:
             value = value[k]
@@ -133,35 +133,33 @@ vm = VehicleManager(
     language=LANGUAGE,
 )
 
-for KEY in vm.vehicles:
-    VEHICLE = vm.vehicles[KEY]
-    print(f"timezone: {VEHICLE.timezone}")
-    print(f"vehicle: {VEHICLE}")
+for current_vehicle in vm.vehicles.values():
+    print(f"timezone: {current_vehicle.timezone}")
+    print(f"vehicle: {current_vehicle}")
 
 vm.check_and_refresh_token()
 # vm.force_refresh_all_vehicles_states()
 vm.update_all_vehicles_with_cached_state()  # needed >= 2.0.0
 vm.update_all_vehicles_with_cached_state()  # do twice to check geocode cache
 
-for KEY in vm.vehicles:
-    VEHICLE = vm.vehicles[KEY]
-    print(f"timezone: {VEHICLE.timezone}")
-    print(f"Last updated at: {VEHICLE.last_updated_at}")
-    print(f"Location Last updated at: {VEHICLE.location_last_updated_at}")
-    print(f"Location: {VEHICLE.location}")
-    print(f"vehicle: {VEHICLE}")
+for current_vehicle in vm.vehicles.values():
+    print(f"timezone: {current_vehicle.timezone}")
+    print(f"Last updated at: {current_vehicle.last_updated_at}")
+    print(f"Location Last updated at: {current_vehicle.location_last_updated_at}")
+    print(f"Location: {current_vehicle.location}")
+    print(f"vehicle: {current_vehicle}")
 
     now = datetime.now()
     yyyymm = now.strftime("%Y%m")
     yyyymmdd = now.strftime("%Y%m%d")
-    vm.update_month_trip_info(VEHICLE.id, yyyymm)
-    if VEHICLE.month_trip_info is not None:
-        for day in VEHICLE.month_trip_info.day_list:  # ordered on day
+    vm.update_month_trip_info(current_vehicle.id, yyyymm)
+    if current_vehicle.month_trip_info is not None:
+        for day in current_vehicle.month_trip_info.day_list:  # ordered on day
             if yyyymmdd == day.yyyymmdd:  # in example only interested in current day
-                vm.update_day_trip_info(VEHICLE.id, day.yyyymmdd)
-                if VEHICLE.day_trip_info is not None:
+                vm.update_day_trip_info(current_vehicle.id, day.yyyymmdd)
+                if current_vehicle.day_trip_info is not None:
                     for trip in reversed(
-                        VEHICLE.day_trip_info.trip_list
+                        current_vehicle.day_trip_info.trip_list
                     ):  # show oldest first
                         print(
                             f"{day.yyyymmdd},{trip.hhmmss},{trip.drive_time},{trip.idle_time},{trip.distance},{trip.avg_speed},{trip.max_speed}"  # noqa

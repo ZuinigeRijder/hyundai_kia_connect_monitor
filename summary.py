@@ -2,25 +2,29 @@
 """
 Simple Python3 script to make a summary of monitor.csv
 """
+
 # pylint:disable=logging-fstring-interpolation,logging-not-lazy
 from copy import deepcopy
 from io import TextIOWrapper
 import logging
 import logging.config
 from os import path
+from pathlib import Path
 import sys
 import configparser
 import traceback
 from dataclasses import dataclass
 from datetime import datetime
-from pathlib import Path
 from collections import deque
+from typing import Final
 import typing
 
 try:  # make gspread optional
     import gspread
+
+    HAS_GSPREAD = True
 except ImportError:
-    gspread = None
+    HAS_GSPREAD = False
 
 from domoticz_utils import SEND_TO_DOMOTICZ, send_summary_line_to_domoticz
 from monitor_utils import (
@@ -30,6 +34,7 @@ from monitor_utils import (
     get_filepath,
     arg_has,
     get,
+    get_csv_path,
     get_splitted_list_item,
     get_vin_arg,
     safe_divide,
@@ -51,14 +56,14 @@ from monitor_utils import (
 )
 from mqtt_utils import SEND_TO_MQTT, send_summary_line_to_mqtt, stop_mqtt
 
-SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
+SCRIPT_DIRNAME: Final = path.abspath(path.dirname(__file__))
 logging.config.fileConfig(f"{SCRIPT_DIRNAME}/logging_config.ini")
-D = arg_has("debug")
+D: Final = arg_has("debug")
 if D:
     set_dbg()
 
 
-KEYWORD_LIST = [
+KEYWORD_LIST: Final = [
     "trip",
     "day",
     "week",
@@ -69,7 +74,7 @@ KEYWORD_LIST = [
     "help",
     "debug",
 ]
-KEYWORD_ERROR = False
+keyword_error = False
 for kindex in range(1, len(sys.argv)):
     if sys.argv[kindex].lower() not in KEYWORD_LIST:
         arg = sys.argv[kindex]
@@ -77,47 +82,41 @@ for kindex in range(1, len(sys.argv)):
             _ = D and dbg("vin parameter: " + arg)
         else:
             print("Unknown keyword: " + arg)
-            KEYWORD_ERROR = True
+            keyword_error = True
 
-if KEYWORD_ERROR or arg_has("help"):
+if keyword_error or arg_has("help"):
     die(
         "Usage: python summary.py [trip] [day] [week] [month] [year] [sheetupdate] [vin=VIN]"  # noqa
     )
 
 
-CURRENT_DAY_STR = datetime.now().strftime("%Y-%m-%d")
-MONITOR_CSV_FILENAME = Path("monitor.csv")
-LASTRUN_FILENAME = Path("monitor.lastrun")
-OUTPUT_SPREADSHEET_NAME = "hyundai-kia-connect-monitor"
-SUMMARY_CHARGE_CSV_FILENAME = Path("summary.charge.csv")
-SUMMARY_TRIP_CSV_FILENAME = Path("summary.trip.csv")
-SUMMARY_DAY_CSV_FILENAME = Path("summary.day.csv")
-SUMMARY_CHARGE_CSV_FILE: TextIOWrapper
+VIN: Final[str] = get_vin_arg()
+MONITOR_CSV_FILENAME: Final[Path] = get_csv_path("monitor.csv", VIN)
+LASTRUN_FILENAME: Final[Path] = get_csv_path("monitor.lastrun", VIN)
+SUMMARY_CHARGE_CSV_FILENAME: Final[Path] = get_csv_path("summary.charge.csv", VIN)
+SUMMARY_TRIP_CSV_FILENAME: Final[Path] = get_csv_path("summary.trip.csv", VIN)
+SUMMARY_DAY_CSV_FILENAME: Final[Path] = get_csv_path("summary.day.csv", VIN)
 
-LENCHECK = 1
-VIN = get_vin_arg()
-if VIN != "":
-    MONITOR_CSV_FILENAME = Path(f"monitor.{VIN}.csv")
-    LASTRUN_FILENAME = Path(f"monitor.{VIN}.lastrun")
-    OUTPUT_SPREADSHEET_NAME = f"monitor.{VIN}"
-    SUMMARY_CHARGE_CSV_FILENAME = Path(f"summary.charge.{VIN}.csv")
-    SUMMARY_TRIP_CSV_FILENAME = Path(f"summary.trip.{VIN}.csv")
-    SUMMARY_DAY_CSV_FILENAME = Path(f"summary.day.{VIN}.csv")
-    LENCHECK = 2
+OUTPUT_SPREADSHEET_NAME: Final[str] = (
+    f"monitor.{VIN}" if VIN else "hyundai-kia-connect-monitor"
+)
+
 _ = D and dbg(f"INPUT_CSV_FILE: {MONITOR_CSV_FILENAME.name}")
 
-TRIP = len(sys.argv) == LENCHECK or arg_has("trip") and not arg_has("-trip")
-DAY = len(sys.argv) == LENCHECK or arg_has("day") or arg_has("-trip")
-WEEK = len(sys.argv) == LENCHECK or arg_has("week") or arg_has("-trip")
-MONTH = len(sys.argv) == LENCHECK or arg_has("month") or arg_has("-trip")
-YEAR = len(sys.argv) == LENCHECK or arg_has("year") or arg_has("-trip")
-SHEETUPDATE = arg_has("sheetupdate")
-if SHEETUPDATE:
-    TRIP = True
-    DAY = True
-    WEEK = True
-    MONTH = True
-    YEAR = True
+SUMMARY_CHARGE_CSV_FILE: TextIOWrapper
+
+SHEETUPDATE: Final[bool] = arg_has("sheetupdate")
+LENCHECK: Final[int] = 2 if VIN else 1
+ALL_DEFAULT: Final[bool] = len(sys.argv) == LENCHECK
+
+TRIP: Final[bool] = (
+    SHEETUPDATE or ALL_DEFAULT or (arg_has("trip") and not arg_has("-trip"))
+)
+DAY: Final[bool] = SHEETUPDATE or ALL_DEFAULT or arg_has("day") or arg_has("-trip")
+WEEK: Final[bool] = SHEETUPDATE or ALL_DEFAULT or arg_has("week") or arg_has("-trip")
+MONTH: Final[bool] = SHEETUPDATE or ALL_DEFAULT or arg_has("month") or arg_has("-trip")
+YEAR: Final[bool] = SHEETUPDATE or ALL_DEFAULT or arg_has("year") or arg_has("-trip")
+
 
 HIGHEST_ODO = 0.0
 
@@ -125,45 +124,45 @@ HIGHEST_ODO = 0.0
 config_parser = configparser.ConfigParser()
 config_parser.read(get_filepath("monitor.cfg"))
 monitor_settings = dict(config_parser.items("monitor", raw=True))
-ODO_METRIC = get(monitor_settings, "odometer_metric", "km").lower()
-CONSUMPTION_EFFICIENCY_FACTOR_SUMMARY = to_float(
+ODO_METRIC: Final = get(monitor_settings, "odometer_metric", "km").lower()
+CONSUMPTION_EFFICIENCY_FACTOR_SUMMARY: Final = to_float(
     get(monitor_settings, "consumption_efficiency_factor_summary", "1.0")
 )
 
 config_parser.read(get_filepath("summary.cfg"))
 summary_settings = dict(config_parser.items("summary"))
 
-NET_BATTERY_SIZE_KWH = to_float(summary_settings["net_battery_size_kwh"])
-AVERAGE_COST_PER_KWH = to_float(summary_settings["average_cost_per_kwh"])
-COST_CURRENCY = summary_settings["cost_currency"]
-MIN_CONSUMPTION_DISCHARGE_KWH = to_float(
+NET_BATTERY_SIZE_KWH: Final = to_float(summary_settings["net_battery_size_kwh"])
+AVERAGE_COST_PER_KWH: Final = to_float(summary_settings["average_cost_per_kwh"])
+COST_CURRENCY: Final = summary_settings["cost_currency"]
+MIN_CONSUMPTION_DISCHARGE_KWH: Final = to_float(
     summary_settings["min_consumption_discharge_kwh"]
 )
-SMALL_POSITIVE_DELTA = int(summary_settings["ignore_small_positive_delta_soc"])
-SMALL_NEGATIVE_DELTA = int(summary_settings["ignore_small_negative_delta_soc"])
-SHOW_ZERO_VALUES = is_true(summary_settings["show_zero_values"])
+SMALL_POSITIVE_DELTA: Final = int(summary_settings["ignore_small_positive_delta_soc"])
+SMALL_NEGATIVE_DELTA: Final = int(summary_settings["ignore_small_negative_delta_soc"])
+SHOW_ZERO_VALUES: Final = is_true(summary_settings["show_zero_values"])
 
 # indexes to splitted monitor.csv items
-DT = 0  # datetime
-LON = 1  # longitude
-LAT = 2  # latitude
-ENGINEON = 3  # engineOn
-V12 = 4  # 12V%
-ODO = 5  # odometer
-SOC = 6  # SOC%
-CHARGING = 7  # charging
-PLUGGED = 8  # plugged
-LOCATION = 9  # location address (optional field)
-EV_RANGE = 10  # EV range (optional field)
+DT: Final = 0  # datetime
+LON: Final = 1  # longitude
+LAT: Final = 2  # latitude
+ENGINEON: Final = 3  # engineOn
+V12: Final = 4  # 12V%
+ODO: Final = 5  # odometer
+SOC: Final = 6  # SOC%
+CHARGING: Final = 7  # charging
+PLUGGED: Final = 8  # plugged
+LOCATION: Final = 9  # location address (optional field)
+EV_RANGE: Final = 10  # EV range (optional field)
 
 # number of days passed in this year
 DAY_COUNTER = 0
 
 # Initializing a queue with maximum size
-LAST_OUTPUT_QUEUE_MAX_LEN = 122
+LAST_OUTPUT_QUEUE_MAX_LEN: Final = 122
 LAST_OUTPUT_QUEUE: deque[str] = deque(maxlen=LAST_OUTPUT_QUEUE_MAX_LEN)
 
-SHEET: typing.Any = None
+SHEET: typing.Any = None  # pylint: disable=invalid-name
 SHEET_ROW_A = ""
 SHEET_ROW_B = ""
 
@@ -486,36 +485,41 @@ def get_next_monitor_csv_line() -> str:
     """
     global MONITOR_CSV_FILE_EOL, MONITOR_CSV_READ_AHEAD_LINE, MONITOR_CSV_READ_DONE_ONCE, MONITOR_CSV_CURR_SPLIT, MONITOR_CSV_NEXT_SPLIT, MONITOR_CSV_LINECOUNT  # noqa pylint:disable=global-statement
 
-    while not MONITOR_CSV_FILE_EOL:
+    while True:
         if MONITOR_CSV_READ_DONE_ONCE:  # read 1 line
             line = MONITOR_CSV_READ_AHEAD_LINE
             MONITOR_CSV_CURR_SPLIT = MONITOR_CSV_NEXT_SPLIT
         else:  # read 2 lines
             MONITOR_CSV_READ_DONE_ONCE = True
-            line = MONITOR_CSV_FILE.readline()
-            MONITOR_CSV_CURR_SPLIT = split_on_comma(line)
+            while True:
+                MONITOR_CSV_LINECOUNT += 1
+                line = MONITOR_CSV_FILE.readline()
+                MONITOR_CSV_CURR_SPLIT = split_on_comma(line)
+                if line != "" and (
+                    (not line.startswith("datetime"))
+                    and len(MONITOR_CSV_CURR_SPLIT) == 11
+                ):
+                    break
 
-        MONITOR_CSV_LINECOUNT += 1
-        MONITOR_CSV_READ_AHEAD_LINE = MONITOR_CSV_FILE.readline()
-        MONITOR_CSV_NEXT_SPLIT = split_on_comma(MONITOR_CSV_READ_AHEAD_LINE)
         if not line:
             MONITOR_CSV_FILE_EOL = True
             MONITOR_CSV_READ_AHEAD_LINE = line
             MONITOR_CSV_NEXT_SPLIT = []
-            break  # finished
+            return ""  # finished
+
+        MONITOR_CSV_LINECOUNT += 1
+        MONITOR_CSV_READ_AHEAD_LINE = MONITOR_CSV_FILE.readline()
+        MONITOR_CSV_NEXT_SPLIT = split_on_comma(MONITOR_CSV_READ_AHEAD_LINE)
+        if (
+            MONITOR_CSV_READ_AHEAD_LINE != ""
+            and MONITOR_CSV_NEXT_SPLIT[0] == MONITOR_CSV_CURR_SPLIT[0]
+        ):
+            # skip prev line, same date/time
+            continue  # back to beginning while loop
 
         line = line.strip()
-        # only lines with content and not header line
-        if line != "" and not line.startswith("datetime"):
-            index = line.find(",")
-            if index >= 0:
-                _ = D and dbg(f"next=[{line}]")
-                return line
-
-        _ = D and dbg(f"skip=[{line}]")
-
-    _ = D and dbg("return=[]\n")
-    return ""
+        if line != "" and len(MONITOR_CSV_CURR_SPLIT) == 11:
+            return line
 
 
 def get_corrected_next_monitor_csv_line() -> str:
@@ -526,9 +530,6 @@ def get_corrected_next_monitor_csv_line() -> str:
             return ""  # finished
 
         split = MONITOR_CSV_CURR_SPLIT
-        if len(split) != 11:
-            _ = D and dbg(f"#### Skipping line {MONITOR_CSV_LINECOUNT}: [{line}]")
-            continue
 
         _ = D and dbg(str(MONITOR_CSV_LINECOUNT) + ": LINE=[" + line + "]")
         next_line = MONITOR_CSV_READ_AHEAD_LINE.strip()
@@ -1105,28 +1106,28 @@ SUMMARY_CHARGE_CSV_FILE.close()
 SUMMARY_DAY_CSV_FILE.close()
 SUMMARY_TRIP_CSV_FILE.close()
 
-RETRIES = -1
+retries = -1
 if SHEETUPDATE:
-    if gspread is None:
+    if not HAS_GSPREAD:
         die(
             "Google spreadsheet support not available, please install gspread, e.g."
             'pip install "gspread>=5.6.2"'
         )
 
-    RETRIES = 2
-    while RETRIES > 0:
+    retries = 2
+    while retries > 0:
         try:
             gc = gspread.service_account()
             spreadsheet = gc.open(OUTPUT_SPREADSHEET_NAME)
-            SHEET = spreadsheet.sheet1
+            SHEET = spreadsheet.sheet1  # pylint: disable=invalid-name
             SHEET.clear()
             sheet_append_first_rows(SHEET_ROW_A, SHEET_ROW_B)
             print_output_queue()
-            RETRIES = -1
+            retries = -1
         except Exception as ex:  # pylint: disable=broad-except
             logging.info("Exception: " + str(ex))
             traceback.print_exc()
-            RETRIES = sleep_a_minute(RETRIES)
+            retries = sleep_a_minute(retries)
 
 if SEND_TO_DOMOTICZ or SEND_TO_MQTT:
     if SEND_TO_MQTT:
@@ -1134,6 +1135,6 @@ if SEND_TO_DOMOTICZ or SEND_TO_MQTT:
     send_to_mqtt_domoticz()
 
 
-if RETRIES == -1:
+if retries == -1:
     sys.exit(0)
 sys.exit(-1)

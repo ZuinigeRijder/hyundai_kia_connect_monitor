@@ -1,7 +1,9 @@
 # == domoticz_utils.py Author: Zuinige Rijder =========
-""" domoticz utils """
+"""domoticz utils"""
+
 # pylint:disable=logging-fstring-interpolation, consider-using-enumerate
 
+from typing import Final
 import configparser
 import logging
 import logging.config
@@ -22,13 +24,13 @@ from monitor_utils import (
     get_summary_headers,
 )
 
-PARSER = configparser.ConfigParser()
+PARSER: Final = configparser.ConfigParser()
 PARSER.read(get_filepath("monitor.cfg"))
 
 # == read [Domoticz] settings in monitor.cfg ===========================
 domoticz_settings = dict(PARSER.items("Domoticz"))
-SEND_TO_DOMOTICZ = get_bool(domoticz_settings, "send_to_domoticz", False)
-DOMOTICZ_URL = get(domoticz_settings, "domot_url")
+SEND_TO_DOMOTICZ: Final = get_bool(domoticz_settings, "send_to_domoticz", False)
+DOMOTICZ_URL: Final = get(domoticz_settings, "domot_url")
 
 if SEND_TO_DOMOTICZ:
     ITEMS_MONITOR_CSV = get_items_monitor_csv()

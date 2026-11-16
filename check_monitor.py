@@ -1,34 +1,36 @@
 # == check_monitor.py Author: Zuinige Rijder =========
 """Simple Python3 script to check monitor.csv"""
+
 from os import path
 from datetime import datetime
 from io import TextIOWrapper
 import logging
 import logging.config
 from pathlib import Path
+from typing import Final
 
 from monitor_utils import arg_has, dbg, set_dbg, split_on_comma
 
-SCRIPT_DIRNAME = path.abspath(path.dirname(__file__))
+SCRIPT_DIRNAME: Final = path.abspath(path.dirname(__file__))
 logging.config.fileConfig(f"{SCRIPT_DIRNAME}/logging_config.ini")
-D = arg_has("debug")
+D: Final = arg_has("debug")
 if D:
     set_dbg()
 
 # indexes to splitted monitor.csv items
-DT = 0  # datetime
-LON = 1  # longitude
-LAT = 2  # latitude
-ENGINEON = 3  # engineOn
-V12 = 4  # 12V%
-ODO = 5  # odometer
-SOC = 6  # SOC%
-CHARGING = 7  # charging
-PLUGGED = 8  # plugged
-LOCATION = 9  # location address (optional field)
-EV_RANGE = 10  # EV range (optional field)
+DT: Final = 0  # datetime
+LON: Final = 1  # longitude
+LAT: Final = 2  # latitude
+ENGINEON: Final = 3  # engineOn
+V12: Final = 4  # 12V%
+ODO: Final = 5  # odometer
+SOC: Final = 6  # SOC%
+CHARGING: Final = 7  # charging
+PLUGGED: Final = 8  # plugged
+LOCATION: Final = 9  # location address (optional field)
+EV_RANGE: Final = 10  # EV range (optional field)
 
-MONITOR_CSV_FILENAME = Path("monitor.csv")
+MONITOR_CSV_FILENAME: Final = Path("monitor.csv")
 
 MONITOR_CSV_FILE: TextIOWrapper = MONITOR_CSV_FILENAME.open("r", encoding="utf-8")
 MONITOR_CSV_FILE_EOL: bool = False

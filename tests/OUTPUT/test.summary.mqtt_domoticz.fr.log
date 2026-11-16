@@ -268,7 +268,7 @@ hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/battery12v_avg = 86
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/battery12v_min = 76
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/battery12v_max = 95
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/charging_sessions = 18
-hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/trip_count = 89
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/trip_count = 88
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/range = 204
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEAR/address = "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
 idx = 1, summary_YEAR_date = 2023-02-19
@@ -307,21 +307,21 @@ idx = 1, summary_YEAR_battery12v_max = 95
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=95
 idx = 1, summary_YEAR_charging_sessions = 18
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=18
-idx = 1, summary_YEAR_trip_count = 89
-domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=89
+idx = 1, summary_YEAR_trip_count = 88
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=88
 idx = 1, summary_YEAR_range = 204
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=204
 idx = 1, summary_YEAR_address = "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue="9;Kwakstraat; Duckstad; Nederland; 7054; AN"
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/date = 2023-02-19
-hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/info = 89t
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/info = 88t
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/odometer = 23589.5
-hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/delta_distance = 19.6
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/delta_distance = 19.8
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/kwh_charged = 3.4
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/kwh_discharged = -3.5
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/distance_unit_per_kwh = 5.6
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/kwh_per_100_distance_unit = 17.9
-hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/cost = 0.86
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/cost = 0.87
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/soc = 57
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/soc_avg = 57
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/soc_min = 19
@@ -336,12 +336,12 @@ hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/range = 204
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/TRIPAVG/address = "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
 idx = 1, summary_TRIPAVG_date = 2023-02-19
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=2023-02-19
-idx = 1, summary_TRIPAVG_info = 89t
-domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=89t
+idx = 1, summary_TRIPAVG_info = 88t
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=88t
 idx = 1, summary_TRIPAVG_odometer = 23589.5
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=23589.5
-idx = 1, summary_TRIPAVG_delta_distance = 19.6
-domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=19.6
+idx = 1, summary_TRIPAVG_delta_distance = 19.8
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=19.8
 idx = 1, summary_TRIPAVG_kwh_charged = 3.4
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=3.4
 idx = 1, summary_TRIPAVG_kwh_discharged = -3.5
@@ -350,8 +350,8 @@ idx = 1, summary_TRIPAVG_distance_unit_per_kwh = 5.6
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=5.6
 idx = 1, summary_TRIPAVG_kwh_per_100_distance_unit = 17.9
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=17.9
-idx = 1, summary_TRIPAVG_cost = 0.86
-domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=0.86
+idx = 1, summary_TRIPAVG_cost = 0.87
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=0.87
 idx = 1, summary_TRIPAVG_soc = 57
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=57
 idx = 1, summary_TRIPAVG_soc_avg = 57
@@ -457,7 +457,7 @@ hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/battery12v_avg = 8
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/battery12v_min = 76
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/battery12v_max = 95
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/charging_sessions = 2.7
-hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/trip_count = 13.3
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/trip_count = 13.1
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/range = 204
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/WEEKAVG/address = "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
 idx = 1, summary_WEEKAVG_date = 2023-02-19
@@ -496,8 +496,8 @@ idx = 1, summary_WEEKAVG_battery12v_max = 95
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=95
 idx = 1, summary_WEEKAVG_charging_sessions = 2.7
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=2.7
-idx = 1, summary_WEEKAVG_trip_count = 13.3
-domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=13.3
+idx = 1, summary_WEEKAVG_trip_count = 13.1
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=13.1
 idx = 1, summary_WEEKAVG_range = 204
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=204
 idx = 1, summary_WEEKAVG_address = "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
@@ -520,7 +520,7 @@ hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/battery12v_avg = 
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/battery12v_min = 76
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/battery12v_max = 95
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/charging_sessions = 11.6
-hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/trip_count = 57.6
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/trip_count = 57
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/range = 204
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/MONTHAVG/address = "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
 idx = 1, summary_MONTHAVG_date = 2023-02-19
@@ -559,8 +559,8 @@ idx = 1, summary_MONTHAVG_battery12v_max = 95
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=95
 idx = 1, summary_MONTHAVG_charging_sessions = 11.6
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=11.6
-idx = 1, summary_MONTHAVG_trip_count = 57.6
-domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=57.6
+idx = 1, summary_MONTHAVG_trip_count = 57
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=57
 idx = 1, summary_MONTHAVG_range = 204
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=204
 idx = 1, summary_MONTHAVG_address = "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
@@ -583,7 +583,7 @@ hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/battery12v_avg = 86
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/battery12v_min = 76
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/battery12v_max = 95
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/charging_sessions = 139.8
-hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/trip_count = 691.2
+hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/trip_count = 683.4
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/range = 204
 hyundai_kia_connect_monitor/KMHKR81CPNU012345/summary/YEARLY/address = "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
 idx = 1, summary_YEARLY_date = 2023-02-19
@@ -622,8 +622,8 @@ idx = 1, summary_YEARLY_battery12v_max = 95
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=95
 idx = 1, summary_YEARLY_charging_sessions = 139.8
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=139.8
-idx = 1, summary_YEARLY_trip_count = 691.2
-domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=691.2
+idx = 1, summary_YEARLY_trip_count = 683.4
+domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=683.4
 idx = 1, summary_YEARLY_range = 204
 domoticz_reference_test/json.htm?type=command&param=udevice&idx=1&svalue=204
 idx = 1, summary_YEARLY_address = "9;Kwakstraat; Duckstad; Nederland; 7054; AN"
