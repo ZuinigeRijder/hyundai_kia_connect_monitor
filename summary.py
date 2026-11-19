@@ -488,6 +488,13 @@ def get_next_monitor_csv_line() -> str:
     while True:
         if MONITOR_CSV_READ_DONE_ONCE:  # read 1 line
             line = MONITOR_CSV_READ_AHEAD_LINE
+            if line != "" and line.startswith("datetime"):
+                # skip line starting with datetime
+                MONITOR_CSV_LINECOUNT += 1
+                MONITOR_CSV_READ_AHEAD_LINE = MONITOR_CSV_FILE.readline()
+                MONITOR_CSV_NEXT_SPLIT = split_on_comma(MONITOR_CSV_READ_AHEAD_LINE)
+                continue
+
             MONITOR_CSV_CURR_SPLIT = MONITOR_CSV_NEXT_SPLIT
         else:  # read 2 lines
             MONITOR_CSV_READ_DONE_ONCE = True

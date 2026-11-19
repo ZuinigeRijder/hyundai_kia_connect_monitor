@@ -24,6 +24,9 @@ mypy summary.py | egrep -v ": note:|Success: no issues found in 1 source file"
 echo mypy dailystats.p
 mypy dailystats.py | egrep -v ": note:|Success: no issues found in 1 source file"
 
+echo mypy tripmaker.py
+mypy tripmaker.py | egrep -v "Success: no issues found in 1 source file"
+
 echo mypy kml.py
 mypy kml.py | egrep -v "^Success"
 

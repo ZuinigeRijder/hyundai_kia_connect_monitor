@@ -7,10 +7,11 @@
   - [MQTT-Explorer screenshot after running summary.py](#mqtt-explorer-screenshot-after-running-summarypy)
   - [MQTT-Explorer screenshot after running dailystats.py:](#mqtt-explorer-screenshot-after-running-dailystatspy)
 - [Domoticz](#domoticz)
-- [Configuration of gspread for "python summary.py sheetupdate" and "python dailystats.py sheetupdate"](#configuration-of-gspread-for-python-summarypy-sheetupdate-and-python-dailystatspy-sheetupdate)
+- [Configuration of gspread for "python summary.py sheetupdate", "python dailystats.py sheetupdate" and "python tripmaker sheetupdate"](#configuration-of-gspread-for-python-summarypy-sheetupdate-python-dailystatspy-sheetupdate-and-python-tripmaker-sheetupdate)
 - [summary.py](#summarypy)
 - [summary.py sheetupdate](#summarypy-sheetupdate)
 - [dailystats.py](#dailystatspy)
+- [tripmaker.py](#tripmakerpy)
 - [kml.py](#kmlpy)
 - [shrink.py](#shrinkpy)
 - [debug.py](#debugpy)
@@ -27,6 +28,7 @@
   - [monitor.csv](#monitorcsv)
   - [python summary.py](#python-summarypy)
   - [python dailystats.py](#python-dailystatspy)
+  - [python tripmaker.py](#python-tripmakerpy)
   - [python kml.py](#python-kmlpy)
   - [python shrink.py](#python-shrinkpy)
 - [Avoid waking up your car (forced updates or sending commands with Apps or Tools)](#avoid-waking-up-your-car-forced-updates-or-sending-commands-with-apps-or-tools)
@@ -42,7 +44,7 @@ Best of all is the fact that it does NOT drain your 12-volt battery of the car, 
 
 Examples of supported cars (including cars with newer [ccNC Infotainment](https://ifdesign.com/en/winner-ranking/project/hyundai-ccnc-infotainment-system-seon/568244)):
 - Hyundai (Bluelink): Ioniq, IONIQ 5, IONIQ 6, Kona
-- Kia (Connect): EV6, EV9, Niro, Soul
+- Kia (Connect): EV6, EV9, EV3, EV2, Niro, Soul
 
 [Here a video](https://www.youtube.com/watch?feature=player_embedded&v=W5syq4uqo7U) with some nice diagrams in a Google Sheet, showing:
 
@@ -77,6 +79,9 @@ Example screenshots showing the results in a Google Sheet:
 - Summary
 ![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/summary.py_GoogleSpreadsheet.png)
 
+- Tripmaker
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/tripmaker.py_GoogleSpreadsheet.png)
+
 Run monitor.py e.g. once per hour or infinite (I use it on a Raspberry Pi and on Windows 11 with pure Python, but it will also run on MacOS or a Linux operating system) and you can always check afterwards:
 - captured locations
 - odometer at specific day/hour
@@ -100,6 +105,7 @@ The following tools are available as pure Python3 scripts:
 - monitor.py: Simple Python3 script to monitor values using [hyundai_kia_connect_api](https://github.com/Hyundai-Kia-Connect/hyundai_kia_connect_api)
 - summary.py: make summary per TRIP, DAY, WEEK, MONTH, YEAR with monitor.csv as input
 - dailystats.py: represent the gathered daily statistics and trip info in a nice formatted text, including computed totals.
+- tripmaker.py: generate a trip report
 - kml.py: transform the monitor.csv data to monitor.kml, so you can use it in e.g. Google My Maps to see on a map the captured locations
 - shrink.py: Simple Python3 script to shrink monitor.csv, identical lines removed (first date/time column excluded)
 - debug.py: same sort of Python script as monitor.py, but debug logging enabled and all the (internal) data is just printed to standard output in pretty print
@@ -706,7 +712,7 @@ In the file "monitor.cfg" there is a configuration section for domoticz. [See co
 *Note: only when there is something added when running monitor.py (in monitor.csv, monitor.tripinfo.csv and/or monitor.dailystats.csv) the corresponding line is split and sent to Domoticz. You can trigger this for testing by e.g. removing the last line of monitor.csv , monitor.tripinfo.csv and/or monitor.dailystats.csv. However, summary.py and dailystats.py will always send the latest values to Domoticz.*
 
 ---
-# Configuration of gspread for "python summary.py sheetupdate" and "python dailystats.py sheetupdate"
+# Configuration of gspread for "python summary.py sheetupdate", "python dailystats.py sheetupdate" and "python tripmaker sheetupdate"
 
 :
 *Note: For updating Google Sheets by summary.py and dailystats.py, additional python package(s) installation are required that are not installed by default, using the package gspread, see [requirements-gspread.txt](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/requirements-gspread.txt)*
@@ -735,6 +741,7 @@ Follow the steps in this link above, here is the summary of these steps:
   - In Google Sheets, create an empty Google Sheet with the name: hyundai-kia-connect-monitor or monitor.VIN (latter if vin=VIN is given as parameter)
   - Go to your Google Sheet and share it with the client_email from the step above (inside service_account.json)
   - In Google Sheets, create an empty Google Sheet with the name: monitor.dailystats or monitor.dailystats.VIN (latter if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google Sheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and change e.g. diagram titles into your own language.
+  - In Google Sheets, create an empty Google Sheet with the name: monitor.tripmaker or monitor.tripmaker.VIN (latter if vin=VIN is given as parameter).
   - Go to your Google Sheet and share it with the client_email from the step above (inside service_account.json).
   - How to share a Google Sheet:
     1. Open the Sheet you want to share (that you own or have edit access to).
@@ -744,9 +751,10 @@ Follow the steps in this link above, here is the summary of these steps:
     5. Click Send.
 4. run "python summary.py sheetupdate" and if everything is correct, the hyundai-kia-connect-monitor or monitor.VIN spreadheet will be updated with a summary and the last 122 lines of standard output
 5. run "python dailystats.py sheetupdate" and if everything is correct, the monitor.dailystats or monitor.dailystats.VIN spreadheet will be updated with the last 122 lines of standard output
-6. configure to run "python summary.py sheetupdate" regularly, after having run "python monitor.py"
-7. configure to run "python dailystats.py sheetupdate" regularly, after having run "python summary.py sheetupdate"
-8.
+6. run "python tripmaker.py sheetupdate" and if everything is correct, the monitor.tripmaker or monitor.tripmaker.VIN spreadheet will be updated with the last 1000 lines of standard output
+7. configure to run "python summary.py sheetupdate" regularly, after having run "python monitor.py"
+8. configure to run "python dailystats.py sheetupdate" regularly, after having run "python summary.py sheetupdate"
+9. configure to run "python tripmaker.py sheetupdate" regularly, after having run "python summary.py sheetupdate"
 ---
 # summary.py
 make summary per TRIP, DAY, WEEK, MONTH, YEAR or a combination with monitor.csv as input or monitor.VIN.csv (latter if vin=VIN is given as parameter). Support for Domoticz and/or MQTT Broker (e.g. HomeAssistant, ioBroker).
@@ -904,6 +912,56 @@ INPUT:
 OUTPUT:
 - standard output: totals, daily and tripinfo statistics in a nice formatted text, including charge information using summary.charge.csv
 - Google Sheet update with name: monitor.dailystats or monitor.dailystats.VIN (latter if vin=VIN is given as parameter)
+
+---
+# tripmaker.py
+Generate a trip report.
+Note:
+-  you must have run "python summary.py" before, because it relies on the generated summary.trip.csv
+
+For sheetupdate configure once gspread and a specific Google Sheet:
+- [See configuration of gspread here](#configuration-of-gspread-for-python-summarypy-sheetupdate-python-dailystatspy-sheetupdate-and-python-tripmaker-sheetupdate)
+- In Google Sheets, create an empty Google Sheet with the name: monitor.tripmaker or monitor.tripmaker.VIN (latter if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google Sheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and e.g. change diagram titles into your own language.
+- Go to your Google Sheet and share it with the client_email inside service_account.json created above
+
+Usage:
+```
+python tripmaker.py
+or
+python tripmaker.py sheetupdate
+or
+python tripmaker.py vin=VIN
+or
+python tripmaker.py vin=VIN sheetupdate
+```
+
+INPUT:
+- monitor.tripinfo.csv or monitor.tripinfo.VIN.csv (latter if vin=VIN is given as parameter)
+- summary.trip.csv or summary.trip.VIN.csv
+
+OUTPUT:
+- standard output: trips grouped per day
+- tripmaker.csv or tripmaker.VIN.csv: trips, comma separated
+- Google Sheet update with name: monitor.tripmaker or monitor.tripmaker.VIN (latter if vin=VIN is given as parameter)
+
+The following coolums are generated:
+- Date (Date of trip in format yyyy-mm-dd)
+- Index (index starts with 1 for each new day and increments per trip that day)
+- Trip (start time till end time in format hh:mm-hh:mm)
+- Odometer start
+- Odometer end
+- Distance
+- Start address
+- End address
+- Time (date and time of end address, as found in summary.trip.csv, in format yyy-mm-dd hh:mm)
+
+
+Notes:
+- monitor.tripinfo.csv contains the trips (each time the car is put to off and sending to the server is successfull) and this is used for populating the trips
+- summary.trip.csv is used to find the corresponding odometer and address begin and end.
+- - monitor.py needs to be run often enough to find the correct odometer and address begin/end. So check the results carefully.
+- - summary.py needs to be run before running tripmaker.py, to generate summary.trip.csv
+- copy/paste the (new) results in a separate file/spreadheet and modify the possible wrong data manually
 
 ---
 # kml.py
@@ -1306,6 +1364,65 @@ German screenshot of Google Sheet:
 - "pl" Polish (no translation yet)
 - ["fi" Finnish](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.dailystats.fi.logtrip)
 - ["pt" Portuguese](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.dailystats.pt.logtrip)
+
+----
+## python tripmaker.py
+
+The tripmaker.py [standard output of the tripmaker.csv file](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/test.tripmaker.log)
+```
+           Date Index        Trip    Odometer start      Odometer end    Distance                                                                                       Start address                                                                                         End address                Time
+     2023-01-02     1 16:06-16:12           21847.6           21850.6         3.0                                                                                                                                                                                                            2023-01-02 16:38
+     2023-01-02     2 16:29-16:35           21847.6           21850.6         3.0                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"    2023-01-02 16:38
+     2023-01-03     1 12:05-12:19           21851.5           21857.5         6.0                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"                  "29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland"    2023-01-03 12:22
+     2023-01-03     2 12:33-12:58           21830.5           21857.5        27.0                  "29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland"                  "29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland"    2023-01-03 12:22
+     2023-01-03     3 14:34-15:08           21837.5           21857.5        20.0                  "29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland"                  "29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland"    2023-01-03 12:22
+     2023-01-03     4 18:54-19:06           21850.5           21857.5         7.0                  "29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland"                  "29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland"    2023-01-03 12:22
+     2023-01-03     5 19:21-19:29           21912.9           21919.9         7.0                  "29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland"                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"    2023-01-03 19:32
+     2023-01-04     1 13:37-13:56           21900.9           21919.9        19.0                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"    2023-01-03 19:32
+     2023-01-04     2 16:24-16:45           21899.9           21919.9        20.0                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"    2023-01-03 19:32
+     2023-01-06     1 08:18-08:25           21918.9           21919.9         1.0                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"    2023-01-03 19:32
+     2023-01-06     2 08:42-08:46           21918.9           21919.9         1.0                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"    2023-01-03 19:32
+     2023-01-06     3 14:14-14:22           21914.9           21919.9         5.0                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"    2023-01-03 19:32
+     2023-01-06     4 16:00-16:08           21969.1           21973.1         4.0                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"    2023-01-06 16:08
+     2023-01-07     1 13:03-13:08           21971.1           21973.1         2.0                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"    2023-01-06 16:08
+     2023-01-07     2 13:18-13:21           21973.1           21973.1         0.0                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"    2023-01-06 16:08
+     2023-01-07     3 13:28-13:31           21976.2           21977.2         1.0                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"    2023-01-07 13:34
+     2023-01-08     1 10:01-11:03           21900.2           21977.2        77.0                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"    2023-01-07 13:34
+     2023-01-08     2 11:36-11:38           21977.2           21977.2         0.0                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"    2023-01-07 13:34
+     2023-01-08     3 16:07-17:08           22056.2           22132.2        76.0                           "115; Kerkstraat; Parkhof; Weert; Limburg; Nederland; 6006 KM; Nederland"                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"    2023-01-08 17:13
+     2023-01-10     1 13:10-13:22           22132.6           22140.6         8.0                                                       "9;Kwakstraat; Duckstad; Nederland; 7054; AN"     "Boerenbond; Ovito; Vijfhoeven; Vlijmen; Heusden; Noord-Brabant; Nederland; 5251 BZ; Nederland"    2023-01-10 13:24
+
+```
+
+
+Example output of [tripmaker.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/tripmaker.csv)
+```
+Date,Index,Trip,Odometer start,Odometer end,Distance,Start address,End address,Time
+2023-01-02,1,16:06-16:12,21847.6,21850.6,3.0,,,2023-01-02 16:38
+2023-01-02,2,16:29-16:35,21847.6,21850.6,3.0,"9;Kwakstraat; Duckstad; Nederland; 7054; AN","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-02 16:38
+2023-01-03,1,12:05-12:19,21851.5,21857.5,6.0,"9;Kwakstraat; Duckstad; Nederland; 7054; AN","29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland",2023-01-03 12:22
+2023-01-03,2,12:33-12:58,21830.5,21857.5,27.0,"29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland","29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland",2023-01-03 12:22
+2023-01-03,3,14:34-15:08,21837.5,21857.5,20.0,"29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland","29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland",2023-01-03 12:22
+2023-01-03,4,18:54-19:06,21850.5,21857.5,7.0,"29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland","29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland",2023-01-03 12:22
+2023-01-03,5,19:21-19:29,21912.9,21919.9,7.0,"29a; Westeinde; Besoijen; Waalwijk; Noord-Brabant; Nederland; 5141 AA; Nederland","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-03 19:32
+2023-01-04,1,13:37-13:56,21900.9,21919.9,19.0,"9;Kwakstraat; Duckstad; Nederland; 7054; AN","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-03 19:32
+2023-01-04,2,16:24-16:45,21899.9,21919.9,20.0,"9;Kwakstraat; Duckstad; Nederland; 7054; AN","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-03 19:32
+2023-01-06,1,08:18-08:25,21918.9,21919.9,1.0,"9;Kwakstraat; Duckstad; Nederland; 7054; AN","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-03 19:32
+2023-01-06,2,08:42-08:46,21918.9,21919.9,1.0,"9;Kwakstraat; Duckstad; Nederland; 7054; AN","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-03 19:32
+2023-01-06,3,14:14-14:22,21914.9,21919.9,5.0,"9;Kwakstraat; Duckstad; Nederland; 7054; AN","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-03 19:32
+2023-01-06,4,16:00-16:08,21969.1,21973.1,4.0,"9;Kwakstraat; Duckstad; Nederland; 7054; AN","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-06 16:08
+2023-01-07,1,13:03-13:08,21971.1,21973.1,2.0,"9;Kwakstraat; Duckstad; Nederland; 7054; AN","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-06 16:08
+2023-01-07,2,13:18-13:21,21973.1,21973.1,0.0,"9;Kwakstraat; Duckstad; Nederland; 7054; AN","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-06 16:08
+2023-01-07,3,13:28-13:31,21976.2,21977.2,1.0,"9;Kwakstraat; Duckstad; Nederland; 7054; AN","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-07 13:34
+2023-01-08,1,10:01-11:03,21900.2,21977.2,77.0,"9;Kwakstraat; Duckstad; Nederland; 7054; AN","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-07 13:34
+2023-01-08,2,11:36-11:38,21977.2,21977.2,0.0,"9;Kwakstraat; Duckstad; Nederland; 7054; AN","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-07 13:34
+2023-01-08,3,16:07-17:08,22056.2,22132.2,76.0,"115; Kerkstraat; Parkhof; Weert; Limburg; Nederland; 6006 KM; Nederland","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-08 17:13
+2023-01-10,1,13:10-13:22,22132.6,22140.6,8.0,"9;Kwakstraat; Duckstad; Nederland; 7054; AN","Boerenbond; Ovito; Vijfhoeven; Vlijmen; Heusden; Noord-Brabant; Nederland; 5251 BZ; Nederland",2023-01-10 13:24
+2023-01-10,2,13:26-13:38,22140.9,22148.9,8.0,"Boerenbond; Ovito; Vijfhoeven; Vlijmen; Heusden; Noord-Brabant; Nederland; 5251 BZ; Nederland","9;Kwakstraat; Duckstad; Nederland; 7054; AN",2023-01-10 13:41
+```
+
+Example screenshot of Google spreadsheet generated with parameter sheetupdate:
+![alt text](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/tripmaker.py_GoogleSpreadsheet.png)
 
 ----
 ## python kml.py

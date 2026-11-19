@@ -37,6 +37,9 @@ call :COPY_INPUT
 
 call :CHECK_SUMMARY trip test.summary.logtrip
 rem summary.day.csv will not be filled
+
+call :CHECK_TRIPMAKER sheetupdate test.tripmaker.log
+
 call :CHECK_DAILYSTATS "" test.dailystats.logtrip
 
 call :CHECK_SUMMARY day test.summary.logday
@@ -155,6 +158,27 @@ if "%args%" == "sheetupdate" (
     %SED% -e "1s?^1: A: \[Last run\], B: \[20.*?1: A: [Last run], B: [20...?" monitor.dailystats.dump > monitor.dailystats.dump.tmp
 
     call :CHECK_FILE monitor.dailystats.dump.tmp monitor.dailystats.dump
+)
+
+EXIT /B
+
+rem #######################
+:CHECK_TRIPMAKER
+set args=%1
+set output=%2
+IF "%~1" == "" set args=
+
+echo ################## python tripmaker.py %args% ^> %output% #############
+call python tripmaker.py %args% > %output%
+
+call :CHECK_FILE %output% %output%
+call :CHECK_FILE tripmaker.csv tripmaker.csv
+
+if "%args%" == "sheetupdate" (
+    if "%FULL%" == "" exit /B
+    call python tests\dump_sheet.py monitor.tripmaker > monitor.tripmaker.dump
+
+    call :CHECK_FILE monitor.tripmaker.dump monitor.tripmaker.dump
 )
 
 EXIT /B
