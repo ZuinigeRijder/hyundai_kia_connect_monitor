@@ -921,7 +921,7 @@ Note:
 
 For sheetupdate configure once gspread and a specific Google Sheet:
 - [See configuration of gspread here](#configuration-of-gspread-for-python-summarypy-sheetupdate-python-dailystatspy-sheetupdate-and-python-tripmaker-sheetupdate)
-- In Google Sheets, create an empty Google Sheet with the name: monitor.tripmaker or monitor.tripmaker.VIN (latter if vin=VIN is given as parameter). If you want nice diagrams, you can copy this [example Google Sheet](https://docs.google.com/spreadsheets/d/1WwdosLQ0ViTHct_kBSNddnd-H3IUc604_Tz-0dgYI9A/edit?usp=sharing) and e.g. change diagram titles into your own language.
+- In Google Sheets, create an empty Google Sheet with the name: monitor.tripmaker or monitor.tripmaker.VIN (latter if vin=VIN is given as parameter).
 - Go to your Google Sheet and share it with the client_email inside service_account.json created above
 
 Usage:
