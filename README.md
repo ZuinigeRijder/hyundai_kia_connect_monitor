@@ -1368,7 +1368,7 @@ German screenshot of Google Sheet:
 ----
 ## python tripmaker.py
 
-The tripmaker.py [standard output of the tripmaker.csv file](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/test.tripmaker.log)
+The tripmaker.py [standard output of the tripmaker.csv file](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/test.tripmaker.log)
 ```
            Date Index        Trip    Odometer start      Odometer end    Distance                                                                                       Start address                                                                                         End address                Time
      2023-01-02     1 16:06-16:12           21847.6           21850.6         3.0                                                                                                                                                                                                            2023-01-02 16:38
@@ -1395,7 +1395,7 @@ The tripmaker.py [standard output of the tripmaker.csv file](https://raw.githubu
 ```
 
 
-Example output of [tripmaker.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/examples/tripmaker.csv)
+Example output of [tripmaker.csv](https://raw.githubusercontent.com/ZuinigeRijder/hyundai_kia_connect_monitor/main/tests/OUTPUT/tripmaker.csv)
 ```
 Date,Index,Trip,Odometer start,Odometer end,Distance,Start address,End address,Time
 2023-01-02,1,16:06-16:12,21847.6,21850.6,3.0,,,2023-01-02 16:38
