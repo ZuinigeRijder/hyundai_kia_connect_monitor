@@ -1051,7 +1051,7 @@ Steps:
 1. create a directory hyundai_kia_connect_monitor in your home directory
 2. copy hyundai_kia_connect_api as subdirectory of directory hyundai_kia_connect_monitor
 3. copy run_monitor_infinite.sh, monitor.py, monitor.cfg, monitor.translations.csv, monitor_utils.py, domoticz_utils.py, mqtt_utils.py, summary.py, summary.cfg, dailystats.py, kml.py, debug.py and logging_config.ini
-4. change inside monitor.cfg the appropriate hyundai_kia_connect settings, e.g. monitor_infinite = True and monitor_execute_commands_when_something_written_or_error = /usr/bin/python -u ~/hyundai_kia_connect_monitor/summary.py sheetupdate > summary.log;/usr/bin/python -u ~/hyundai_kia_connect_monitor/dailystats.py sheetupdate > dailystats.log
+4. change inside monitor.cfg the appropriate hyundai_kia_connect settings, e.g. monitor_infinite = True and monitor_execute_commands_when_something_written_or_error = /usr/bin/python -u ~/hyundai_kia_connect_monitor/summary.py sheetupdate > summary.log;/usr/bin/python -u ~/hyundai_kia_connect_monitor/dailystats.py sheetupdate > dailystats.log;/usr/bin/python -u ~/hyundai_kia_connect_monitor/tripmaker.py sheetupdate > tripmaker.log
 5. chmod +x ~/hyundai_kia_connect_monitor/run_monitor_infinite.sh
 
 Add to your crontab to run once per hour to restart after crashes or reboot (crontab -e)
